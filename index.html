@@ -342,37 +342,15 @@
             border: 4px solid #fff;
             box-shadow: inset 0 0 0 2px #000;
             width: 100%;
-            padding: 12px 8px 8px 8px; /* 上部にバナー分の余白を確保 */
+            padding: 10px 8px;
             margin-bottom: 6px;
             text-align: center;
             position: relative;
         }
 
-        .streak-banner {
-            position: absolute;
-            top: 4px; /* ウィンドウ内の上部に配置してふりがなに被らないように調整 */
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ffcc00;
-            color: #000;
-            font-size: 0.75rem;
-            padding: 1px 8px;
-            border: 2px solid #fff;
-            font-weight: bold;
-            display: none;
-            animation: streak-jump 0.3s infinite alternate;
-            z-index: 10;
-        }
-
-        @keyframes streak-jump {
-            0% { transform: translateX(-50%) translateY(0); }
-            100% { transform: translateX(-50%) translateY(-2px); }
-        }
-
         .rpg-kana {
             font-size: 0.95rem;
             color: var(--accent-color);
-            margin-top: 4px; /* バナーとの間に少し隙間を持たせる */
             margin-bottom: 2px;
             min-height: 18px;
         }
@@ -485,7 +463,7 @@
 
     <div class="arcade-cabinet">
         <div class="top-bar">
-            <span>🎵 ファミコンちびっこBGM</span>
+            <span>🎵 BGM</span>
             <button id="bgm-btn" class="bgm-toggle-btn" onclick="toggleBGM()">BGM: OFF</button>
         </div>
 
@@ -604,7 +582,6 @@
             </div>
 
             <div class="rpg-window">
-                <div id="streak-banner" class="streak-banner">2もんれんぞくせいかい中！</div>
                 <div class="rpg-kana" id="kana-display">いんいちがいち</div>
                 <div class="rpg-problem" id="problem-display">1 × 1</div>
             </div>
@@ -789,16 +766,33 @@
             } else if (mode === 'battle') {
                 melody = [220.00, 220.00, 329.63, 220.00, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94, 220.00, 196.00, 164.81];
                 tempo = 180;
+            } else if (mode === 'nextworld') {
+                // 魔王城：低音の重厚感と厳かな戦闘曲風 (トライアングル/パルス波で荘厳に)
+                melody = [130.81, 130.81, 155.56, 130.81, 116.54, 130.81, 146.83, 155.56, 174.61, 155.56, 146.83, 130.81, 110.00, 116.54, 130.81, 0];
+                tempo = 210;
             } else if (mode === 'spring') {
-                melody = [392.00, 523.25, 659.25, 783.99, 659.25, 523.25, 440.00, 523.25];
-                tempo = 350;
+                // いやしのいずみ：かわいい、幻想的、癒やしのアルペジオ風
+                melody = [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25, 587.33, 659.25, 783.99, 987.77, 783.99, 659.25];
+                tempo = 300;
             }
 
             bgmTimer = setInterval(() => {
                 if (!bgmEnabled) return;
                 const freq = melody[step % melody.length];
                 if (freq > 0) {
-                    playTone(freq, tempo / 1000 * 0.8, mode === 'battle' ? 'sawtooth' : 'square', 0.02);
+                    let waveType = 'square';
+                    let vol = 0.02;
+                    if (mode === 'battle') {
+                        waveType = 'sawtooth';
+                        vol = 0.025;
+                    } else if (mode === 'nextworld') {
+                        waveType = 'sawtooth';
+                        vol = 0.025; // 厳かかつ強そうな重み
+                    } else if (mode === 'spring') {
+                        waveType = 'triangle'; // 柔らかく癒やしのある音色
+                        vol = 0.025;
+                    }
+                    playTone(freq, tempo / 1000 * 0.8, waveType, vol);
                 }
                 step++;
             }, tempo);
@@ -992,7 +986,6 @@
         let isAnswered = false;
         let stageEarnedExp = 0;
         let currentBattleHp = 5;
-        let correctStreak = 0;
 
         let springStage = 1;
         let springIsNextWorld = false;
@@ -1158,7 +1151,7 @@
 
         function showNextWorldSelect() {
             setWorldTheme(true);
-            playBGM('battle');
+            playBGM('nextworld');
             const container = document.getElementById('next-world-list-container');
             container.innerHTML = '';
 
@@ -1224,10 +1217,8 @@
             isAnswered = false;
             stageEarnedExp = 0;
             currentBattleHp = saveData.hp;
-            correctStreak = 0;
-            updateStreakDisplay();
             setWorldTheme(true);
-            playBGM('battle');
+            playBGM('nextworld');
 
             const totalCount = getNextWorldProblemCount(lvl);
             problemsQueue = generateNextWorldProblems(lvl, totalCount);
@@ -1258,8 +1249,6 @@
             isAnswered = false;
             stageEarnedExp = 0;
             currentBattleHp = saveData.hp;
-            correctStreak = 0;
-            updateStreakDisplay();
             setWorldTheme(false);
             playBGM('battle');
 
@@ -1302,16 +1291,6 @@
 
             saveData.hp = currentBattleHp;
             updatePersistentStatus();
-        }
-
-        function updateStreakDisplay() {
-            const banner = document.getElementById('streak-banner');
-            if (correctStreak >= 2) {
-                banner.textContent = `${correctStreak}もんれんぞくせいかい中！`;
-                banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
         }
 
         function loadCurrentProblem() {
@@ -1362,8 +1341,6 @@
             if (userInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
                     isAnswered = true;
-                    correctStreak++;
-                    updateStreakDisplay();
 
                     showPopup("こうげき ヒット！");
                     playHitSound();
@@ -1414,9 +1391,6 @@
                     playDamageSound();
                     currentBattleHp--;
                     saveData.hp = currentBattleHp;
-                    
-                    correctStreak = 0;
-                    updateStreakDisplay();
                     
                     if (isNextWorldMode) {
                         saveData.failedIsNextWorld = true;
