@@ -864,7 +864,7 @@
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="showProfile()">🦭 ぼうけんしゃカード</button>
+                <button class="retro-btn" onclick="showProfile()">📋️ ぼうけんしゃカード</button>
                 <button class="retro-btn" onclick="openSpecialPractice()">⚔️ とっくん</button>
                 <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
             </div>
@@ -1275,15 +1275,15 @@
 
         const kukuData = {
             1: {
-                1: { first: "いんいちがいち", second: "いち" },
-                2: { first: "いんにがに", second: "に" },
-                3: { first: "いんさんがさん", second: "さん" },
-                4: { first: "いんしがし", second: "し" },
-                5: { first: "いんごがご", second: "ご" },
-                6: { first: "いんろくがろく", second: "ろく" },
-                7: { first: "いんしちがしち", second: "しち" },
-                8: { first: "いんはちがはち", second: "はち" },
-                9: { first: "いんくがく", second: "く" }
+                1: { first: "いんいちが", second: "いち" },
+                2: { first: "いんにが", second: "に" },
+                3: { first: "いんさんが", second: "さん" },
+                4: { first: "いんしが", second: "し" },
+                5: { first: "いんごが", second: "ご" },
+                6: { first: "いんろくが", second: "ろく" },
+                7: { first: "いんしちが", second: "しち" },
+                8: { first: "いんはちが", second: "はち" },
+                9: { first: "いんくが", second: "く" }
             },
             2: {
                 1: { first: "にいちが", second: "に" },
@@ -1389,40 +1389,40 @@
         };
 
         const MONSTER_DATA = {
-            1: { icon: "🌱", name: "プチビビ" },
-            2: { icon: "🟢", name: "モチモチ" },
-            5: { icon: "⭐", name: "ピカテング" },
-            3: { icon: "👺", name: "トゲトゲ" },
-            4: { icon: "💀", name: "ゴースト" },
+            1: { icon: "🌱", name: "スプラー" },
+            2: { icon: "🟢", name: "モスリン" },
+            5: { icon: "⭐", name: "キラリン" },
+            3: { icon: "👺", name: "ピノッキー" },
+            4: { icon: "💀", name: "スカルル" },
             6: { icon: "👹", name: "ヤマオニ" },
-            7: { icon: "🗿", name: "ストーン" },
+            7: { icon: "🗿", name: "モアイーノ" },
             8: { icon: "🦅", name: "アイスバード" },
             9: { icon: "🐲", name: "ドラゴン" }
         };
 
         const RANDOM_MONSTER_DATA = {
-            1: { icon: "🌱", name: "プカプカポコポコ" },
-            2: { icon: "🟢", name: "ランランニノノ" },
-            5: { icon: "⭐", name: "ピカピカキラキラ" },
-            3: { icon: "👺", name: "ガガガギギギ" },
-            4: { icon: "💀", name: "ウロウロドギマギ" },
-            6: { icon: "👹", name: "ドスンバスン" },
-            7: { icon: "🗿", name: "カチカチゴロゴロ" },
-            8: { icon: "🦅", name: "ヒュードロドロ" },
-            9: { icon: "🐲", name: "ギガゴガガーン" }
+            1: { icon: "🌱", name: "スプラウトンガ" },
+            2: { icon: "🟢", name: "モスズーン" },
+            5: { icon: "⭐", name: "シュティンガー" },
+            3: { icon: "👺", name: "ビノギオン" },
+            4: { icon: "💀", name: "スカルンガー" },
+            6: { icon: "👹", name: "ワルイゴイネガー" },
+            7: { icon: "🗿", name: "ホリブカーン" },
+            8: { icon: "🦅", name: "ファイアーファルコン" },
+            9: { icon: "🐲", name: "ギガンテス" }
         };
 
         const NEXT_WORLD_MONSTER_DATA = {
-            1: { icon: "🦇", name: "暗黒バット" },
+            1: { icon: "🦇", name: "あんこくバット" },
             2: { icon: "💀", name: "スケルトンナイト" },
-            3: { icon: "👁️", name: "魔眼のストーカー" },
+            3: { icon: "👁️", name: "まがんアイリス" },
             4: { icon: "🦂", name: "ヴェノムスコーピオン" },
             5: { icon: "👻", name: "ファントムスペクター" },
             6: { icon: "🛡️", name: "アイアンゴーレム" },
             7: { icon: "⚔️", name: "ダークソードマン" },
             8: { icon: "🧊", name: "フロストデーモン" },
             9: { icon: "🔥", name: "フレイムキメラ" },
-            10: { icon: "👿", name: "魔王ギガデウス" }
+            10: { icon: "😈", name: "魔王ギガデウス" }
         };
 
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
