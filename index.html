@@ -1359,7 +1359,7 @@
             7: { icon: "⚔️", name: "ダークソードマン" },
             8: { icon: "🧊", name: "フロストデーモン" },
             9: { icon: "🔥", name: "フレイムキメラ" },
-            10: { icon: "👿", name: "魔王ギガデウス" }
+            10: { icon: "😈", name: "魔王ギガデウス" }
         };
 
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
@@ -1873,10 +1873,9 @@
                             stopBGM();
                             playVictoryFanfare();
                             setTimeout(() => { completeStage(); }, 1200);
-                        } else {
-                            registerProfileAnswer(false);
-                            loadCurrentProblem();
-                        }
+} else {
+    loadCurrentProblem();
+}
                     });
                 } else {
                     playDamageSound();
