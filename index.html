@@ -779,9 +779,9 @@
                 <h1>ゆうしゃの いえ</h1>
                 <p class="subtitle">きょうも くくの しゅぎょうじゃ！</p>
             </div>
-            <div class="field-box" style="height: 150px; padding: 8px;">
+            <div class="field-box" style="height: 150px;">
                 <img id="home-hero-icon" class="hero-img" src="image/boy-1.png" alt="主人公">
-                <p id="home-last-adventure" style="font-size: 0.78rem; color: #8ef; margin-top: 3px;">さいごの ぼうけん：まだ ありません</p>
+                <p id="home-last-adventure" style="font-size: 0.78rem; color: #8ef; margin-top: 5px;">さいごの ぼうけん：まだ ありません</p>
             </div>
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
@@ -801,9 +801,18 @@
             </div>
 
             <div class="profile-card">
-                <div class="profile-hero" id="profile-hero-icon"></div>
+                <div class="profile-characters" style="display:flex; justify-content:center; align-items:flex-end; gap:18px; margin-bottom:8px;">
+                    <div style="text-align:center;">
+                        <img id="profile-hero-icon" class="hero-img" src="image/boy-1.png" alt="主人公">
+                        <div style="font-size:0.7rem; color:#aaa;">しゅじんこう</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <img id="profile-companion-icon" class="hero-img" src="image/pet-1.png" alt="あいぼう">
+                        <div style="font-size:0.7rem; color:#aaa;">あいぼう</div>
+                    </div>
                 </div>
                 <button class="retro-btn secondary" onclick="openCharacterSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">👥 キャラクターをかえる</button>
+                <button class="retro-btn secondary" onclick="openCompanionSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🐾 あいぼうをえらぶ</button>
                 <div class="profile-name" id="profile-name">ゆうしゃ</div>
                 <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
 
@@ -1278,6 +1287,7 @@
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
             playerName: "ゆうしゃ",
             heroIcon: "image/boy-1.png",
+            companionIcon: "image/pet-1.png",
             lastAdventureAt: null,
             unlockedStages: [1],
             clearedStages: [],
@@ -1298,6 +1308,7 @@
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.heroIcon === 'undefined') saveData.heroIcon = "image/boy-1.png";
+        if (typeof saveData.companionIcon === 'undefined') saveData.companionIcon = "image/pet-1.png";
         if (typeof saveData.lastAdventureAt === 'undefined') saveData.lastAdventureAt = null;
         if (!saveData.stageClearCounts) saveData.stageClearCounts = {};
         if (!saveData.nextWorldClearCounts) saveData.nextWorldClearCounts = {};
@@ -1442,7 +1453,8 @@
             if (hero) {
                 hero.src = saveData.heroIcon || "image/boy-1.png";
             }
-if (lastAdventure) {
+
+            if (lastAdventure) {
                 if (saveData.lastAdventureAt) {
                     const d = new Date(saveData.lastAdventureAt);
                     if (!Number.isNaN(d.getTime())) {
@@ -2209,7 +2221,53 @@ if (lastAdventure) {
             showPopup(`${targetChar.name}に かえたよ！`);
         }
 
-                const PROFILE_TITLES = [
+        const AVAILABLE_COMPANIONS = [
+            { path: "image/pet-1.png", name: "あいぼう 1", minLevel: 1 },
+            { path: "image/pet-2.png", name: "あいぼう 2", minLevel: 5 },
+            { path: "image/pet-3.png", name: "あいぼう 3", minLevel: 10 },
+            { path: "image/pet-4.png", name: "あいぼう 4", minLevel: 15 },
+            { path: "image/pet-5.png", name: "あいぼう 5", minLevel: 20 }
+        ];
+        if (!AVAILABLE_COMPANIONS.some(c => c.path === saveData.companionIcon)) {
+            saveData.companionIcon = "image/pet-1.png";
+            saveGameData();
+        }
+
+
+        function openCompanionSelect() {
+            const currentLevel = Number(saveData.level) || 1;
+            let listHtml = AVAILABLE_COMPANIONS.map((item, idx) => {
+                const isUnlocked = currentLevel >= item.minLevel;
+                const statusStr = isUnlocked
+                    ? "【えらべる】"
+                    : `【🔒 Lv.${item.minLevel}でアンロック】`;
+                return `${idx + 1}: ${item.name} ${statusStr}`;
+            }).join("\n");
+
+            let selectNum = prompt(
+                `どの あいぼうに する？（番号を入力してね）\n\n${listHtml}`,
+                "1"
+            );
+            if (selectNum === null) return;
+
+            const index = parseInt(selectNum, 10) - 1;
+            if (index >= 0 && index < AVAILABLE_COMPANIONS.length) {
+                const target = AVAILABLE_COMPANIONS[index];
+                if (currentLevel >= target.minLevel) {
+                    saveData.companionIcon = target.path;
+                    saveGameData();
+                    updateProfileScreen();
+                    updateHomeScreen();
+                    showPopup(`${target.name}を えらんだよ！`);
+                } else {
+                    alert(`レベルが たりません！ (Lv.${target.minLevel}以上でアンロック)`);
+                }
+            } else {
+                alert("ただしい 番号を 入力してね！");
+            }
+        }
+
+        const PROFILE_TITLES = [
             { name: "はじめての ぼうけんしゃ", icon: "🌱", condition: () => saveData.totalCorrect >= 1 },
             { name: "はらっぱの ぼうけんしゃ", icon: "🌿", condition: () => saveData.clearedStages.includes(1) },
             { name: "九九 見習い", icon: "⭐", condition: () => saveData.clearedStages.length >= 3 },
