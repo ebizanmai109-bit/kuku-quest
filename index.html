@@ -930,7 +930,6 @@
             9: { icon: "🐲", name: "ドラゴン" }
         };
 
-        // ランダムモード専用のユニークな強敵データ
         const RANDOM_MONSTER_DATA = {
             1: { icon: "🌱", name: "プカプカポコポコ" },
             2: { icon: "🟢", name: "ランランニノノ" },
@@ -943,7 +942,6 @@
             9: { icon: "🐲", name: "ギガゴガガーン" }
         };
 
-        // 魔王軍（Lv.1〜10）のかっこいい専用データ
         const NEXT_WORLD_MONSTER_DATA = {
             1: { icon: "🦇", name: "暗黒バット" },
             2: { icon: "💀", name: "スケルトンナイト" },
@@ -961,6 +959,7 @@
             playerName: "ゆうしゃ",
             unlockedStages: [1],
             clearedStages: [],
+            randomClearCounts: {}, // ステージごとのランダムクリア回数
             level: 1,
             exp: 0,
             hp: 5,
@@ -976,6 +975,7 @@
         if (typeof saveData.failedStage === 'undefined') saveData.failedStage = 1;
         if (typeof saveData.failedIsNextWorld === 'undefined') saveData.failedIsNextWorld = false;
         if (typeof saveData.failedNextLevel === 'undefined') saveData.failedNextLevel = 1;
+        if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
         if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
         if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
 
@@ -991,7 +991,7 @@
         let isAnswered = false;
         let stageEarnedExp = 0;
         let currentBattleHp = 5;
-        let correctStreak = 0; // 連続正解数
+        let correctStreak = 0;
 
         let springStage = 1;
         let springIsNextWorld = false;
@@ -1115,7 +1115,8 @@
             const container = document.getElementById('stage-list-container');
             container.innerHTML = '';
 
-            const allStagesCleared = STAGE_ORDER.every(s => saveData.clearedStages.includes(s));
+            // 全ステージのランダム問題が1回以上クリアされているかチェック
+            const allRandomCleared = STAGE_ORDER.every(s => (saveData.randomClearCounts[s] || 0) > 0);
 
             STAGE_ORDER.forEach((stageNum) => {
                 const isUnlocked = saveData.unlockedStages.includes(stageNum);
@@ -1131,22 +1132,23 @@
                 container.appendChild(btn);
 
                 if (isCleared) {
+                    const randomCount = saveData.randomClearCounts[stageNum] || 0;
                     const randomBtn = document.createElement('div');
                     randomBtn.className = `stage-item random-mode`;
-                    randomBtn.textContent = `🎲 ${stageNum}のだん ランダム (EXP多め)`;
+                    randomBtn.textContent = `🎲 ${stageNum}のだん ランダム (${randomCount}回クリア)`;
                     randomBtn.onclick = () => startBattle(stageNum, true, false);
                     container.appendChild(randomBtn);
                 }
             });
 
             const nextAreaBtn = document.createElement('div');
-            nextAreaBtn.className = `stage-item ${allStagesCleared ? 'next-world' : 'locked'}`;
-            nextAreaBtn.textContent = allStagesCleared ? "🔮 まおうじょう (つぎの ぼうけん)" : "🔒 ？？？ (すべての だんを クリアすると…？)";
+            nextAreaBtn.className = `stage-item ${allRandomCleared ? 'next-world' : 'locked'}`;
+            nextAreaBtn.textContent = allRandomCleared ? "🔮 まおうじょう (つぎの ぼうけん)" : "🔒 まおうじょう (すべての だんの ランダムを クリアしよう！)";
             nextAreaBtn.onclick = () => {
-                if (allStagesCleared) {
+                if (allRandomCleared) {
                     showNextWorldSelect();
                 } else {
-                    alert("すべての だんを クリアすると、まおうじょうへの とびらが ひらくよ！");
+                    alert("すべての だんの ランダム問題を クリアすると、まおうじょうへの とびらが ひらくよ！");
                 }
             };
             container.appendChild(nextAreaBtn);
@@ -1162,12 +1164,20 @@
 
             for (let lvl = 1; lvl <= 10; lvl++) {
                 const isCleared = saveData.clearedNextLevels.includes(lvl);
+                // 前のレベル（lvl - 1）がクリアされている、またはLv.1なら解放
+                const isUnlocked = (lvl === 1) || saveData.clearedNextLevels.includes(lvl - 1);
                 const count = getNextWorldProblemCount(lvl);
                 const nwMonster = NEXT_WORLD_MONSTER_DATA[lvl] || { name: "魔王軍" };
+
                 const btn = document.createElement('div');
-                btn.className = `stage-item unlocked ${isCleared ? 'cleared' : ''}`;
-                btn.textContent = `Lv.${lvl} ${nwMonster.name} (${count}もん)`;
-                btn.onclick = () => startNextWorldBattle(lvl);
+                btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
+                btn.textContent = isUnlocked ? `Lv.${lvl} ${nwMonster.name} (${count}もん)` : `Lv.${lvl} ${nwMonster.name} [🔒 まえのレベルをクリアしてね]`;
+                
+                if (isUnlocked) {
+                    btn.onclick = () => startNextWorldBattle(lvl);
+                } else {
+                    btn.onclick = () => alert("前のレベルを クリアすると ちょうせん できるよ！");
+                }
                 container.appendChild(btn);
             }
 
@@ -1215,7 +1225,7 @@
             isAnswered = false;
             stageEarnedExp = 0;
             currentBattleHp = saveData.hp;
-            correctStreak = 0; // 連続正解リセット
+            correctStreak = 0;
             updateStreakDisplay();
             setWorldTheme(true);
             playBGM('battle');
@@ -1249,7 +1259,7 @@
             isAnswered = false;
             stageEarnedExp = 0;
             currentBattleHp = saveData.hp;
-            correctStreak = 0; // 連続正解リセット
+            correctStreak = 0;
             updateStreakDisplay();
             setWorldTheme(false);
             playBGM('battle');
@@ -1353,7 +1363,7 @@
             if (userInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
                     isAnswered = true;
-                    correctStreak++; // 連続正解数アップ
+                    correctStreak++;
                     updateStreakDisplay();
 
                     showPopup("こうげき ヒット！");
@@ -1406,10 +1416,9 @@
                     currentBattleHp--;
                     saveData.hp = currentBattleHp;
                     
-                    correctStreak = 0; // 間違えたら連続正解リセット
+                    correctStreak = 0;
                     updateStreakDisplay();
                     
-                    // 敗北した場所を記録（まおうじょうならフラグとレベルを保存）
                     if (isNextWorldMode) {
                         saveData.failedIsNextWorld = true;
                         saveData.failedNextLevel = currentNextLevel;
@@ -1462,7 +1471,7 @@
                 if (!saveData.clearedNextLevels.includes(currentNextLevel)) {
                     saveData.clearedNextLevels.push(currentNextLevel);
                 }
-            } else if (!isRandomMode) {
+            } else {
                 if (!saveData.clearedStages.includes(currentStage)) {
                     saveData.clearedStages.push(currentStage);
                 }
@@ -1472,6 +1481,10 @@
                     if (!saveData.unlockedStages.includes(nextStageNum)) {
                         saveData.unlockedStages.push(nextStageNum);
                     }
+                }
+                if (isRandomMode) {
+                    if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
+                    saveData.randomClearCounts[currentStage] = (saveData.randomClearCounts[currentStage] || 0) + 1;
                 }
             }
             saveData.hp = currentBattleHp;
@@ -1691,7 +1704,7 @@
             } else {
                 practiceIndex++;
                 if (practiceIndex >= 9) {
-                    alert(`${practiceStage}のだんの れんしゅうが おわったよ！`);
+                    alert(`${practiceStage}のだんの れんしゅうが おわったよ！`;
                     showPracticeStageSelect();
                 } else {
                     flashcardState = 0;
