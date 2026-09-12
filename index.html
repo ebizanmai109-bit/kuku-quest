@@ -299,8 +299,8 @@
         }
 
         .hero-img {
-            width: 64px;
-            height: 64px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
             image-rendering: pixelated;
         }
@@ -631,11 +631,113 @@
         #popup-msg.show {
             transform: translate(-50%, -50%) scale(1);
         }
+
+        /* キャラクター選択 */
+        .character-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.82);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+        }
+        .character-modal.show {
+            display: flex;
+        }
+        .character-modal-window {
+            width: min(460px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #050509;
+            border: 4px solid var(--accent-color);
+            box-shadow: 0 0 0 3px #000, 0 0 20px rgba(255,204,0,0.25);
+            padding: 12px;
+        }
+        .character-modal-title {
+            color: var(--accent-color);
+            font-size: 1.25rem;
+            margin-bottom: 4px;
+        }
+        .character-modal-subtitle {
+            color: #aaa;
+            font-size: 0.75rem;
+            margin-bottom: 10px;
+        }
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 7px;
+        }
+        .character-choice {
+            position: relative;
+            min-height: 125px;
+            background: #111;
+            border: 2px solid #444;
+            color: #fff;
+            cursor: pointer;
+            padding: 7px 4px;
+            font-family: 'DotGothic16';
+            text-align: center;
+        }
+        .character-choice.unlocked {
+            border-color: var(--accent-color);
+            background: #171700;
+        }
+        .character-choice.unlocked:hover {
+            background: #292900;
+        }
+        .character-choice.current {
+            box-shadow: inset 0 0 0 2px #fff;
+        }
+        .character-choice.locked {
+            color: #555;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+        .character-choice img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            display: block;
+            margin: 0 auto 3px;
+        }
+        .character-choice .char-name {
+            font-size: 0.72rem;
+            line-height: 1.2;
+        }
+        .character-choice .char-status {
+            font-size: 0.62rem;
+            margin-top: 3px;
+            color: #aaa;
+        }
+        .character-choice.unlocked .char-status {
+            color: #55ff55;
+        }
+        .character-choice.current .char-status {
+            color: #ffcc00;
+        }
+        .character-close-btn {
+            margin-top: 8px;
+        }
+
     </style>
 </head>
 <body id="body-root">
 
     <div id="popup-msg">せいかい！</div>
+
+    <div id="character-modal" class="character-modal" onclick="closeCharacterSelectIfOutside(event)">
+        <div class="character-modal-window" onclick="event.stopPropagation()">
+            <div class="character-modal-title">キャラクターを えらぼう！</div>
+            <div class="character-modal-subtitle" id="character-modal-subtitle">レベルが あがると あたらしい すがたが ひらくよ。</div>
+            <div id="character-grid" class="character-grid"></div>
+            <button class="retro-btn character-close-btn" onclick="closeCharacterSelect()">もどる</button>
+        </div>
+    </div>
+
 
     <div class="arcade-cabinet">
         <div class="top-bar">
@@ -1933,42 +2035,108 @@
         }
 
         // ========================================
-        // ぼうけんしゃカード ＆ キャラクター選択 (画像対応版)
+        // ぼうけんしゃカード ＆ キャラクター選択
         // ========================================
+        // 解放バランス：
+        // Lv.1 = girl-1 / boy-1
+        // Lv.3 = girl-2 / boy-2
+        // Lv.5 = girl-3 / boy-3
+        // Lv.7 = girl-4 / boy-4
+        // Lv.9 = girl-5 / boy-5
+        //
+        // 2レベルごとに新しい姿を解放することで、
+        // 「次の姿まであと少し」という目標を作りつつ、
+        // Lv.9で全10種類が揃う設計にしています。
 
         const AVAILABLE_CHARACTERS = [
-            { path: "image/girl-1.png", name: "女の子 (Lv.1)", minLevel: 1 },
-            { path: "image/boy-1.png", name: "男の子 (Lv.1)", minLevel: 1 },
-            { path: "image/girl-2.png", name: "女の子 Lv.3", minLevel: 3 },
-            { path: "image/boy-2.png", name: "男の子 Lv.3", minLevel: 3 }
+            { path: "image/girl-1.png", name: "女の子 1", minLevel: 1 },
+            { path: "image/boy-1.png",  name: "男の子 1", minLevel: 1 },
+
+            { path: "image/girl-2.png", name: "女の子 2", minLevel: 3 },
+            { path: "image/boy-2.png",  name: "男の子 2", minLevel: 3 },
+
+            { path: "image/girl-3.png", name: "女の子 3", minLevel: 5 },
+            { path: "image/boy-3.png",  name: "男の子 3", minLevel: 5 },
+
+            { path: "image/girl-4.png", name: "女の子 4", minLevel: 7 },
+            { path: "image/boy-4.png",  name: "男の子 4", minLevel: 7 },
+
+            { path: "image/girl-5.png", name: "女の子 5", minLevel: 9 },
+            { path: "image/boy-5.png",  name: "男の子 5", minLevel: 9 }
         ];
+        // 古いセーブデータで絵文字などが入っている場合は、最初の画像へ移行。
+        if (!AVAILABLE_CHARACTERS.some(c => c.path === saveData.heroIcon)) {
+            saveData.heroIcon = "image/boy-1.png";
+            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+        }
+
 
         function openCharacterSelect() {
-            const currentLevel = Number(saveData.level) || 1;
-            
-            let listHtml = AVAILABLE_CHARACTERS.map((item, idx) => {
-                const isUnlocked = currentLevel >= item.minLevel;
-                const statusStr = isUnlocked ? "【えらべる】" : `【🔒 Lv.${item.minLevel}でアンロック】`;
-                return `${idx + 1}: ${item.name} ${statusStr}`;
-            }).join("\n");
+            renderCharacterSelect();
+            document.getElementById('character-modal').classList.add('show');
+        }
 
-            let selectNum = prompt(`どのキャラクターに する？（番号を入力してね）\n\n${listHtml}`, "1");
-            if (selectNum === null) return;
+        function closeCharacterSelect() {
+            document.getElementById('character-modal').classList.remove('show');
+        }
 
-            let index = parseInt(selectNum, 10) - 1;
-            if (index >= 0 && index < AVAILABLE_CHARACTERS.length) {
-                const targetChar = AVAILABLE_CHARACTERS[index];
-                if (currentLevel >= targetChar.minLevel) {
-                    saveData.heroIcon = targetChar.path;
-                    localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-                    updateProfileScreen();
-                    showPopup(`${targetChar.name}に かえたよ！`);
-                } else {
-                    alert(`レベルが たりません！ (Lv.${targetChar.minLevel}以上でアンロック)`);
-                }
-            } else {
-                alert("ただしい 番号を 入力してね！");
+        function closeCharacterSelectIfOutside(event) {
+            if (event.target.id === 'character-modal') {
+                closeCharacterSelect();
             }
+        }
+
+        function renderCharacterSelect() {
+            const currentLevel = Number(saveData.level) || 1;
+            const currentHero = saveData.heroIcon || "image/boy-1.png";
+            const grid = document.getElementById('character-grid');
+
+            document.getElementById('character-modal-subtitle').textContent =
+                `いまは Lv.${currentLevel}。レベルアップで あたらしい すがたが ひらくよ！`;
+
+            grid.innerHTML = AVAILABLE_CHARACTERS.map((item) => {
+                const isUnlocked = currentLevel >= item.minLevel;
+                const isCurrent = currentHero === item.path;
+
+                let statusText;
+                if (isCurrent) {
+                    statusText = "★ いまの すがた";
+                } else if (isUnlocked) {
+                    statusText = "えらべる！";
+                } else {
+                    statusText = `🔒 Lv.${item.minLevel}で解放`;
+                }
+
+                return `
+                    <button
+                        class="character-choice ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}"
+                        ${isUnlocked ? `onclick="selectCharacter('${item.path}')"` : 'disabled'}
+                    >
+                        <img src="${item.path}" alt="${item.name}">
+                        <div class="char-name">${item.name}</div>
+                        <div class="char-status">${statusText}</div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCharacter(path) {
+            const targetChar = AVAILABLE_CHARACTERS.find(c => c.path === path);
+            if (!targetChar) return;
+
+            const currentLevel = Number(saveData.level) || 1;
+
+            if (currentLevel < targetChar.minLevel) {
+                showPopup(`Lv.${targetChar.minLevel}で ひらくよ！`);
+                return;
+            }
+
+            saveData.heroIcon = targetChar.path;
+            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+
+            updateProfileScreen();
+            closeCharacterSelect();
+            showPopup(`${targetChar.name}に かえたよ！`);
         }
 
         const PROFILE_TITLES = [
