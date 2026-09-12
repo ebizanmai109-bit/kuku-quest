@@ -723,6 +723,69 @@
             margin-top: 8px;
         }
 
+        /* あいぼう選択画面（ポップアップではなく通常画面） */
+        .companion-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .companion-choice {
+            min-height: 145px;
+            background: #111;
+            border: 2px solid #444;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px 5px;
+            font-family: 'DotGothic16';
+            text-align: center;
+        }
+
+        .companion-choice.unlocked {
+            border-color: var(--accent-color);
+            background: #171700;
+        }
+
+        .companion-choice.current {
+            box-shadow: inset 0 0 0 2px #fff;
+        }
+
+        .companion-choice.locked {
+            color: #555;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .companion-choice img {
+            width: 82px;
+            height: 82px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            display: block;
+            margin: 0 auto 4px;
+        }
+
+        .companion-choice .companion-name {
+            font-size: 0.78rem;
+            line-height: 1.2;
+        }
+
+        .companion-choice .companion-status {
+            font-size: 0.62rem;
+            margin-top: 4px;
+            color: #aaa;
+        }
+
+        .companion-choice.unlocked .companion-status {
+            color: #55ff55;
+        }
+
+        .companion-choice.current .companion-status {
+            color: #ffcc00;
+        }
+
     </style>
 </head>
 <body id="body-root">
@@ -846,6 +909,18 @@
             </div>
 
             <button class="retro-btn" onclick="showHome()">ゆうしゃの いえへ</button>
+        </div>
+
+        <!-- あいぼう選択画面 -->
+        <div id="companion-select-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showProfile()">◀ もどる</button>
+                <span>あいぼうを えらぼう！</span>
+                <span></span>
+            </div>
+            <p class="subtitle" id="companion-select-subtitle">レベルが あがると あたらしい あいぼうが ひらくよ。</p>
+            <div id="companion-grid" class="companion-grid"></div>
+            <button class="retro-btn" onclick="showProfile()" style="margin-top: 8px;">ぼうけんしゃカードへ</button>
         </div>
 
         <!-- ステージセレクト画面 -->
@@ -2235,36 +2310,60 @@
 
 
         function openCompanionSelect() {
+            renderCompanionSelect();
+            switchScreen('companion-select-screen');
+        }
+
+        function renderCompanionSelect() {
             const currentLevel = Number(saveData.level) || 1;
-            let listHtml = AVAILABLE_COMPANIONS.map((item, idx) => {
+            const currentCompanion = saveData.companionIcon || "image/pet-1.png";
+            const grid = document.getElementById('companion-grid');
+
+            document.getElementById('companion-select-subtitle').textContent =
+                `いまは Lv.${currentLevel}。レベルアップで あたらしい あいぼうが ひらくよ！`;
+
+            grid.innerHTML = AVAILABLE_COMPANIONS.map((item) => {
                 const isUnlocked = currentLevel >= item.minLevel;
-                const statusStr = isUnlocked
-                    ? "【えらべる】"
-                    : `【🔒 Lv.${item.minLevel}でアンロック】`;
-                return `${idx + 1}: ${item.name} ${statusStr}`;
-            }).join("\n");
+                const isCurrent = currentCompanion === item.path;
 
-            let selectNum = prompt(
-                `どの あいぼうに する？（番号を入力してね）\n\n${listHtml}`,
-                "1"
-            );
-            if (selectNum === null) return;
-
-            const index = parseInt(selectNum, 10) - 1;
-            if (index >= 0 && index < AVAILABLE_COMPANIONS.length) {
-                const target = AVAILABLE_COMPANIONS[index];
-                if (currentLevel >= target.minLevel) {
-                    saveData.companionIcon = target.path;
-                    saveGameData();
-                    updateProfileScreen();
-                    updateHomeScreen();
-                    showPopup(`${target.name}を えらんだよ！`);
+                let statusText;
+                if (isCurrent) {
+                    statusText = "★ いまの あいぼう";
+                } else if (isUnlocked) {
+                    statusText = "えらべる！";
                 } else {
-                    alert(`レベルが たりません！ (Lv.${target.minLevel}以上でアンロック)`);
+                    statusText = `🔒 Lv.${item.minLevel}で解放`;
                 }
-            } else {
-                alert("ただしい 番号を 入力してね！");
+
+                return `
+                    <button
+                        class="companion-choice ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}"
+                        ${isUnlocked ? `onclick="selectCompanion('${item.path}')"` : 'disabled'}
+                    >
+                        <img src="${item.path}" alt="${item.name}">
+                        <div class="companion-name">${item.name}</div>
+                        <div class="companion-status">${statusText}</div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCompanion(path) {
+            const target = AVAILABLE_COMPANIONS.find(c => c.path === path);
+            if (!target) return;
+
+            const currentLevel = Number(saveData.level) || 1;
+            if (currentLevel < target.minLevel) {
+                showPopup(`Lv.${target.minLevel}で ひらくよ！`);
+                return;
             }
+
+            saveData.companionIcon = target.path;
+            saveGameData();
+            updateProfileScreen();
+            updateHomeScreen();
+            renderCompanionSelect();
+            showPopup(`${target.name}を えらんだよ！`);
         }
 
         const PROFILE_TITLES = [
