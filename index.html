@@ -439,169 +439,6 @@
             outline: none;
         }
 
-
-        .profile-card {
-            width: 100%;
-            background: #050509;
-            border: 4px solid var(--accent-color);
-            box-shadow: inset 0 0 0 2px #333, 0 0 12px rgba(255,204,0,0.18);
-            padding: 12px;
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .profile-hero {
-            font-size: 3.6rem;
-            line-height: 1;
-            margin: 2px 0 4px;
-        }
-
-        .profile-name {
-            color: #fff;
-            font-size: 1.45rem;
-            font-weight: bold;
-            text-shadow: 2px 2px #000;
-        }
-
-        .profile-title {
-            color: var(--accent-color);
-            font-size: 0.95rem;
-            margin: 4px 0 8px;
-        }
-
-        .profile-level {
-            color: #fff;
-            font-size: 1.15rem;
-            border-top: 2px solid #555;
-            padding-top: 7px;
-        }
-
-        .profile-exp-text {
-            color: #aaa;
-            font-size: 0.75rem;
-            margin-top: 3px;
-        }
-
-        .profile-exp-bg {
-            width: 100%;
-            height: 10px;
-            background: #222;
-            border: 2px solid #777;
-            margin: 4px 0 9px;
-        }
-
-        .profile-exp-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--success-color);
-            transition: width 0.4s steps(10);
-        }
-
-        .profile-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            text-align: left;
-        }
-
-        .profile-stats div {
-            background: #111;
-            border: 2px solid #444;
-            padding: 6px;
-        }
-
-        .profile-stats span {
-            display: block;
-            color: #aaa;
-            font-size: 0.65rem;
-        }
-
-        .profile-stats strong {
-            display: block;
-            color: #fff;
-            font-size: 0.95rem;
-            margin-top: 2px;
-        }
-
-        .profile-section {
-            width: 100%;
-            background: #050509;
-            border: 2px solid #555;
-            padding: 8px;
-            margin-bottom: 7px;
-        }
-
-        .profile-section-title {
-            color: var(--accent-color);
-            font-size: 0.95rem;
-            margin-bottom: 6px;
-            text-align: left;
-        }
-
-        .collection-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
-
-        .collection-item {
-            border: 2px solid #444;
-            background: #111;
-            padding: 5px 4px;
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-        }
-
-        .collection-item.earned {
-            border-color: var(--accent-color);
-            background: #222200;
-        }
-
-        .collection-item.locked {
-            color: #555;
-            filter: grayscale(1);
-        }
-
-        .collection-icon {
-            font-size: 1.35rem;
-            line-height: 1.1;
-        }
-
-        .collection-name {
-            font-size: 0.68rem;
-            margin-top: 2px;
-        }
-
-        .profile-map {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .map-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 2px solid #444;
-            background: #111;
-            padding: 5px 7px;
-            font-size: 0.72rem;
-        }
-
-        .map-item.cleared {
-            border-color: #777;
-            color: var(--accent-color);
-        }
-
-        .map-item.current {
-            border-color: #fff;
-            box-shadow: 0 0 6px rgba(255,255,255,0.25);
-        }
-
         #popup-msg {
             position: fixed;
             top: 40%;
@@ -651,7 +488,9 @@
                 <p class="subtitle">-- RETRO KUKU RPG --</p>
             </div>
             <div class="field-box" style="height: 140px;">
-                <div class="dot-graphic">🏠✨</div>
+                <!-- 主人公の画像を girl-1.png に変更 -->
+                <img src="image/girl-1.png" alt="主人公" style="width: 64px; height: 64px; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="dot-graphic" style="display: none;">🏠✨</div>
                 <p style="font-size: 0.85rem; color: #aaa; margin-top: 4px;">きみの なまえを おしえてね！</p>
                 <input type="text" id="player-name-input" class="name-input" value="ゆうしゃ" maxlength="8">
             </div>
@@ -665,61 +504,17 @@
                 <p class="subtitle">きょうも くくの しゅぎょうじゃ！</p>
             </div>
             <div class="field-box" style="height: 110px;">
-                <div class="dot-graphic" style="font-size: 2.3rem;">🧑‍💻📜</div>
+                <img src="image/girl-1.png" alt="主人公" style="width: 48px; height: 48px; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="dot-graphic" style="font-size: 2.3rem; display: none;">🧑‍💻📜</div>
                 <p style="font-size: 0.85rem; color: #8ef; margin-top: 2px;">タンスのなかに くくのきおく</p>
             </div>
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="showProfile()">🦭 ぼうけんしゃカード</button>
                 <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
+                <!-- その他の画像枠の選択肢：アップデートをまってね -->
+                <button class="retro-btn" onclick="alert('アップデートをまってね')" style="font-size: 0.9rem; padding: 8px; background-color: #555;">🔒 アップデートをまってね</button>
             </div>
-        </div>
-
-
-        <!-- ぼうけんしゃカード画面 -->
-        <div id="profile-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
-                <span>ぼうけんしゃカード</span>
-                <span>🦭</span>
-            </div>
-
-            <div class="profile-card">
-                <div class="profile-hero">🦭</div>
-                <div class="profile-name" id="profile-name">ゆうしゃ</div>
-                <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
-
-                <div class="profile-level">LEVEL <span id="profile-level">1</span></div>
-                <div class="profile-exp-text" id="profile-exp-text">EXP 0</div>
-                <div class="profile-exp-bg">
-                    <div class="profile-exp-fill" id="profile-exp-fill"></div>
-                </div>
-
-                <div class="profile-stats">
-                    <div><span>クリアしただん</span><strong id="profile-cleared">0 / 9</strong></div>
-                    <div><span>さいこうれんぞく</span><strong id="profile-combo">0</strong></div>
-                    <div><span>せいかいしたもんだい</span><strong id="profile-correct">0</strong></div>
-                    <div><span>ぼうけんしたかいすう</span><strong id="profile-plays">0</strong></div>
-                </div>
-            </div>
-
-            <div class="profile-section">
-                <div class="profile-section-title">🏅 しょうごう</div>
-                <div id="profile-titles" class="collection-grid"></div>
-            </div>
-
-            <div class="profile-section">
-                <div class="profile-section-title">🎖️ バッジ</div>
-                <div id="profile-badges" class="collection-grid"></div>
-            </div>
-
-            <div class="profile-section">
-                <div class="profile-section-title">🗺️ ぼうけんマップ</div>
-                <div id="profile-map" class="profile-map"></div>
-            </div>
-
-            <button class="retro-btn" onclick="showHome()">ゆうしゃの いえへ</button>
         </div>
 
         <!-- ステージセレクト画面 -->
@@ -977,11 +772,9 @@
                 melody = [220.00, 220.00, 329.63, 220.00, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94, 220.00, 196.00, 164.81];
                 tempo = 180;
             } else if (mode === 'nextworld') {
-                // 魔王城：低音の重厚感と厳かな戦闘曲風 (トライアングル/パルス波で荘厳に)
                 melody = [130.81, 130.81, 155.56, 130.81, 116.54, 130.81, 146.83, 155.56, 174.61, 155.56, 146.83, 130.81, 110.00, 116.54, 130.81, 0];
                 tempo = 210;
             } else if (mode === 'spring') {
-                // いやしのいずみ：かわいい、幻想的、癒やしのアルペジオ風
                 melody = [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25, 587.33, 659.25, 783.99, 987.77, 783.99, 659.25];
                 tempo = 300;
             }
@@ -997,9 +790,9 @@
                         vol = 0.025;
                     } else if (mode === 'nextworld') {
                         waveType = 'sawtooth';
-                        vol = 0.025; // 厳かかつ強そうな重み
+                        vol = 0.025;
                     } else if (mode === 'spring') {
-                        waveType = 'triangle'; // 柔らかく癒やしのある音色
+                        waveType = 'triangle';
                         vol = 0.025;
                     }
                     playTone(freq, tempo / 1000 * 0.8, waveType, vol);
@@ -1171,11 +964,7 @@
             failedStage: 1,
             failedIsNextWorld: false,
             failedNextLevel: 1,
-            clearedNextLevels: [],
-            totalCorrect: 0,
-            totalAnswered: 0,
-            bestCombo: 0,
-            playCount: 0
+            clearedNextLevels: []
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.level === 'undefined') saveData.level = 1;
@@ -1187,10 +976,6 @@
         if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
         if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
         if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
-        if (typeof saveData.totalCorrect === 'undefined') saveData.totalCorrect = 0;
-        if (typeof saveData.totalAnswered === 'undefined') saveData.totalAnswered = 0;
-        if (typeof saveData.bestCombo === 'undefined') saveData.bestCombo = 0;
-        if (typeof saveData.playCount === 'undefined') saveData.playCount = 0;
 
         let currentStage = 1;
         let isRandomMode = false;
@@ -1241,32 +1026,22 @@
 
         function registerNameAndStart() {
             initAudioContext();
-
             const inputVal = document.getElementById('player-name-input').value.trim();
-            const safeName = getSafePlayerName(inputVal);
-
-            if (safeName === null) return;
-
-            if (safeName !== "") {
-                saveData.playerName = safeName;
+            if (inputVal !== "") {
+                saveData.playerName = inputVal;
             }
-
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             showHome();
         }
 
         function openNameChange() {
             const newName = prompt("あたらしい なまえを 入力してね（8文字まで）:", saveData.playerName);
-            if (newName === null) return;
-
-            const safeName = getSafePlayerName(newName);
-            if (safeName === null) return;
-
-            saveData.playerName = safeName;
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-            updatePersistentStatus();
-            updateProfileScreen();
-            showPopup("なまえを かえたよ！");
+            if (newName !== null && newName.trim() !== "") {
+                saveData.playerName = newName.trim().substring(0, 8);
+                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                updatePersistentStatus();
+                showPopup("なまえを かえたよ！");
+            }
         }
 
         function getNextLevelExp(level) {
@@ -1466,7 +1241,6 @@
         }
 
         function startBattle(stageNum, randomMode, nextWorld = false) {
-            registerAdventureStart();
             if (saveData.hp <= 0) {
                 showGameOverScreen();
                 return;
@@ -1569,7 +1343,6 @@
 
             if (userInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
-                    registerProfileAnswer(true);
                     isAnswered = true;
 
                     showPopup("こうげき ヒット！");
@@ -1614,7 +1387,6 @@
                             playVictoryFanfare();
                             setTimeout(() => { completeStage(); }, 1200);
                         } else {
-                            registerProfileAnswer(false);
                             loadCurrentProblem();
                         }
                     });
@@ -1917,148 +1689,6 @@
                 }
             }
         }
-
-        // ========================================
-        // ぼうけんしゃカード
-        // ========================================
-
-        const PROFILE_TITLES = [
-            { name: "はじめての ぼうけんしゃ", icon: "🌱", condition: () => saveData.totalCorrect >= 1 },
-            { name: "はらっぱの ぼうけんしゃ", icon: "🌿", condition: () => saveData.clearedStages.includes(1) },
-            { name: "九九 見習い", icon: "⭐", condition: () => saveData.clearedStages.length >= 3 },
-            { name: "九九の ぼうけんしゃ", icon: "⚔️", condition: () => saveData.clearedStages.length >= 5 },
-            { name: "九九の たつじん", icon: "🔥", condition: () => saveData.clearedStages.length >= 7 },
-            { name: "九九マスター", icon: "👑", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "れんぞく名人", icon: "💫", condition: () => saveData.bestCombo >= 10 },
-            { name: "九九の 勇者", icon: "🛡️", condition: () => saveData.clearedNextLevels.length >= 5 },
-            { name: "でんせつの 勇者", icon: "🐲", condition: () => saveData.clearedNextLevels.length >= 10 }
-        ];
-
-        const PROFILE_BADGES = [
-            { name: "はじめの一歩", icon: "👣", condition: () => saveData.totalCorrect >= 1 },
-            { name: "1のだん", icon: "1️⃣", condition: () => saveData.clearedStages.includes(1) },
-            { name: "3だん クリア", icon: "3️⃣", condition: () => saveData.clearedStages.length >= 3 },
-            { name: "5だん クリア", icon: "5️⃣", condition: () => saveData.clearedStages.length >= 5 },
-            { name: "9だん クリア", icon: "9️⃣", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "れんぞく10", icon: "🔥", condition: () => saveData.bestCombo >= 10 },
-            { name: "れんぞく20", icon: "⚡", condition: () => saveData.bestCombo >= 20 },
-            { name: "まおうじょう", icon: "🏰", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "まおう たおし", icon: "🐉", condition: () => saveData.clearedNextLevels.length >= 10 }
-        ];
-
-        function getCurrentProfileTitle() {
-            let earned = PROFILE_TITLES.filter(t => t.condition());
-            return earned.length ? earned[earned.length - 1] : PROFILE_TITLES[0];
-        }
-
-        function showProfile() {
-            updateProfileScreen();
-            switchScreen('profile-screen');
-        }
-
-        function updateProfileScreen() {
-            const title = getCurrentProfileTitle();
-            const level = Number(saveData.level) || 1;
-            const exp = Number(saveData.exp) || 0;
-            const expNeeded = 20 + (level - 1) * 10;
-            const expPercent = Math.min(100, Math.round((exp / expNeeded) * 100));
-            const cleared = Array.isArray(saveData.clearedStages) ? saveData.clearedStages.length : 0;
-
-            document.getElementById('profile-name').textContent = saveData.playerName || 'ゆうしゃ';
-            document.getElementById('profile-title').textContent = `${title.icon} ${title.name}`;
-            document.getElementById('profile-level').textContent = level;
-            document.getElementById('profile-exp-text').textContent = `EXP ${exp} / ${expNeeded}`;
-            document.getElementById('profile-exp-fill').style.width = `${expPercent}%`;
-            document.getElementById('profile-cleared').textContent = `${cleared} / 9`;
-            document.getElementById('profile-combo').textContent = Number(saveData.bestCombo) || 0;
-            document.getElementById('profile-correct').textContent = Number(saveData.totalCorrect) || 0;
-            document.getElementById('profile-plays').textContent = Number(saveData.playCount) || 0;
-
-            const titlesEl = document.getElementById('profile-titles');
-            titlesEl.innerHTML = PROFILE_TITLES.map(t => {
-                const earned = t.condition();
-                return `<div class="collection-item ${earned ? 'earned' : 'locked'}">
-                    <div class="collection-icon">${earned ? t.icon : '？'}</div>
-                    <div class="collection-name">${earned ? t.name : 'ひみつの しょうごう'}</div>
-                </div>`;
-            }).join('');
-
-            const badgesEl = document.getElementById('profile-badges');
-            badgesEl.innerHTML = PROFILE_BADGES.map(b => {
-                const earned = b.condition();
-                return `<div class="collection-item ${earned ? 'earned' : 'locked'}">
-                    <div class="collection-icon">${earned ? b.icon : '？'}</div>
-                    <div class="collection-name">${earned ? b.name : '？？？'}</div>
-                </div>`;
-            }).join('');
-
-            const mapEl = document.getElementById('profile-map');
-            mapEl.innerHTML = STAGE_ORDER.map((stage, i) => {
-                const clearedStage = saveData.clearedStages.includes(stage);
-                const unlocked = saveData.unlockedStages.includes(stage);
-                const status = clearedStage ? '★ クリア！' : (unlocked ? '▶ ちょうせんできる' : '🔒 まだ とおれない');
-                return `<div class="map-item ${clearedStage ? 'cleared' : ''} ${unlocked && !clearedStage ? 'current' : ''}">
-                    <span>${i + 1}. ${STAGE_NAMES[stage].replace(/^\d+のだん /, '')}</span>
-                    <span>${status}</span>
-                </div>`;
-            }).join('');
-        }
-
-        function saveGameData() {
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-        }
-
-        function registerProfileAnswer(isCorrect) {
-            saveData.totalAnswered = (Number(saveData.totalAnswered) || 0) + 1;
-            if (isCorrect) {
-                saveData.totalCorrect = (Number(saveData.totalCorrect) || 0) + 1;
-            }
-        }
-
-        function updateBestCombo(combo) {
-            if (combo > (Number(saveData.bestCombo) || 0)) {
-                saveData.bestCombo = combo;
-            }
-        }
-
-        function registerAdventureStart() {
-            saveData.playCount = (Number(saveData.playCount) || 0) + 1;
-            saveGameData();
-        }
-
-        // 名前入力時の簡易NGワード対策
-        const NG_WORDS = [
-            "ばか", "ばかちん", "あほ", "まぬけ", "くず", "ごみ", "ゴミ",
-            "かす", "カス", "しね", "死ね", "ころす", "殺す", "うざい",
-            "うぜえ", "きもい", "きしょい", "うんこ", "うんち", "くそ",
-            "おしっこ", "おなら", "おっぱい", "ちんこ", "ちんぽ", "ちんちん",
-            "きんたま", "まんこ", "おなにー", "セックス", "ふざけんな",
-            "ふざけるな", "くたばれ", "消えろ", "きえろ", "でぶ", "デブ",
-            "ぶす", "ブス", "はげ", "ハゲ", "ばばあ", "ババア", "じじい", "ジジイ"
-        ];
-
-        function normalizePlayerName(name) {
-            return String(name || '')
-                .toLowerCase()
-                .replace(/[\s　・.。,，、_\-ー]/g, '')
-                .replace(/[ァ-ヶ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
-        }
-
-        function containsNGWord(name) {
-            const normalized = normalizePlayerName(name);
-            return NG_WORDS.some(word => normalized.includes(normalizePlayerName(word)));
-        }
-
-        function getSafePlayerName(input) {
-            let name = String(input || '').trim().slice(0, 8);
-            if (!name) return "ゆうしゃ";
-            if (containsNGWord(name)) {
-                alert("その なまえは つかえません。\nほかの なまえに してね！");
-                return null;
-            }
-            return name;
-        }
-
     </script>
 </body>
 </html>
