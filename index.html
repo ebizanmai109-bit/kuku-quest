@@ -679,6 +679,39 @@
             margin-bottom: 12px;
         }
 
+        /* 新しい称号・バッジ獲得通知 */
+        #achievement-popup {
+            position: fixed;
+            left: 50%;
+            top: 18%;
+            transform: translate(-50%, -20px) scale(0.92);
+            background: #000;
+            color: #fff;
+            border: 4px solid #ffcc00;
+            box-shadow: 0 0 0 3px #000, 0 0 18px rgba(255,204,0,0.4);
+            width: min(420px, calc(100vw - 32px));
+            padding: 14px 16px;
+            text-align: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        #achievement-popup.show {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+        }
+        #achievement-popup .achievement-kind {
+            color: #ffcc00;
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+        #achievement-popup .achievement-name {
+            font-size: 1.45rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
         /* キャラクター選択 */
         .character-modal {
             position: fixed;
@@ -841,6 +874,11 @@
     <div id="copyright-notice">© 2026 MRS EBISAWA</div>
 
     <div id="popup-msg">せいかい！</div>
+
+    <div id="achievement-popup" aria-live="polite" aria-atomic="true">
+        <div class="achievement-kind" id="achievement-popup-kind">新しい称号をゲット！</div>
+        <div class="achievement-name" id="achievement-popup-name"></div>
+    </div>
 
     <div id="timeout-overlay" aria-hidden="true">
         <div class="timeout-window">
@@ -2467,31 +2505,31 @@
         // ========================================
         // 解放バランス：
         // Lv.1 = girl-1 / boy-1
-        // Lv.3 = girl-2 / boy-2
-        // Lv.5 = girl-3 / boy-3
-        // Lv.7 = girl-4 / boy-4
-        // Lv.9 = girl-5 / boy-5
-        // Lv.12 = girl-6 / boy-6（まほうせんし）
-        // Lv.15 = girl-7 / boy-7
+        // Lv.5 = girl-2 / boy-2
+        // Lv.8 = girl-3 / boy-3
+        // Lv.11 = girl-4 / boy-4
+        // Lv.14 = girl-5 / boy-5
+        // Lv.16 = girl-6 / boy-6（まほうせんし）
+        // Lv.18 = girl-7 / boy-7
         // Lv.20 = girl-8 / boy-8
         //
-        // レベルに応じて順番に解放し、Lv.11ですべて選べてしまわないようにします。
+        // 最初の姿を長めに育て、後半ほど特別な姿が解放される設計です。
 
         const AVAILABLE_CHARACTERS = [
             { path: "image/girl-1.png", name: "ククリン（しんまいゆうしゃのすがた）", minLevel: 1 },
             { path: "image/boy-1.png",  name: "ククル（しんまいゆうしゃのすがた）", minLevel: 1 },
-            { path: "image/girl-2.png", name: "ククリン（かけだしゆうしゃのすがた）", minLevel: 3 },
-            { path: "image/boy-2.png",  name: "ククル（かけだしゆうしゃのすがた）", minLevel: 3 },
-            { path: "image/girl-3.png", name: "ククリン（たびするゆうしゃのすがた）", minLevel: 5 },
-            { path: "image/boy-3.png",  name: "ククル（たびするゆうしゃのすがた）", minLevel: 5 },
-            { path: "image/girl-4.png", name: "ククリン（せいちょうしたゆうしゃのすがた）", minLevel: 7 },
-            { path: "image/boy-4.png",  name: "ククル（せいちょうしたゆうしゃのすがた）", minLevel: 7 },
-            { path: "image/girl-5.png", name: "ククリン（たたかうゆうしゃのすがた）", minLevel: 9 },
-            { path: "image/boy-5.png",  name: "ククル（たたかうゆうしゃのすがた）", minLevel: 9 },
-            { path: "image/girl-6.png", name: "ククリン（まほうせんしのすがた）", minLevel: 12 },
-            { path: "image/boy-6.png",  name: "ククル（まほうせんしのすがた）", minLevel: 12 },
-            { path: "image/girl-7.png", name: "ククリン（きらめきのまほうせんしのすがた）", minLevel: 15 },
-            { path: "image/boy-7.png",  name: "ククル（きらめきのまほうせんしのすがた）", minLevel: 15 },
+            { path: "image/girl-2.png", name: "ククリン（かけだしゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/boy-2.png",  name: "ククル（かけだしゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/girl-3.png", name: "ククリン（たびするゆうしゃのすがた）", minLevel: 8 },
+            { path: "image/boy-3.png",  name: "ククル（たびするゆうしゃのすがた）", minLevel: 8 },
+            { path: "image/girl-4.png", name: "ククリン（せいちょうしたゆうしゃのすがた）", minLevel: 11 },
+            { path: "image/boy-4.png",  name: "ククル（せいちょうしたゆうしゃのすがた）", minLevel: 11 },
+            { path: "image/girl-5.png", name: "ククリン（たたかうゆうしゃのすがた）", minLevel: 14 },
+            { path: "image/boy-5.png",  name: "ククル（たたかうゆうしゃのすがた）", minLevel: 14 },
+            { path: "image/girl-6.png", name: "ククリン（まほうせんしのすがた）", minLevel: 16 },
+            { path: "image/boy-6.png",  name: "ククル（まほうせんしのすがた）", minLevel: 16 },
+            { path: "image/girl-7.png", name: "ククリン（きらめきのまほうせんしのすがた）", minLevel: 18 },
+            { path: "image/boy-7.png",  name: "ククル（きらめきのまほうせんしのすがた）", minLevel: 18 },
             { path: "image/girl-8.png", name: "ククリン（でんせつのまほうせんしのすがた）", minLevel: 20 },
             { path: "image/boy-8.png",  name: "ククル（でんせつのまほうせんしのすがた）", minLevel: 20 }
         ];
@@ -2499,6 +2537,18 @@
         if (!AVAILABLE_CHARACTERS.some(c => c.path === saveData.heroIcon)) {
             saveData.heroIcon = "image/boy-1.png";
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+        }
+        // 解放条件を変更したため、旧セーブデータで現在のレベルでは
+        // 選べない姿になっていた場合は、同じ性別の最新解放姿へ戻します。
+        {
+            const currentLevel = Number(saveData.level) || 1;
+            const currentCharacter = AVAILABLE_CHARACTERS.find(c => c.path === saveData.heroIcon);
+            if (currentCharacter && currentCharacter.minLevel > currentLevel) {
+                const gender = saveData.heroIcon.includes('/girl-') ? 'girl' : 'boy';
+                const eligible = AVAILABLE_CHARACTERS.filter(c => c.path.includes(`/${gender}-`) && c.minLevel <= currentLevel);
+                if (eligible.length) saveData.heroIcon = eligible[eligible.length - 1].path;
+                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+            }
         }
 
 
@@ -2743,28 +2793,118 @@
         }
 
         const PROFILE_TITLES = [
-            { name: "はじめての ぼうけんしゃ", icon: "🌱", condition: () => saveData.totalCorrect >= 1 },
-            { name: "はらっぱの ぼうけんしゃ", icon: "🌿", condition: () => saveData.clearedStages.includes(1) },
-            { name: "九九 見習い", icon: "⭐", condition: () => saveData.clearedStages.length >= 3 },
-            { name: "九九の ぼうけんしゃ", icon: "⚔️", condition: () => saveData.clearedStages.length >= 5 },
-            { name: "九九の たつじん", icon: "🔥", condition: () => saveData.clearedStages.length >= 7 },
-            { name: "九九マスター", icon: "👑", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "れんぞく名人", icon: "💫", condition: () => saveData.bestCombo >= 10 },
-            { name: "九九の 勇者", icon: "🛡️", condition: () => saveData.clearedNextLevels.length >= 5 },
-            { name: "でんせつの 勇者", icon: "🐲", condition: () => saveData.clearedNextLevels.length >= 10 }
+            { id: "title_first", name: "はじめての ぼうけんしゃ", icon: "🌱", condition: () => saveData.totalCorrect >= 1 },
+            { id: "title_stage1", name: "はらっぱの ぼうけんしゃ", icon: "🌿", condition: () => saveData.clearedStages.includes(1) },
+            { id: "title_stage3", name: "九九 見習い", icon: "⭐", condition: () => saveData.clearedStages.length >= 3 },
+            { id: "title_stage5", name: "九九の ぼうけんしゃ", icon: "⚔️", condition: () => saveData.clearedStages.length >= 5 },
+            { id: "title_stage7", name: "九九の たつじん", icon: "🔥", condition: () => saveData.clearedStages.length >= 7 },
+            { id: "title_stage9", name: "九九マスター", icon: "👑", condition: () => saveData.clearedStages.length >= 9 },
+            { id: "title_reverse", name: "さかさまの たつじん", icon: "🔄", condition: () => Object.keys(saveData.reverseClearCounts || {}).filter(k => Number(saveData.reverseClearCounts[k]) > 0).length >= 5 },
+            { id: "title_reverse_all", name: "さかさまマスター", icon: "🪞", condition: () => Object.keys(saveData.reverseClearCounts || {}).filter(k => Number(saveData.reverseClearCounts[k]) > 0).length >= 9 },
+            { id: "title_random", name: "ランダムの たつじん", icon: "🎲", condition: () => Object.keys(saveData.randomClearCounts || {}).filter(k => Number(saveData.randomClearCounts[k]) > 0).length >= 5 },
+            { id: "title_random_all", name: "ランダムマスター", icon: "🌈", condition: () => Object.keys(saveData.randomClearCounts || {}).filter(k => Number(saveData.randomClearCounts[k]) > 0).length >= 9 },
+            { id: "title_combo10", name: "れんぞく名人", icon: "💫", condition: () => saveData.bestCombo >= 10 },
+            { id: "title_combo20", name: "れんぞく達人", icon: "⚡", condition: () => saveData.bestCombo >= 20 },
+            { id: "title_castle5", name: "まおうじょうの つわもの", icon: "🏰", condition: () => saveData.clearedNextLevels.length >= 5 },
+            { id: "title_castle10", name: "でんせつの 勇者", icon: "🐲", condition: () => saveData.clearedNextLevels.length >= 10 },
+            { id: "title_fast", name: "タイムアタック名人", icon: "⏱️", condition: () => Object.values(saveData.stageBestTimes || {}).some(v => Number(v) <= 10) },
+            { id: "title_all", name: "九九の でんせつ", icon: "🏆", condition: () => hasClearedAllContent() }
         ];
 
         const PROFILE_BADGES = [
-            { name: "はじめの一歩", icon: "👣", condition: () => saveData.totalCorrect >= 1 },
-            { name: "1のだん", icon: "1️⃣", condition: () => saveData.clearedStages.includes(1) },
-            { name: "3だん クリア", icon: "3️⃣", condition: () => saveData.clearedStages.length >= 3 },
-            { name: "5だん クリア", icon: "5️⃣", condition: () => saveData.clearedStages.length >= 5 },
-            { name: "9だん クリア", icon: "9️⃣", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "れんぞく10", icon: "🔥", condition: () => saveData.bestCombo >= 10 },
-            { name: "れんぞく20", icon: "⚡", condition: () => saveData.bestCombo >= 20 },
-            { name: "まおうじょう", icon: "🏰", condition: () => saveData.clearedStages.length >= 9 },
-            { name: "まおう たおし", icon: "🐉", condition: () => saveData.clearedNextLevels.length >= 10 }
+            { id: "badge_first", name: "はじめの一歩", icon: "👣", condition: () => saveData.totalCorrect >= 1 },
+            { id: "badge_s1", name: "1のだん クリア", icon: "1️⃣", condition: () => saveData.clearedStages.includes(1) },
+            { id: "badge_s2", name: "2のだん クリア", icon: "2️⃣", condition: () => saveData.clearedStages.includes(2) },
+            { id: "badge_s3", name: "3のだん クリア", icon: "3️⃣", condition: () => saveData.clearedStages.includes(3) },
+            { id: "badge_s4", name: "4のだん クリア", icon: "4️⃣", condition: () => saveData.clearedStages.includes(4) },
+            { id: "badge_s5", name: "5のだん クリア", icon: "5️⃣", condition: () => saveData.clearedStages.includes(5) },
+            { id: "badge_s6", name: "6のだん クリア", icon: "6️⃣", condition: () => saveData.clearedStages.includes(6) },
+            { id: "badge_s7", name: "7のだん クリア", icon: "7️⃣", condition: () => saveData.clearedStages.includes(7) },
+            { id: "badge_s8", name: "8のだん クリア", icon: "8️⃣", condition: () => saveData.clearedStages.includes(8) },
+            { id: "badge_s9", name: "9のだん クリア", icon: "9️⃣", condition: () => saveData.clearedStages.includes(9) },
+            { id: "badge_rev3", name: "さかさま3だん", icon: "🔄", condition: () => Number(saveData.reverseClearCounts?.[3] || 0) > 0 },
+            { id: "badge_rev6", name: "さかさま6だん", icon: "🪞", condition: () => Number(saveData.reverseClearCounts?.[6] || 0) > 0 },
+            { id: "badge_rev9", name: "さかさま9だん", icon: "🔃", condition: () => Number(saveData.reverseClearCounts?.[9] || 0) > 0 },
+            { id: "badge_rev_all", name: "さかさま全クリア", icon: "🌟", condition: () => Object.keys(saveData.reverseClearCounts || {}).filter(k => Number(saveData.reverseClearCounts[k]) > 0).length >= 9 },
+            { id: "badge_rand3", name: "ランダム3だん", icon: "🎲", condition: () => Number(saveData.randomClearCounts?.[3] || 0) > 0 },
+            { id: "badge_rand6", name: "ランダム6だん", icon: "🎯", condition: () => Number(saveData.randomClearCounts?.[6] || 0) > 0 },
+            { id: "badge_rand9", name: "ランダム9だん", icon: "🌈", condition: () => Number(saveData.randomClearCounts?.[9] || 0) > 0 },
+            { id: "badge_rand_all", name: "ランダム全クリア", icon: "✨", condition: () => Object.keys(saveData.randomClearCounts || {}).filter(k => Number(saveData.randomClearCounts[k]) > 0).length >= 9 },
+            { id: "badge_combo5", name: "れんぞく5", icon: "🔥", condition: () => saveData.bestCombo >= 5 },
+            { id: "badge_combo10", name: "れんぞく10", icon: "⚡", condition: () => saveData.bestCombo >= 10 },
+            { id: "badge_combo20", name: "れんぞく20", icon: "💥", condition: () => saveData.bestCombo >= 20 },
+            { id: "badge_combo30", name: "れんぞく30", icon: "🌟", condition: () => saveData.bestCombo >= 30 },
+            { id: "badge_castle1", name: "まおうじょう Lv.1", icon: "🏰", condition: () => Number(saveData.nextWorldClearCounts?.[1] || 0) > 0 },
+            { id: "badge_castle5", name: "まおうじょう Lv.5", icon: "🗝️", condition: () => Number(saveData.nextWorldClearCounts?.[5] || 0) > 0 },
+            { id: "badge_castle10", name: "まおうじょう Lv.10", icon: "🐉", condition: () => Number(saveData.nextWorldClearCounts?.[10] || 0) > 0 },
+            { id: "badge_correct50", name: "せいかい50", icon: "💯", condition: () => saveData.totalCorrect >= 50 },
+            { id: "badge_correct100", name: "せいかい100", icon: "💎", condition: () => saveData.totalCorrect >= 100 },
+            { id: "badge_correct200", name: "せいかい200", icon: "👑", condition: () => saveData.totalCorrect >= 200 },
+            { id: "badge_play5", name: "5かい ぼうけん", icon: "🗺️", condition: () => saveData.playCount >= 5 },
+            { id: "badge_play10", name: "10かい ぼうけん", icon: "🧭", condition: () => saveData.playCount >= 10 },
+            { id: "badge_fast", name: "10びょういない", icon: "⏱️", condition: () => Object.values(saveData.stageBestTimes || {}).some(v => Number(v) <= 10) },
+            { id: "badge_all", name: "くくクエスト クリア", icon: "🏆", condition: () => hasClearedAllContent() }
         ];
+
+        // 旧セーブデータでは獲得済み情報を現在の条件から初期化し、
+        // アップデート直後に過去の実績が一斉に通知されないようにします。
+        if (!Array.isArray(saveData.earnedTitleKeys)) {
+            saveData.earnedTitleKeys = PROFILE_TITLES.filter(t => t.condition()).map(t => t.id);
+        }
+        if (!Array.isArray(saveData.earnedBadgeKeys)) {
+            saveData.earnedBadgeKeys = PROFILE_BADGES.filter(b => b.condition()).map(b => b.id);
+        }
+
+        let achievementQueue = [];
+        let achievementShowing = false;
+
+        function showAchievementNotice(kind, name) {
+            achievementQueue.push({ kind, name });
+            processAchievementQueue();
+        }
+
+        function processAchievementQueue() {
+            if (achievementShowing || !achievementQueue.length) return;
+            achievementShowing = true;
+            const item = achievementQueue.shift();
+            const popup = document.getElementById('achievement-popup');
+            const kindEl = document.getElementById('achievement-popup-kind');
+            const nameEl = document.getElementById('achievement-popup-name');
+            if (!popup || !kindEl || !nameEl) { achievementShowing = false; return; }
+            kindEl.textContent = item.kind;
+            nameEl.textContent = item.name;
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => {
+                    achievementShowing = false;
+                    processAchievementQueue();
+                }, 180);
+            }, 1500);
+        }
+
+        function checkNewAchievements() {
+            const earnedTitles = Array.isArray(saveData.earnedTitleKeys) ? saveData.earnedTitleKeys : [];
+            const earnedBadges = Array.isArray(saveData.earnedBadgeKeys) ? saveData.earnedBadgeKeys : [];
+            const earnedTitleSet = new Set(earnedTitles);
+            const earnedBadgeSet = new Set(earnedBadges);
+
+            PROFILE_TITLES.forEach(t => {
+                if (t.condition() && !earnedTitleSet.has(t.id)) {
+                    earnedTitleSet.add(t.id);
+                    showAchievementNotice('新しい称号をゲット！', `${t.icon} ${t.name}`);
+                }
+            });
+            PROFILE_BADGES.forEach(b => {
+                if (b.condition() && !earnedBadgeSet.has(b.id)) {
+                    earnedBadgeSet.add(b.id);
+                    showAchievementNotice('新しいバッジをゲット！', `${b.icon} ${b.name}`);
+                }
+            });
+
+            saveData.earnedTitleKeys = Array.from(earnedTitleSet);
+            saveData.earnedBadgeKeys = Array.from(earnedBadgeSet);
+        }
 
         function getCurrentProfileTitle() {
             let earned = PROFILE_TITLES.filter(t => t.condition());
@@ -2872,6 +3012,7 @@
         }
 
         function saveGameData() {
+            checkNewAchievements();
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
         }
 
