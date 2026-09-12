@@ -342,7 +342,7 @@
             border: 4px solid #fff;
             box-shadow: inset 0 0 0 2px #000;
             width: 100%;
-            padding: 8px;
+            padding: 12px 8px 8px 8px; /* 上部にバナー分の余白を確保 */
             margin-bottom: 6px;
             text-align: center;
             position: relative;
@@ -350,7 +350,7 @@
 
         .streak-banner {
             position: absolute;
-            top: -12px;
+            top: 4px; /* ウィンドウ内の上部に配置してふりがなに被らないように調整 */
             left: 50%;
             transform: translateX(-50%);
             background: #ffcc00;
@@ -372,6 +372,7 @@
         .rpg-kana {
             font-size: 0.95rem;
             color: var(--accent-color);
+            margin-top: 4px; /* バナーとの間に少し隙間を持たせる */
             margin-bottom: 2px;
             min-height: 18px;
         }
@@ -959,7 +960,7 @@
             playerName: "ゆうしゃ",
             unlockedStages: [1],
             clearedStages: [],
-            randomClearCounts: {}, // ステージごとのランダムクリア回数
+            randomClearCounts: {},
             level: 1,
             exp: 0,
             hp: 5,
@@ -1115,7 +1116,6 @@
             const container = document.getElementById('stage-list-container');
             container.innerHTML = '';
 
-            // 全ステージのランダム問題が1回以上クリアされているかチェック
             const allRandomCleared = STAGE_ORDER.every(s => (saveData.randomClearCounts[s] || 0) > 0);
 
             STAGE_ORDER.forEach((stageNum) => {
@@ -1164,7 +1164,6 @@
 
             for (let lvl = 1; lvl <= 10; lvl++) {
                 const isCleared = saveData.clearedNextLevels.includes(lvl);
-                // 前のレベル（lvl - 1）がクリアされている、またはLv.1なら解放
                 const isUnlocked = (lvl === 1) || saveData.clearedNextLevels.includes(lvl - 1);
                 const count = getNextWorldProblemCount(lvl);
                 const nwMonster = NEXT_WORLD_MONSTER_DATA[lvl] || { name: "魔王軍" };
