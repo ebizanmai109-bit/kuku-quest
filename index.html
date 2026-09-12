@@ -3,47 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>九九のぼうけん - かけ算バトルRPG</title>
+    <title>九九のぼうけん - レトロRPG</title>
+    <!-- レトロ風フォント（ドット絵風に見せるためのスタイル） -->
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+
         :root {
-            --primary: #FF6B6B;
-            --secondary: #4ECDC4;
-            --bg: #1A202C;
-            --card-bg: #FFFFFF;
-            --text: #2D3748;
-            --shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            --radius: 24px;
+            --bg-color: #111111;
+            --screen-bg: #1a1a2e;
+            --border-color: #ffffff;
+            --accent-color: #ffcc00;
+            --danger-color: #ff4444;
+            --success-color: #44ff44;
+            --text-color: #ffffff;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            font-family: 'DotGothic16', monospace, sans-serif;
+            image-rendering: pixelated;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
+        }
+
+        /* ファミコンの画面フレーム風 */
+        .arcade-cabinet {
+            width: 100%;
+            max-width: 480px;
+            background-color: #222;
+            border: 4px solid #555;
+            box-shadow: 0 0 0 4px #000, 0 15px 30px rgba(0,0,0,0.8);
+            border-radius: 4px;
+            padding: 12px;
+            position: relative;
+        }
+
+        /* 上部ステータスバー（BGM切り替えなど） */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #000;
+            border: 2px solid #555;
+            padding: 6px 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .bgm-toggle-btn {
+            background: #444;
+            color: #fff;
+            border: 2px solid #888;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-family: 'DotGothic16';
+            font-size: 0.8rem;
+        }
+        .bgm-toggle-btn.active {
+            background: #00aa00;
+            border-color: #55ff55;
         }
 
         .screen {
             display: none;
             width: 100%;
-            max-width: 480px;
-            background-color: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 30px 20px;
+            background-color: var(--screen-bg);
+            border: 4px solid var(--border-color);
+            padding: 20px 15px;
             text-align: center;
             flex-direction: column;
             align-items: center;
+            min-height: 480px;
+            justify-content: space-between;
         }
 
         .screen.active {
@@ -51,89 +93,103 @@
         }
 
         h1 {
-            font-size: 2.3rem;
-            color: #1A365D;
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            text-shadow: 3px 3px #000;
             margin-bottom: 10px;
+            letter-spacing: 2px;
         }
 
         .subtitle {
-            font-size: 1.1rem;
-            color: #718096;
-            margin-bottom: 25px;
+            font-size: 1rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
 
-        .start-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 22px 36px;
-            font-size: 1.6rem;
+        /* レトロ風ドットボタン */
+        .retro-btn {
+            background-color: #333;
+            color: #fff;
+            border: 3px solid #fff;
+            box-shadow: inset -3px -3px 0px #111, inset 3px 3px 0px #666;
+            padding: 14px 20px;
+            font-size: 1.2rem;
             font-weight: bold;
-            border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-            margin-top: 20px;
+            width: 100%;
+            margin-top: 10px;
+            font-family: 'DotGothic16';
+            text-transform: uppercase;
+            transition: none;
         }
 
-        .adventure-btn {
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-            color: white;
-            border: none;
-            padding: 20px 40px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        .retro-btn:active {
+            box-shadow: inset 3px 3px 0px #111;
+            transform: translate(2px, 2px);
         }
 
-        .stage-title {
-            font-size: 1.6rem;
-            color: #1A365D;
-            margin-bottom: 15px;
+        .retro-btn.primary {
+            background-color: #aa0000;
+            border-color: #ff5555;
+            box-shadow: inset -3px -3px 0px #550000, inset 3px 3px 0px #ff8888;
         }
 
+        .retro-btn.secondary {
+            background-color: #006666;
+            border-color: #44ffff;
+            box-shadow: inset -3px -3px 0px #003333, inset 3px 3px 0px #88ffff;
+        }
+
+        .home-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin: auto 0;
+        }
+
+        /* ステージ選択・準備セレクトリスト */
         .stage-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
             width: 100%;
-            max-height: 380px;
+            max-height: 320px;
             overflow-y: auto;
-            padding-right: 5px;
+            border: 2px solid #555;
+            background: #000;
+            padding: 5px;
+            text-align: left;
         }
 
         .stage-item {
-            background-color: #EDF2F7;
-            border: none;
-            padding: 16px 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border-radius: 16px;
+            background-color: #111;
+            border: 2px solid #444;
+            color: #fff;
+            padding: 10px;
+            font-size: 1rem;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #2D3748;
-            text-align: left;
+            font-family: 'DotGothic16';
         }
 
         .stage-item.unlocked {
-            background-color: #E6FFFA;
-            color: #234E52;
-            border: 2px solid var(--secondary);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background-color: #222200;
         }
 
         .stage-item.locked {
-            background-color: #E2E8F0;
-            color: #A0AEC0;
+            color: #666;
+            border-color: #333;
             cursor: not-allowed;
         }
 
         .stage-item.cleared::after {
-            content: " ⭐クリア";
-            color: #D69E2E;
-            font-size: 1rem;
+            content: " ★";
+            color: #ffcc00;
         }
 
         .battle-header {
@@ -141,186 +197,158 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid #555;
+            padding-bottom: 8px;
             margin-bottom: 10px;
-            font-weight: bold;
-            color: #718096;
+            font-size: 0.9rem;
         }
 
         .back-home-btn {
             background: none;
-            border: none;
-            color: #718096;
-            font-size: 1rem;
+            border: 1px solid #aaa;
+            color: #aaa;
+            padding: 4px 8px;
             cursor: pointer;
+            font-family: 'DotGothic16';
         }
 
-        .monster-container {
-            margin: 10px 0;
-            height: 100px;
+        /* ドット絵キャラクターウィンドウ */
+        .field-box {
+            background: #000;
+            border: 4px ridge #666;
+            width: 100%;
+            height: 140px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            width: 100%;
+            position: relative;
+            margin-bottom: 10px;
         }
 
-        .monster-avatar {
-            font-size: 4rem;
-            animation: bounce 1.5s infinite ease-in-out;
-            transition: transform 0.3s, filter 0.3s;
+        .dot-graphic {
+            font-size: 3.5rem;
+            animation: dot-bounce 1s infinite steps(2);
         }
 
-        @keyframes bounce {
+        @keyframes dot-bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-4px); }
         }
 
-        .monster-avatar.attacked {
-            transform: scale(1.2) rotate(10deg);
-            filter: grayscale(100%);
+        .dot-graphic.hit {
+            transform: scale(1.2) rotate(15deg);
+            filter: invert(1);
         }
 
-        .progress-bar-bg {
-            width: 100%;
-            background-color: #E2E8F0;
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 8px;
-            overflow: hidden;
+        /* HP/プログレスバー風 */
+        .pixel-gauge-bg {
+            width: 80%;
+            background: #333;
+            border: 2px solid #fff;
+            height: 12px;
+            margin-top: 10px;
+            position: relative;
         }
-
-        .progress-bar-fill {
+        .pixel-gauge-fill {
+            background: var(--success-color);
             height: 100%;
-            background-color: var(--secondary);
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.2s;
         }
 
-        .problem-card {
-            background: #F7F9FC;
+        /* 問題カード */
+        .rpg-window {
+            background: #000;
+            border: 4px solid #fff;
+            box-shadow: inset 0 0 0 2px #000;
             width: 100%;
             padding: 12px;
-            border-radius: 16px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            text-align: center;
         }
 
-        .problem-text {
-            font-size: 2.3rem;
-            font-weight: 900;
-            color: #1A365D;
-        }
-
-        .kana-display {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary);
+        .rpg-kana {
+            font-size: 1.1rem;
+            color: var(--accent-color);
             margin-bottom: 4px;
-            transition: opacity 0.2s;
+            min-height: 24px;
         }
 
-        .keypad {
+        .rpg-problem {
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        /* 入力画面 */
+        .input-screen-box {
+            background: #111;
+            border: 2px solid #888;
+            color: #ffcc00;
+            font-size: 1.5rem;
+            padding: 6px;
+            width: 100%;
+            margin-bottom: 10px;
+            letter-spacing: 6px;
+            min-height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* キーパッド (ファミコンコントローラー風) */
+        .pixel-keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 6px;
             width: 100%;
             margin-bottom: 10px;
         }
 
-        .key-btn {
-            background-color: #EDF2F7;
-            border: none;
-            padding: 14px 0;
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: #2D3748;
-            border-radius: 14px;
+        .pixel-key {
+            background: #444;
+            color: #fff;
+            border: 2px solid #888;
+            box-shadow: inset -2px -2px 0px #222, inset 2px 2px 0px #666;
+            padding: 10px 0;
+            font-size: 1.4rem;
+            font-family: 'DotGothic16';
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: background-color 0.1s, transform 0.1s;
         }
-
-        .key-btn:active {
-            transform: scale(0.93);
-            background-color: #CBD5E0;
+        .pixel-key:active {
+            box-shadow: inset 2px 2px 0px #222;
         }
-
-        .key-btn.clear {
-            background-color: #FED7D7;
-            color: #C53030;
+        .pixel-key.clear-key {
+            background: #622;
+            border-color: #f55;
             grid-column: span 2;
         }
 
-        .control-row {
-            display: flex;
-            justify-content: center;
+        /* フラッシュカード（練習用） */
+        .flashcard-box {
+            background: #000;
+            border: 4px solid var(--accent-color);
             width: 100%;
-        }
-
-        .sub-action-btn {
-            background: #E2E8F0;
-            border: none;
-            padding: 8px 14px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #4A5568;
-            border-radius: 10px;
+            padding: 25px 15px;
+            margin: 15px 0;
             cursor: pointer;
-        }
-
-        .result-title {
-            font-size: 2rem;
-            color: #D69E2E;
-            margin-bottom: 10px;
-        }
-
-        .result-stats {
-            font-size: 1.2rem;
-            color: #4A5568;
-            margin: 20px 0;
-            line-height: 1.6;
-            background: #F7F9FC;
-            padding: 15px;
-            border-radius: 16px;
-            width: 100%;
-        }
-
-        .time-display {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #2B6CB0;
-        }
-
-        .action-btn {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            padding: 16px 25px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            width: 100%;
-            box-shadow: 0 6px 15px rgba(78, 205, 196, 0.4);
-            margin-top: 10px;
+            box-shadow: inset 0 0 10px rgba(255,204,0,0.2);
         }
 
         #popup-msg {
             position: fixed;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
-            background-color: rgba(255, 107, 107, 0.95);
-            color: white;
-            font-size: 2.5rem;
-            font-weight: 900;
-            padding: 18px 35px;
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            z-index: 2000;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
+            background-color: #000;
+            color: var(--accent-color);
+            border: 4px solid #fff;
+            font-size: 2rem;
+            padding: 15px 25px;
+            z-index: 999;
+            transition: transform 0.1s;
         }
-
         #popup-msg.show {
             transform: translate(-50%, -50%) scale(1);
         }
@@ -328,85 +356,223 @@
 </head>
 <body>
 
-    <div id="popup-msg">せいかい！🎉</div>
+    <div id="popup-msg">せいかい！</div>
 
-    <div id="start-screen" class="screen active">
-        <h1>かけ算九九を はじめよう！</h1>
-        <p class="subtitle">音声をオンにしてぼうけんに出かけよう</p>
-        <div style="font-size: 4rem; margin: 10px 0;">🔊✨</div>
-        <button class="start-btn" onclick="initAudioAndStart()">音声をONにして<br>はじめる</button>
-    </div>
-
-    <div id="home-screen" class="screen">
-        <h1>九九のぼうけん</h1>
-        <p class="subtitle">モンスターをたおして九九をきわめよう！</p>
-        <div style="font-size: 4.5rem; margin: 15px 0;">🏰⚔️</div>
-        <button class="adventure-btn" onclick="showStageSelect()">ぼうけんに出る</button>
-    </div>
-
-    <div id="stage-select-screen" class="screen">
-        <div class="battle-header">
-            <button class="back-home-btn" onclick="showHome()">＜ ホーム</button>
-            <span>ステージを選ぼう</span>
-            <span style="width: 40px;"></span>
-        </div>
-        <h2 class="stage-title" style="margin-top: 10px;">九九のぼうけんの森</h2>
-        <div class="stage-list" id="stage-list-container"></div>
-    </div>
-
-    <div id="battle-screen" class="screen">
-        <div class="battle-header">
-            <button class="back-home-btn" onclick="showStageSelect()">＜ やめる</button>
-            <span id="current-stage-title">2の段</span>
-            <span id="question-counter">1 / 9</span>
+    <div class="arcade-cabinet">
+        <!-- 上部コントロール：BGM切り替え -->
+        <div class="top-bar">
+            <span>🎵 ファミコンちびっ子BGM</span>
+            <button id="bgm-btn" class="bgm-toggle-btn" onclick="toggleBGM()">BGM: OFF</button>
         </div>
 
-        <div class="monster-container">
-            <div class="monster-avatar" id="monster-emoji">🐲</div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="battle-progress"></div>
+        <!-- ① スタート画面（家の中・タイトル） -->
+        <div id="start-screen" class="screen active">
+            <div>
+                <h1>九九のぼうけん</h1>
+                <p class="subtitle">-- RETRO KUKU RPG --</p>
+            </div>
+            <div class="field-box">
+                <div class="dot-graphic">🏠✨</div>
+                <p style="font-size: 0.9rem; color: #aaa; margin-top: 5px;">セーブデータ けんしょうずみ</p>
+            </div>
+            <button class="retro-btn primary" onclick="startApp()">ゲームをはじめる</button>
+        </div>
+
+        <!-- ② ホーム画面（家の中） -->
+        <div id="home-screen" class="screen">
+            <div>
+                <h1>ゆう者のいえ</h1>
+                <p class="subtitle">きょうも九九の修業じゃ！</p>
+            </div>
+            <div class="field-box">
+                <div class="dot-graphic">🧑‍💻📜</div>
+                <p style="font-size: 0.9rem; color: #8ef;">タンスのなかに 九九のきおく</p>
+            </div>
+            <div class="home-menu">
+                <button class="retro-btn primary" onclick="showStageSelect()">⚔️ ぼうけんにでる</button>
+                <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 ぼうけんのじゅんびをする</button>
             </div>
         </div>
 
-        <div class="problem-card">
-            <div class="kana-display" id="kana-display">にいちが</div>
-            <div class="problem-text" id="problem-display">2 × 1</div>
+        <!-- ③ ぼうけん ステージセレクト -->
+        <div id="stage-select-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
+                <span>フィールドせんたく</span>
+                <span></span>
+            </div>
+            <div class="stage-list" id="stage-list-container"></div>
+            <button class="retro-btn" onclick="showHome()" style="margin-top: 10px;">いえに かえる</button>
         </div>
 
-        <div style="background: #2D3748; color: #FFF; width: 100%; padding: 10px; border-radius: 12px; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 4px; min-height: 50px; display: flex; justify-content: center; align-items: center;" id="user-input-display">
-            -
+        <!-- ④ じゅんび（練習）セレクト -->
+        <div id="practice-stage-select-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
+                <span>じゅんびするだん</span>
+                <span></span>
+            </div>
+            <div class="stage-list" id="practice-stage-list-container"></div>
+            <button class="retro-btn" onclick="showHome()" style="margin-top: 10px;">いえに かえる</button>
         </div>
 
-        <div class="keypad">
-            <button class="key-btn" onclick="inputNumber(1)">1</button>
-            <button class="key-btn" onclick="inputNumber(2)">2</button>
-            <button class="key-btn" onclick="inputNumber(3)">3</button>
-            <button class="key-btn" onclick="inputNumber(4)">4</button>
-            <button class="key-btn" onclick="inputNumber(5)">5</button>
-            <button class="key-btn" onclick="inputNumber(6)">6</button>
-            <button class="key-btn" onclick="inputNumber(7)">7</button>
-            <button class="key-btn" onclick="inputNumber(8)">8</button>
-            <button class="key-btn" onclick="inputNumber(9)">9</button>
-            <button class="key-btn clear" onclick="clearInput()">けす</button>
-            <button class="key-btn" onclick="inputNumber(0)">0</button>
+        <!-- ⑤ 練習（フラッシュカード）画面 -->
+        <div id="practice-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showPracticeStageSelect()">◀ やめる</button>
+                <span id="practice-stage-title">2の段のじゅんび</span>
+                <span id="practice-counter">1/9</span>
+            </div>
+
+            <div class="flashcard-box" onclick="onFlashcardClick()">
+                <div class="rpg-kana" id="practice-kana">にいちが</div>
+                <div class="rpg-problem" id="practice-main" style="font-size: 2.5rem;">2 × 1</div>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 15px;">[ 画面をタッチしてこたえ／つぎへ ]</p>
+            </div>
+
+            <button class="retro-btn secondary" onclick="playPracticeCurrentAudio()" style="font-size: 1rem; padding: 10px;">🔊 音声をもういちどきく</button>
         </div>
 
-        <div class="control-row">
-            <button class="sub-action-btn" onclick="playFirstAudio()">🔊 もういちど きく</button>
-        </div>
-    </div>
+        <!-- ⑥ バトル（冒険）画面 -->
+        <div id="battle-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showStageSelect()">◀ にげる</button>
+                <span id="current-stage-title">2の段の森</span>
+                <span id="question-counter">1/9</span>
+            </div>
 
-    <div id="result-screen" class="screen">
-        <h2 class="result-title">ステージクリア！</h2>
-        <div style="font-size: 3.5rem;">🏆✨</div>
-        <div class="result-stats">
-            かかった時間<br>
-            <span class="time-display" id="clear-time-display">0秒</span>
+            <div class="field-box" id="battle-field-box">
+                <div class="dot-graphic" id="monster-emoji">🟢</div>
+                <div class="pixel-gauge-bg">
+                    <div class="pixel-gauge-fill" id="battle-progress"></div>
+                </div>
+            </div>
+
+            <div class="rpg-window">
+                <div class="rpg-kana" id="kana-display">にいちが</div>
+                <div class="rpg-problem" id="problem-display">2 × 1</div>
+            </div>
+
+            <div class="input-screen-box" id="user-input-display">-</div>
+
+            <div class="pixel-keypad">
+                <button class="pixel-key" onclick="inputNumber(1)">1</button>
+                <button class="pixel-key" onclick="inputNumber(2)">2</button>
+                <button class="pixel-key" onclick="inputNumber(3)">3</button>
+                <button class="pixel-key" onclick="inputNumber(4)">4</button>
+                <button class="pixel-key" onclick="inputNumber(5)">5</button>
+                <button class="pixel-key" onclick="inputNumber(6)">6</button>
+                <button class="pixel-key" onclick="inputNumber(7)">7</button>
+                <button class="pixel-key" onclick="inputNumber(8)">8</button>
+                <button class="pixel-key" onclick="inputNumber(9)">9</button>
+                <button class="pixel-key clear-key" onclick="clearInput()">けす</button>
+                <button class="pixel-key" onclick="inputNumber(0)">0</button>
+            </div>
         </div>
-        <button class="action-btn" onclick="showStageSelect()">ステージいちらんへ</button>
+
+        <!-- ⑦ クリア画面 -->
+        <div id="result-screen" class="screen" style="justify-content: center;">
+            <h1 style="color: #ffcc00;">ステージクリア！</h1>
+            <div class="dot-graphic" style="margin: 20px 0;">🏆✨</div>
+            <div class="rpg-window" style="margin: 15px 0;">
+                <p style="font-size: 1rem; color: #aaa;">かかった時間</p>
+                <p class="rpg-problem" id="clear-time-display" style="color: #55ff55; margin-top: 5px;">0秒</p>
+            </div>
+            <button class="retro-btn primary" onclick="showStageSelect()">ステージせんたくへ</button>
+        </div>
     </div>
 
     <script>
+        // --- Web Audio API によるファミコン風BGMジェネレーター ---
+        let audioCtx = null;
+        let bgmTimer = null;
+        let bgmEnabled = false;
+        let currentBgmMode = 'home'; // 'home', 'practice', 'battle'
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleBGM() {
+            initAudioContext();
+            bgmEnabled = !bgmEnabled;
+            const btn = document.getElementById('bgm-btn');
+            if (bgmEnabled) {
+                btn.textContent = "BGM: ON";
+                btn.classList.add('active');
+                playBGM(currentBgmMode);
+            } else {
+                btn.textContent = "BGM: OFF";
+                btn.classList.remove('active');
+                stopBGM();
+            }
+        }
+
+        function stopBGM() {
+            if (bgmTimer) {
+                clearInterval(bgmTimer);
+                bgmTimer = null;
+            }
+        }
+
+        function playTone(freq, duration, type = 'square', vol = 0.05) {
+            if (!bgmEnabled || !audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        // シーン別のファミコン風ループメロディ
+        function playBGM(mode) {
+            currentBgmMode = mode;
+            stopBGM();
+            if (!bgmEnabled) return;
+
+            let step = 0;
+            // メロディの音階データ (Hz)
+            let melody = [];
+            let tempo = 250;
+
+            if (mode === 'home') {
+                // 穏やかな家の中のテーマ（レトロRPG風）
+                melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 329.63, 349.23, 329.63, 293.66, 261.63, 220.00, 246.94, 261.63, 0];
+                tempo = 280;
+            } else if (mode === 'practice') {
+                // 練習用・のんびりとした音色
+                melody = [330.00, 392.00, 440.00, 493.88, 440.00, 392.00, 330.00, 293.66, 330.00, 392.00, 330.00, 261.63];
+                tempo = 320;
+            } else if (mode === 'battle') {
+                // 冒険・戦闘用のアップテンポなリズム
+                melody = [220.00, 220.00, 329.63, 220.00, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94, 220.00, 196.00, 164.81];
+                tempo = 180;
+            }
+
+            bgmTimer = setInterval(() => {
+                if (!bgmEnabled) return;
+                const freq = melody[step % melody.length];
+                if (freq > 0) {
+                    playTone(freq, tempo / 1000 * 0.8, mode === 'battle' ? 'sawtooth' : 'square', 0.03);
+                }
+                step++;
+            }, tempo);
+        }
+
+
+        // --- 九九データ＆ゲーム進行ロジック ---
         const kukuData = {
             1: {
                 1: { first: "いんいちが", second: "いち" },
@@ -536,27 +702,28 @@
         let problemsQueue = [];
         let isAnswered = false;
 
+        let practiceStage = 1;
+        let practiceIndex = 0;
+        let flashcardState = 0; // 0: 問題, 1: 答え
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        function initAudioAndStart() {
-            let dummy = new Audio();
-            dummy.play().catch(() => {});
+        function startApp() {
+            initAudioContext();
             showHome();
         }
 
         function showHome() {
+            playBGM('home');
             switchScreen('home-screen');
         }
 
+        // --- 冒険ステージ ---
         function showStageSelect() {
-            renderStageList();
-            switchScreen('stage-select-screen');
-        }
-
-        function renderStageList() {
+            playBGM('home');
             const container = document.getElementById('stage-list-container');
             container.innerHTML = '';
 
@@ -564,45 +731,36 @@
                 const isUnlocked = saveData.unlockedStages.includes(stageNum);
                 const isCleared = saveData.clearedStages.includes(stageNum);
 
-                const btn = document.createElement('button');
+                const btn = document.createElement('div');
                 btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                
-                let label = `${STAGE_NAMES[stageNum]}`;
-                if (!isUnlocked) {
-                    label += " 🔒";
-                }
-
-                btn.textContent = label;
+                btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? "" : " [🔒]");
                 
                 if (isUnlocked) {
                     btn.onclick = () => startBattle(stageNum);
-                } else {
-                    btn.onclick = () => alert("前のステージをクリアするとあそべるよ！");
                 }
-
                 container.appendChild(btn);
             });
+            switchScreen('stage-select-screen');
         }
 
         function startBattle(stageNum) {
             currentStage = stageNum;
             currentMultiplierIndex = 0;
             isAnswered = false;
-            
+            playBGM('battle');
+
             problemsQueue = [];
             for (let b = 1; b <= 9; b++) {
                 problemsQueue.push({ a: currentStage, b: b });
             }
 
             document.getElementById('current-stage-title').textContent = STAGE_NAMES[currentStage].split(' ')[0];
-            
             const stageIdx = STAGE_ORDER.indexOf(currentStage);
             document.getElementById('monster-emoji').textContent = MONSTER_ICONS[stageIdx] || "🐲";
-            document.getElementById('monster-emoji').classList.remove('attacked');
+            document.getElementById('monster-emoji').classList.remove('hit');
 
             switchScreen('battle-screen');
             startTime = Date.now();
-            
             loadCurrentProblem();
         }
 
@@ -612,70 +770,33 @@
             updateInputDisplay();
 
             const prob = problemsQueue[currentMultiplierIndex];
-            document.getElementById('question-counter').textContent = `${currentMultiplierIndex + 1} / 9`;
-
-            const progressPercent = (currentMultiplierIndex / 9) * 100;
-            document.getElementById('battle-progress').style.width = `${progressPercent}%`;
-
+            document.getElementById('question-counter').textContent = `${currentMultiplierIndex + 1}/9`;
+            document.getElementById('battle-progress').style.width = `${(currentMultiplierIndex / 9) * 100}%`;
             document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b}`;
 
             if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
-                const data = kukuData[prob.a][prob.b];
-                document.getElementById('kana-display').textContent = data.first;
-            } else {
-                document.getElementById('kana-display').textContent = `${prob.a} × ${prob.b}`;
+                document.getElementById('kana-display').textContent = kukuData[prob.a][prob.b].first;
             }
-
             playFirstAudio();
         }
 
-        // 問題が出たときは前半（「にさんが」など）だけ再生
         function playFirstAudio() {
             if (isAnswered) return;
             const prob = problemsQueue[currentMultiplierIndex];
             const audioPath = `audio/${prob.a}-${prob.b}_1.wav`;
-
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-
+            if (currentAudio) { currentAudio.pause(); }
             currentAudio = new Audio(audioPath);
-            const kanaEl = document.getElementById('kana-display');
-
-            currentAudio.play().then(() => {
-                kanaEl.style.opacity = "0.5";
-                currentAudio.onended = () => {
-                    kanaEl.style.opacity = "1";
-                };
-            }).catch(e => {
-                console.warn("前半の音声ファイルがありません:", audioPath);
-            });
+            currentAudio.play().catch(e => {});
         }
 
-        // 正解したときは後半（「ろく」など）だけ再生
         function playSecondAudio(callback) {
             const prob = problemsQueue[currentMultiplierIndex];
             const audioPath = `audio/${prob.a}-${prob.b}_2.wav`;
-
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
-            }
-
-            const kanaEl = document.getElementById('kana-display');
-            kanaEl.style.opacity = "1";
-
+            if (currentAudio) { currentAudio.pause(); }
             currentAudio = new Audio(audioPath);
-
             currentAudio.play().then(() => {
-                currentAudio.onended = () => {
-                    if (callback) callback();
-                };
-            }).catch(e => {
-                console.warn("後半の音声ファイルがありません:", audioPath);
-                if (callback) callback();
-            });
+                currentAudio.onended = () => { if (callback) callback(); };
+            }).catch(e => { if (callback) callback(); });
         }
 
         function inputNumber(num) {
@@ -687,35 +808,27 @@
             const prob = problemsQueue[currentMultiplierIndex];
             const correctAnswer = prob.a * prob.b;
             const userAns = parseInt(userInputString, 10);
-
             const targetLength = correctAnswer >= 10 ? 2 : 1;
 
             if (userInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
                     isAnswered = true;
-                    showPopup("せいかい！🎉");
-                    
+                    showPopup("せいかい！");
                     document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b} ＝ ${correctAnswer}`;
-                    if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
-                        const data = kukuData[prob.a][prob.b];
-                        document.getElementById('kana-display').textContent = data.first + data.second;
-                    }
+                    document.getElementById('kana-display').textContent = kukuData[prob.a][prob.b].first + kukuData[prob.a][prob.b].second;
 
                     const monsterEl = document.getElementById('monster-emoji');
-                    monsterEl.classList.add('attacked');
+                    monsterEl.classList.add('hit');
 
-                    // 正解時は後半の音声（例：「ろく」）のみを再生する
                     playSecondAudio(() => {
                         currentMultiplierIndex++;
-                        monsterEl.classList.remove('attacked');
-                        
+                        monsterEl.classList.remove('hit');
                         if (currentMultiplierIndex >= 9) {
                             completeStage();
                         } else {
                             loadCurrentProblem();
                         }
                     });
-
                 } else {
                     showPopup("ざんねん！");
                     userInputString = "";
@@ -731,17 +844,14 @@
         }
 
         function updateInputDisplay() {
-            const display = document.getElementById('user-input-display');
-            display.textContent = userInputString === "" ? "-" : userInputString;
+            document.getElementById('user-input-display').textContent = userInputString === "" ? "-" : userInputString;
         }
 
         function showPopup(text) {
             const popup = document.getElementById('popup-msg');
             popup.textContent = text;
             popup.classList.add('show');
-            setTimeout(() => {
-                popup.classList.remove('show');
-            }, 700);
+            setTimeout(() => { popup.classList.remove('show'); }, 600);
         }
 
         function completeStage() {
@@ -751,7 +861,6 @@
             if (!saveData.clearedStages.includes(currentStage)) {
                 saveData.clearedStages.push(currentStage);
             }
-
             const currentIdx = STAGE_ORDER.indexOf(currentStage);
             if (currentIdx < STAGE_ORDER.length - 1) {
                 const nextStageNum = STAGE_ORDER[currentIdx + 1];
@@ -759,9 +868,76 @@
                     saveData.unlockedStages.push(nextStageNum);
                 }
             }
-
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             switchScreen('result-screen');
+        }
+
+        // --- 練習モード (準備) ---
+        function showPracticeStageSelect() {
+            playBGM('home');
+            const container = document.getElementById('practice-stage-list-container');
+            container.innerHTML = '';
+            for (let s = 1; s <= 9; s++) {
+                const btn = document.createElement('div');
+                btn.className = 'stage-item unlocked';
+                btn.textContent = `${s}の段のじゅんびをする`;
+                btn.onclick = () => startPractice(s);
+                container.appendChild(btn);
+            }
+            switchScreen('practice-stage-select-screen');
+        }
+
+        function startPractice(stageNum) {
+            practiceStage = stageNum;
+            practiceIndex = 0;
+            flashcardState = 0;
+            playBGM('practice');
+
+            document.getElementById('practice-stage-title').textContent = `${practiceStage}の段`;
+            switchScreen('practice-screen');
+            updateFlashcardDisplay();
+            playPracticeCurrentAudio();
+        }
+
+        function updateFlashcardDisplay() {
+            const b = practiceIndex + 1;
+            const data = kukuData[practiceStage][b];
+            document.getElementById('practice-counter').textContent = `${practiceIndex + 1}/9`;
+
+            if (flashcardState === 0) {
+                document.getElementById('practice-kana').textContent = data.first;
+                document.getElementById('practice-main').textContent = `${practiceStage} × ${b}`;
+            } else {
+                document.getElementById('practice-kana').textContent = data.second;
+                document.getElementById('practice-main').textContent = practiceStage * b;
+            }
+        }
+
+        function playPracticeCurrentAudio() {
+            const b = practiceIndex + 1;
+            const filename = flashcardState === 0 ? `${practiceStage}-${b}_1.wav` : `${practiceStage}-${b}_2.wav`;
+            const audioPath = `audio/${filename}`;
+            if (currentAudio) { currentAudio.pause(); }
+            currentAudio = new Audio(audioPath);
+            currentAudio.play().catch(e => {});
+        }
+
+        function onFlashcardClick() {
+            if (flashcardState === 0) {
+                flashcardState = 1;
+                updateFlashcardDisplay();
+                playPracticeCurrentAudio();
+            } else {
+                practiceIndex++;
+                if (practiceIndex >= 9) {
+                    alert(`${practiceStage}の段のじゅんびかんりょう！`);
+                    showPracticeStageSelect();
+                } else {
+                    flashcardState = 0;
+                    updateFlashcardDisplay();
+                    playPracticeCurrentAudio();
+                }
+            }
         }
     </script>
 </body>
