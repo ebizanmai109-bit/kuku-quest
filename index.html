@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>九九のぼうけん - レトロRPG</title>
-    <!-- レトロ風フォント（ドット絵風に見せるためのスタイル） -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 
@@ -37,7 +36,6 @@
             padding: 10px;
         }
 
-        /* ファミコンの画面フレーム風 */
         .arcade-cabinet {
             width: 100%;
             max-width: 480px;
@@ -49,7 +47,6 @@
             position: relative;
         }
 
-        /* 上部ステータスバー（BGM切り替えなど） */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -57,7 +54,7 @@
             background-color: #000;
             border: 2px solid #555;
             padding: 6px 10px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 0.9rem;
         }
 
@@ -75,16 +72,57 @@
             border-color: #55ff55;
         }
 
+        /* 常に表示される常駐ステータスバー */
+        .persistent-status-bar {
+            background: #000;
+            border: 2px solid var(--accent-color);
+            width: 100%;
+            padding: 6px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .heart-container {
+            color: var(--danger-color);
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+        }
+
+        .exp-gauge-bg {
+            width: 100%;
+            background: #222;
+            border: 1px solid #777;
+            height: 6px;
+            position: relative;
+            margin-top: 1px;
+        }
+        .exp-gauge-fill {
+            background: var(--success-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s steps(10);
+        }
+
         .screen {
             display: none;
             width: 100%;
             background-color: var(--screen-bg);
             border: 4px solid var(--border-color);
-            padding: 20px 15px;
+            padding: 15px 12px;
             text-align: center;
             flex-direction: column;
             align-items: center;
-            min-height: 480px;
+            min-height: 460px;
             justify-content: space-between;
         }
 
@@ -93,20 +131,19 @@
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             color: var(--accent-color);
             text-shadow: 3px 3px #000;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             letter-spacing: 2px;
         }
 
         .subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #ccc;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        /* レトロ風ドットボタン */
         .retro-btn {
             background-color: #333;
             color: #fff;
@@ -117,7 +154,7 @@
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            margin-top: 8px;
+            margin-top: 6px;
             font-family: 'DotGothic16';
             text-transform: uppercase;
         }
@@ -148,54 +185,17 @@
         .home-menu {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
             margin: auto 0;
         }
 
-        /* ゆうしゃステータス表示パネル（ホーム用） */
-        .status-panel {
-            background: #000;
-            border: 2px solid var(--accent-color);
-            width: 100%;
-            padding: 8px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            font-size: 0.95rem;
-            color: var(--accent-color);
-            margin-bottom: 10px;
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* 経験値ゲージ */
-        .exp-gauge-bg {
-            width: 100%;
-            background: #222;
-            border: 1px solid #777;
-            height: 8px;
-            position: relative;
-            margin-top: 2px;
-        }
-        .exp-gauge-fill {
-            background: var(--success-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s steps(10);
-        }
-
-        /* ステージ選択・準備セレクトリスト */
         .stage-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             width: 100%;
-            max-height: 300px;
+            max-height: 280px;
             overflow-y: auto;
             border: 2px solid #555;
             background: #000;
@@ -207,8 +207,8 @@
             background-color: #111;
             border: 2px solid #444;
             color: #fff;
-            padding: 10px;
-            font-size: 1rem;
+            padding: 9px;
+            font-size: 0.95rem;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
@@ -246,44 +246,36 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #555;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
+            padding-bottom: 5px;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
         }
 
         .back-home-btn {
             background: none;
             border: 1px solid #aaa;
             color: #aaa;
-            padding: 4px 8px;
+            padding: 3px 6px;
             cursor: pointer;
             font-family: 'DotGothic16';
         }
 
-        /* ハート（HP）表示 */
-        .heart-container {
-            color: var(--danger-color);
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-        }
-
-        /* ドット絵キャラクターウィンドウ */
         .field-box {
             background: #000;
             border: 4px ridge #666;
             width: 100%;
-            height: 130px;
+            height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             position: relative;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             overflow: hidden;
         }
 
         .dot-graphic {
-            font-size: 3.2rem;
+            font-size: 3rem;
             animation: dot-bounce 1s infinite steps(2);
             transition: transform 0.1s, filter 0.1s, opacity 0.2s;
         }
@@ -308,16 +300,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #ff8888;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .pixel-gauge-bg {
             width: 80%;
             background: #333;
             border: 2px solid #fff;
-            height: 10px;
+            height: 9px;
             position: relative;
         }
         .pixel-gauge-fill {
@@ -327,53 +319,50 @@
             transition: width 0.3s steps(9);
         }
 
-        /* 問題カード */
         .rpg-window {
             background: #000;
             border: 4px solid #fff;
             box-shadow: inset 0 0 0 2px #000;
             width: 100%;
-            padding: 10px;
-            margin-bottom: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
 
         .rpg-kana {
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--accent-color);
             margin-bottom: 2px;
-            min-height: 20px;
+            min-height: 18px;
         }
 
         .rpg-problem {
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             color: #fff;
             letter-spacing: 2px;
         }
 
-        /* 入力画面 */
         .input-screen-box {
             background: #111;
             border: 2px solid #888;
             color: #ffcc00;
-            font-size: 1.4rem;
-            padding: 4px;
+            font-size: 1.3rem;
+            padding: 3px;
             width: 100%;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 6px;
-            min-height: 40px;
+            min-height: 36px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* キーパッド */
         .pixel-keypad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 4px;
             width: 100%;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .pixel-key {
@@ -381,10 +370,11 @@
             color: #fff;
             border: 2px solid #888;
             box-shadow: inset -2px -2px 0px #222, inset 2px 2px 0px #666;
-            padding: 8px 0;
-            font-size: 1.3rem;
+            padding: 7px 0;
+            font-size: 1.2rem;
             font-family: 'DotGothic16';
             cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
         }
         .pixel-key:active {
             box-shadow: inset 2px 2px 0px #222;
@@ -395,14 +385,41 @@
             grid-column: span 2;
         }
 
+        /* ヒントで光るボタンのエフェクト */
+        .pixel-key.hint-glow {
+            background: #ffcc00 !important;
+            color: #000 !important;
+            border-color: #ffffff !important;
+            animation: hint-flash 0.4s infinite alternate;
+        }
+
+        @keyframes hint-flash {
+            0% { transform: scale(1); box-shadow: 0 0 5px #ffcc00; }
+            100% { transform: scale(1.05); box-shadow: 0 0 15px #ffff00; }
+        }
+
         .flashcard-box {
             background: #000;
             border: 4px solid var(--accent-color);
             width: 100%;
-            padding: 20px 15px;
-            margin: 10px 0;
+            padding: 15px 10px;
+            margin: 8px 0;
             cursor: pointer;
             box-shadow: inset 0 0 10px rgba(255,204,0,0.2);
+        }
+
+        /* 名前入力インプット */
+        .name-input {
+            background: #000;
+            color: #ffcc00;
+            border: 3px solid #ffcc00;
+            font-size: 1.4rem;
+            padding: 8px;
+            text-align: center;
+            width: 100%;
+            margin: 10px 0;
+            font-family: 'DotGothic16';
+            outline: none;
         }
 
         #popup-msg {
@@ -413,8 +430,8 @@
             background-color: #000;
             color: var(--accent-color);
             border: 4px solid #fff;
-            font-size: 1.8rem;
-            padding: 15px 25px;
+            font-size: 1.6rem;
+            padding: 12px 20px;
             z-index: 999;
             transition: transform 0.1s;
         }
@@ -433,17 +450,33 @@
             <button id="bgm-btn" class="bgm-toggle-btn" onclick="toggleBGM()">BGM: OFF</button>
         </div>
 
+        <!-- 常に画面上部に表示されるステータスバー -->
+        <div class="persistent-status-bar" id="persistent-status" style="display: none;">
+            <div class="status-row">
+                <span id="p-status-name-level">Lv.1 ゆうしゃ</span>
+                <span id="p-status-hearts" class="heart-container">♥♥♥♥♥</span>
+            </div>
+            <div class="status-row" style="font-size: 0.8rem; color: #aaa;">
+                <span id="p-status-exp">EXP: 0 / 20</span>
+                <span id="p-status-next">つぎまであと20</span>
+            </div>
+            <div class="exp-gauge-bg">
+                <div class="exp-gauge-fill" id="p-status-exp-fill"></div>
+            </div>
+        </div>
+
         <!-- ① スタート画面 -->
         <div id="start-screen" class="screen active">
             <div>
                 <h1>九九のぼうけん</h1>
                 <p class="subtitle">-- RETRO KUKU RPG --</p>
             </div>
-            <div class="field-box">
+            <div class="field-box" style="height: 140px;">
                 <div class="dot-graphic">🏠✨</div>
-                <p style="font-size: 0.9rem; color: #aaa; margin-top: 5px;">セーブデータ けんしょうずみ</p>
+                <p style="font-size: 0.85rem; color: #aaa; margin-top: 4px;">きみのなまえを おしえてくれ！</p>
+                <input type="text" id="player-name-input" class="name-input" value="ゆうしゃ" maxlength="8">
             </div>
-            <button class="retro-btn primary" onclick="startApp()">ゲームをはじめる</button>
+            <button class="retro-btn primary" onclick="registerNameAndStart()">ぼうけんをはじめる</button>
         </div>
 
         <!-- ② ホーム画面 -->
@@ -452,27 +485,14 @@
                 <h1>ゆう者のいえ</h1>
                 <p class="subtitle">きょうも九九の修業じゃ！</p>
             </div>
-            <!-- ステータスパネル（レベル＆経験値＆HP） -->
-            <div class="status-panel">
-                <div class="status-row">
-                    <span id="home-level-text">Lv.1 ゆうしゃ</span>
-                    <span id="home-heart-text" class="heart-container">♥♥♥♥♥</span>
-                </div>
-                <div class="status-row" style="font-size: 0.85rem; color: #aaa;">
-                    <span id="home-exp-text">EXP: 0 / 20</span>
-                    <span id="home-next-exp">つぎのLvまであと20</span>
-                </div>
-                <div class="exp-gauge-bg">
-                    <div class="exp-gauge-fill" id="home-exp-fill"></div>
-                </div>
-            </div>
-            <div class="field-box" style="height: 100px;">
-                <div class="dot-graphic" style="font-size: 2.5rem;">🧑‍💻📜</div>
+            <div class="field-box" style="height: 110px;">
+                <div class="dot-graphic" style="font-size: 2.3rem;">🧑‍💻📜</div>
                 <p style="font-size: 0.85rem; color: #8ef; margin-top: 2px;">タンスのなかに 九九のきおく</p>
             </div>
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんにでる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 ぼうけんのじゅんびをする</button>
+                <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえをかえる</button>
             </div>
         </div>
 
@@ -484,7 +504,7 @@
                 <span></span>
             </div>
             <div class="stage-list" id="stage-list-container"></div>
-            <button class="retro-btn" onclick="showHome()" style="margin-top: 10px;">いえに かえる</button>
+            <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
         </div>
 
         <!-- ④ じゅんび（練習）セレクト -->
@@ -495,7 +515,7 @@
                 <span></span>
             </div>
             <div class="stage-list" id="practice-stage-list-container"></div>
-            <button class="retro-btn" onclick="showHome()" style="margin-top: 10px;">いえに かえる</button>
+            <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
         </div>
 
         <!-- ⑤ 練習（フラッシュカード）画面 -->
@@ -508,11 +528,11 @@
 
             <div class="flashcard-box" onclick="onFlashcardClick()">
                 <div class="rpg-kana" id="practice-kana">にいちが</div>
-                <div class="rpg-problem" id="practice-main" style="font-size: 2.3rem;">2 × 1</div>
-                <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">[ 画面をタッチしてこたえ／つぎへ ]</p>
+                <div class="rpg-problem" id="practice-main" style="font-size: 2.2rem;">2 × 1</div>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 8px;">[ 画面をタッチしてこたえ／つぎへ ]</p>
             </div>
 
-            <button class="retro-btn secondary" onclick="playPracticeCurrentAudio()" style="font-size: 1rem; padding: 10px;">🔊 音声をもういちどきく</button>
+            <button class="retro-btn secondary" onclick="playPracticeCurrentAudio()" style="font-size: 0.95rem; padding: 9px;">🔊 音声をもういちどきく</button>
         </div>
 
         <!-- ⑥ バトル（冒険）画面 -->
@@ -520,7 +540,7 @@
             <div class="battle-header">
                 <button class="back-home-btn" onclick="showStageSelect()">◀ にげる</button>
                 <span id="current-stage-title">2の段の森</span>
-                <span id="battle-hearts" class="heart-container">♥♥♥♥♥</span>
+                <span></span>
             </div>
 
             <div class="field-box" id="battle-field-box">
@@ -531,7 +551,7 @@
                 <div class="pixel-gauge-bg">
                     <div class="pixel-gauge-fill" id="battle-progress"></div>
                 </div>
-                <div class="dot-graphic" id="monster-emoji" style="margin-top: 6px;">🟢</div>
+                <div class="dot-graphic" id="monster-emoji" style="margin-top: 4px;">🟢</div>
             </div>
 
             <div class="rpg-window">
@@ -559,11 +579,11 @@
         <!-- ⑦ クリア画面 -->
         <div id="result-screen" class="screen" style="justify-content: center;">
             <h1 style="color: #ffcc00;">ステージクリア！</h1>
-            <div class="dot-graphic" style="margin: 10px 0;">🏆✨</div>
-            <div class="rpg-window" style="margin: 5px 0;">
-                <p style="font-size: 0.9rem; color: #aaa;">かかった時間</p>
+            <div class="dot-graphic" style="margin: 8px 0;">🏆✨</div>
+            <div class="rpg-window" style="margin: 4px 0;">
+                <p style="font-size: 0.85rem; color: #aaa;">かかった時間</p>
                 <p class="rpg-problem" id="clear-time-display" style="color: #55ff55; margin-top: 2px;">0秒</p>
-                <p style="font-size: 1.1rem; color: #ff88ff; margin-top: 8px; font-weight: bold;" id="earned-exp-display">けいけんち +0 EXPをゲット！</p>
+                <p style="font-size: 1.05rem; color: #ff88ff; margin-top: 6px; font-weight: bold;" id="earned-exp-display">けいけんち +0 EXPをゲット！</p>
             </div>
             <button class="retro-btn primary" onclick="showStageSelect()">ステージせんたくへ</button>
         </div>
@@ -571,9 +591,9 @@
         <!-- ⑧ ゲームオーバー画面 -->
         <div id="gameover-screen" class="screen" style="justify-content: center;">
             <h1 style="color: var(--danger-color);">ゲームオーバー</h1>
-            <div class="dot-graphic" style="margin: 10px 0;">💀</div>
-            <div class="rpg-window" style="margin: 10px 0; border-color: var(--danger-color);">
-                <p style="font-size: 1rem; color: #ff8888; line-height: 1.4;" id="gameover-msg">HPがゼロでぼうけんに出られない！</p>
+            <div class="dot-graphic" style="margin: 8px 0;">💀</div>
+            <div class="rpg-window" style="margin: 8px 0; border-color: var(--danger-color);">
+                <p style="font-size: 0.95rem; color: #ff8888; line-height: 1.3;" id="gameover-msg">HPがゼロでぼうけんに出られない！</p>
             </div>
             <button class="retro-btn spring-btn" onclick="startSpringRecovery()">💧 いやしの泉にかいふくしにいく</button>
         </div>
@@ -585,9 +605,9 @@
                 <span id="spring-counter">1/9</span>
             </div>
 
-            <div class="field-box" id="spring-field-box" style="height: 110px;">
-                <div class="dot-graphic" style="font-size: 2.8rem;">🧚‍♀️💧</div>
-                <p style="font-size: 0.85rem; color: #8ef; margin-top: 4px;">ようせいが 九九のじゅもんをきいている…</p>
+            <div class="field-box" id="spring-field-box" style="height: 100px;">
+                <div class="dot-graphic" style="font-size: 2.5rem;">🧚‍♀️💧</div>
+                <p style="font-size: 0.8rem; color: #8ef; margin-top: 3px;">ようせいが 九九のじゅもんをきいている…</p>
             </div>
 
             <div class="rpg-window">
@@ -597,24 +617,23 @@
 
             <div class="input-screen-box" id="spring-input-display">-</div>
 
-            <div class="pixel-keypad">
-                <button class="pixel-key" onclick="inputSpringNumber(1)">1</button>
-                <button class="pixel-key" onclick="inputSpringNumber(2)">2</button>
-                <button class="pixel-key" onclick="inputSpringNumber(3)">3</button>
-                <button class="pixel-key" onclick="inputSpringNumber(4)">4</button>
-                <button class="pixel-key" onclick="inputSpringNumber(5)">5</button>
-                <button class="pixel-key" onclick="inputSpringNumber(6)">6</button>
-                <button class="pixel-key" onclick="inputSpringNumber(7)">7</button>
-                <button class="pixel-key" onclick="inputSpringNumber(8)">8</button>
-                <button class="pixel-key" onclick="inputSpringNumber(9)">9</button>
+            <div class="pixel-keypad" id="spring-keypad">
+                <button class="pixel-key" id="skey-1" onclick="inputSpringNumber(1)">1</button>
+                <button class="pixel-key" id="skey-2" onclick="inputSpringNumber(2)">2</button>
+                <button class="pixel-key" id="skey-3" onclick="inputSpringNumber(3)">3</button>
+                <button class="pixel-key" id="skey-4" onclick="inputSpringNumber(4)">4</button>
+                <button class="pixel-key" id="skey-5" onclick="inputSpringNumber(5)">5</button>
+                <button class="pixel-key" id="skey-6" onclick="inputSpringNumber(6)">6</button>
+                <button class="pixel-key" id="skey-7" onclick="inputSpringNumber(7)">7</button>
+                <button class="pixel-key" id="skey-8" onclick="inputSpringNumber(8)">8</button>
+                <button class="pixel-key" id="skey-9" onclick="inputSpringNumber(9)">9</button>
                 <button class="pixel-key clear-key" onclick="clearSpringInput()">けす</button>
-                <button class="pixel-key" onclick="inputSpringNumber(0)">0</button>
+                <button class="pixel-key" id="skey-0" onclick="inputSpringNumber(0)">0</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- Web Audio API によるファミコン風BGM＆効果音ジェネレーター ---
         let audioCtx = null;
         let bgmTimer = null;
         let bgmEnabled = false;
@@ -680,7 +699,6 @@
             playTone(110, 0.2, 'sawtooth', 0.1, 0.1);
         }
 
-        // レベルアップ音（タラララ♪）
         function playLevelUpSound() {
             initAudioContext();
             const notes = [
@@ -689,9 +707,7 @@
                 { f: 659.25, d: 0.1, t: 0.2 },
                 { f: 880.00, d: 0.3, t: 0.3 }
             ];
-            notes.forEach(n => {
-                playTone(n.f, n.d, 'square', 0.08, n.t);
-            });
+            notes.forEach(n => { playTone(n.f, n.d, 'square', 0.08, n.t); });
         }
 
         function playVictoryFanfare() {
@@ -702,9 +718,7 @@
                 { f: 783.99, d: 0.15, t: 0.30 },
                 { f: 1046.50, d: 0.4, t: 0.45 }
             ];
-            notes.forEach(n => {
-                playTone(n.f, n.d, 'square', 0.08, n.t);
-            });
+            notes.forEach(n => { playTone(n.f, n.d, 'square', 0.08, n.t); });
         }
 
         function playBGM(mode) {
@@ -856,15 +870,17 @@
         };
         const MONSTER_ICONS = ["🟡", "🟢", "👺", "💀", "👻", "👹", "🗿", "🦅", "🐲"];
 
-        // セーブデータ（レベル、経験値、HP、最後にやられた段）
+        // セーブデータ
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
+            playerName: "ゆうしゃ",
             unlockedStages: [1, 2],
             clearedStages: [],
             level: 1,
             exp: 0,
             hp: 5,
-            failedStage: 7 // デフォルト
+            failedStage: 7
         };
+        if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.level === 'undefined') saveData.level = 1;
         if (typeof saveData.exp === 'undefined') saveData.exp = 0;
         if (typeof saveData.hp === 'undefined') saveData.hp = 5;
@@ -885,6 +901,7 @@
         let springStage = 1;
         let springIndex = 0;
         let springInputString = "";
+        let springMistakeCount = 0; // 間違いカウント（ヒント用）
 
         let practiceStage = 1;
         let practiceIndex = 0;
@@ -893,15 +910,39 @@
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
+
+            // スタート画面以外では常駐ステータスバーを表示する
+            const persistentBar = document.getElementById('persistent-status');
+            if (screenId === 'start-screen') {
+                persistentBar.style.display = 'none';
+            } else {
+                persistentBar.style.display = 'flex';
+                updatePersistentStatus();
+            }
         }
 
-        function startApp() {
+        function registerNameAndStart() {
             initAudioContext();
+            const inputVal = document.getElementById('player-name-input').value.trim();
+            if (inputVal !== "") {
+                saveData.playerName = inputVal;
+            }
+            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             showHome();
         }
 
+        function openNameChange() {
+            const newName = prompt("新しいゆうしゃの名前を入力してね（8文字まで）:", saveData.playerName);
+            if (newName !== null && newName.trim() !== "") {
+                saveData.playerName = newName.trim().substring(0, 8);
+                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                updatePersistentStatus();
+                showPopup("名前を変更したよ！");
+            }
+        }
+
         function getNextLevelExp(level) {
-            return level * 20; // レベルアップに必要な経験値の基準
+            return level * 20;
         }
 
         function addExp(amount) {
@@ -917,6 +958,7 @@
             }
 
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+            updatePersistentStatus();
 
             if (leveledUp) {
                 playLevelUpSound();
@@ -926,34 +968,23 @@
             }
         }
 
-        function updateHomeStatus() {
-            document.getElementById('home-level-text').textContent = `Lv.${saveData.level} ゆうしゃ`;
+        function updatePersistentStatus() {
+            document.getElementById('p-status-name-level').textContent = `Lv.${saveData.level} ${saveData.playerName}`;
             
-            const heartsStr = "♥".repeat(saveData.hp) + "♡".repeat(5 - saveData.hp);
-            document.getElementById('home-heart-text').textContent = heartsStr;
+            const heartsStr = "♥".repeat(Math.max(0, saveData.hp)) + "♡".repeat(Math.max(0, 5 - saveData.hp));
+            document.getElementById('p-status-hearts').textContent = heartsStr;
 
             const needed = getNextLevelExp(saveData.level);
-            document.getElementById('home-exp-text').textContent = `EXP: ${saveData.exp} / ${needed}`;
-            document.getElementById('home-next-exp').textContent = `つぎのLvまであと ${needed - saveData.exp}`;
+            document.getElementById('p-status-exp').textContent = `EXP: ${saveData.exp} / ${needed}`;
+            document.getElementById('p-status-next').textContent = `つぎまであと ${needed - saveData.exp}`;
 
             const fillPercent = Math.min(100, (saveData.exp / needed) * 100);
-            document.getElementById('home-exp-fill').style.width = `${fillPercent}%`;
-
-            const goBtn = document.getElementById('btn-go-adventure');
-            if (saveData.hp <= 0) {
-                goBtn.textContent = "❌ HPゼロ (ぼうけんに出られない)";
-                goBtn.style.borderColor = "#ff4444";
-                goBtn.style.color = "#ff8888";
-            } else {
-                goBtn.textContent = "⚔️ ぼうけんにでる";
-                goBtn.style.borderColor = "#ff5555";
-                goBtn.style.color = "#fff";
-            }
+            document.getElementById('p-status-exp-fill').style.width = `${fillPercent}%`;
         }
 
         function showHome() {
             playBGM('home');
-            updateHomeStatus();
+            updatePersistentStatus();
             if (saveData.hp <= 0) {
                 showGameOverScreen();
                 return;
@@ -1002,16 +1033,11 @@
             });
 
             const nextAreaBtn = document.createElement('div');
-            if (allStagesCleared) {
-                nextAreaBtn.className = `stage-item locked`;
-                nextAreaBtn.textContent = "？？？のステージ (つぎの冒険へ準備中...)";
-            } else {
-                nextAreaBtn.className = `stage-item locked`;
-                nextAreaBtn.textContent = "🔒 ？？？ (すべての段をクリアすると…？)";
-            }
+            nextAreaBtn.className = `stage-item locked`;
+            nextAreaBtn.textContent = allStagesCleared ? "？？？のステージ (つぎの冒険へ準備中...)" : "🔒 ？？？ (すべての段をクリアすると…？)";
             nextAreaBtn.onclick = () => {
                 if (allStagesCleared) {
-                    alert("すべての段を制覇した！つぎの冒険の舞台は…これからのアップデートをまつべし！");
+                    alert("すべての段を制覇した！つぎの冒険の舞台は…今後のアップデートをまつべし！");
                 } else {
                     alert("すべての段をクリアすると、あたらしい冒険エリアへの門が開くぞ！");
                 }
@@ -1066,8 +1092,8 @@
             document.getElementById('battle-progress').style.width = `${hpPercent}%`;
             document.getElementById('enemy-hp-text').textContent = `${remainingHp} / 9`;
 
-            const heartsStr = "♥".repeat(currentBattleHp) + "♡".repeat(5 - currentBattleHp);
-            document.getElementById('battle-hearts').textContent = heartsStr;
+            saveData.hp = currentBattleHp;
+            updatePersistentStatus();
         }
 
         function loadCurrentProblem() {
@@ -1121,7 +1147,6 @@
                     showPopup("こうげきヒット！");
                     playHitSound();
 
-                    // 正解ごとの経験値を加算（ランダムモードは多め）
                     const solvedExp = isRandomMode ? 3 : 1;
                     stageEarnedExp += solvedExp;
                     addExp(solvedExp);
@@ -1138,31 +1163,26 @@
                         monsterEl.classList.remove('hit');
 
                         if (currentMultiplierIndex >= 9) {
-                            // クリアボーナスEXP
                             const clearBonusExp = isRandomMode ? 15 : 5;
                             stageEarnedExp += clearBonusExp;
                             addExp(clearBonusExp);
 
-                            // セーブデータのHPを更新
                             saveData.hp = currentBattleHp;
                             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
 
                             monsterEl.classList.add('defeated');
                             stopBGM();
                             playVictoryFanfare();
-                            setTimeout(() => {
-                                completeStage();
-                            }, 1200);
+                            setTimeout(() => { completeStage(); }, 1200);
                         } else {
                             loadCurrentProblem();
                         }
                     });
                 } else {
-                    // 間違えた場合
                     playDamageSound();
                     currentBattleHp--;
                     saveData.hp = currentBattleHp;
-                    saveData.failedStage = currentStage; // やられた段を記録
+                    saveData.failedStage = currentStage;
                     localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
 
                     updateBattleStatusDisplay();
@@ -1171,9 +1191,7 @@
                         isAnswered = true;
                         showPopup("HPがゼロになった…");
                         stopBGM();
-                        setTimeout(() => {
-                            showGameOverScreen();
-                        }, 1000);
+                        setTimeout(() => { showGameOverScreen(); }, 1000);
                         return;
                     }
 
@@ -1220,15 +1238,16 @@
             }
             saveData.hp = currentBattleHp;
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+            updatePersistentStatus();
 
             switchScreen('result-screen');
         }
 
-        // --- いやしの泉（復活ミニゲーム） ---
+        // --- いやしの泉（復活ミニゲーム & ヒント機能） ---
         function startSpringRecovery() {
             springStage = saveData.failedStage || 2;
             springIndex = 0;
-            saveData.hp = 0; // 回復していく
+            saveData.hp = 0;
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             playBGM('spring');
             switchScreen('spring-screen');
@@ -1237,6 +1256,8 @@
 
         function loadSpringProblem() {
             springInputString = "";
+            springMistakeCount = 0;
+            clearSpringKeyGlow();
             updateSpringInputDisplay();
 
             const b = springIndex + 1;
@@ -1247,11 +1268,30 @@
                 document.getElementById('spring-kana-display').textContent = kukuData[springStage][b].first;
             }
 
-            // 音声再生
             const audioPath = `audio/${springStage}-${b}_1.wav`;
             if (currentAudio) { currentAudio.pause(); }
             currentAudio = new Audio(audioPath);
             currentAudio.play().catch(e => {});
+        }
+
+        function clearSpringKeyGlow() {
+            document.querySelectorAll('#spring-keypad .pixel-key').forEach(k => {
+                k.classList.remove('hint-glow');
+            });
+        }
+
+        function showSpringHint() {
+            const b = springIndex + 1;
+            const correctAnswer = springStage * b;
+            const ansStr = correctAnswer.toString();
+
+            // 正解の数字に該当するボタンを光らせる（1桁目または2桁目のボタン）
+            for (let char of ansStr) {
+                const targetBtn = document.getElementById(`skey-${char}`);
+                if (targetBtn) {
+                    targetBtn.classList.add('hint-glow');
+                }
+            }
         }
 
         function inputSpringNumber(num) {
@@ -1267,16 +1307,16 @@
             if (springInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
                     playHitSound();
+                    clearSpringKeyGlow();
                     showPopup("せいかい！♥が1つかいふく！");
 
-                    // HPを1つ回復（最大5まで）
                     saveData.hp = Math.min(5, saveData.hp + 1);
                     localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                    updatePersistentStatus();
 
                     document.getElementById('spring-problem-display').textContent = `${springStage} × ${b} ＝ ${correctAnswer}`;
                     document.getElementById('spring-kana-display').textContent = kukuData[springStage][b].first + kukuData[springStage][b].second;
 
-                    // 2つ目の音声を鳴らして次へ
                     const audioPath = `audio/${springStage}-${b}_2.wav`;
                     if (currentAudio) { currentAudio.pause(); }
                     currentAudio = new Audio(audioPath);
@@ -1293,7 +1333,16 @@
                         }
                     }, 1000);
                 } else {
-                    showPopup("ざんねん！もういちど");
+                    playDamageSound();
+                    springMistakeCount++;
+                    
+                    if (springMistakeCount >= 1) {
+                        showPopup("ヒント：光るボタンを押してね！");
+                        showSpringHint();
+                    } else {
+                        showPopup("ざんねん！もういちど");
+                    }
+
                     springInputString = "";
                     updateSpringInputDisplay();
                 }
@@ -1309,7 +1358,7 @@
             document.getElementById('spring-input-display').textContent = springInputString === "" ? "-" : springInputString;
         }
 
-        // --- 練習モード (準備) ---
+        // --- 練習モード ---
         function showPracticeStageSelect() {
             playBGM('home');
             const container = document.getElementById('practice-stage-list-container');
