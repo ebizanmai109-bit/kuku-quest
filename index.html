@@ -205,7 +205,7 @@
         }
 
         .problem-text {
-            font-size: 2.6rem;
+            font-size: 2.3rem;
             font-weight: 900;
             color: #1A365D;
         }
@@ -369,8 +369,7 @@
         </div>
 
         <div class="problem-card">
-            <!-- 問題の上にひらがな読みを表示 -->
-            <div class="kana-display" id="kana-first">にいちが</div>
+            <div class="kana-display" id="kana-display">にいちが</div>
             <div class="problem-text" id="problem-display">2 × 1</div>
         </div>
 
@@ -408,7 +407,6 @@
     </div>
 
     <script>
-        // 正しい読み方データを内蔵
         const kukuData = {
             1: {
                 1: { first: "いんいちが", second: "いち" },
@@ -536,6 +534,7 @@
         let startTime = 0;
         let userInputString = "";
         let problemsQueue = [];
+        let isAnswered = false; // 正解演出中フラグ
 
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -588,6 +587,7 @@
         function startBattle(stageNum) {
             currentStage = stageNum;
             currentMultiplierIndex = 0;
+            isAnswered = false;
             
             problemsQueue = [];
             for (let b = 1; b <= 9; b++) {
@@ -607,6 +607,7 @@
         }
 
         function loadCurrentProblem() {
+            isAnswered = false;
             userInputString = "";
             updateInputDisplay();
 
@@ -616,19 +617,21 @@
             const progressPercent = (currentMultiplierIndex / 9) * 100;
             document.getElementById('battle-progress').style.width = `${progressPercent}%`;
 
+            // 問題表示を初期状態に戻す
             document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b}`;
 
             if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
                 const data = kukuData[prob.a][prob.b];
-                document.getElementById('kana-first').textContent = data.first;
+                document.getElementById('kana-display').textContent = data.first;
             } else {
-                document.getElementById('kana-first').textContent = `${prob.a} × ${prob.b}`;
+                document.getElementById('kana-display').textContent = `${prob.a} × ${prob.b}`;
             }
 
             playFirstAudio();
         }
 
         function playFirstAudio() {
+            if (isAnswered) return;
             const prob = problemsQueue[currentMultiplierIndex];
             const audioPath = `audio/${prob.a}-${prob.b}_1.wav`;
 
@@ -638,12 +641,12 @@
             }
 
             currentAudio = new Audio(audioPath);
-            const firstPart = document.getElementById('kana-first');
+            const kanaEl = document.getElementById('kana-display');
 
             currentAudio.play().then(() => {
-                firstPart.style.opacity = "0.5";
+                kanaEl.style.opacity = "0.5";
                 currentAudio.onended = () => {
-                    firstPart.style.opacity = "1";
+                    kanaEl.style.opacity = "1";
                 };
             }).catch(e => {
                 console.warn("前半の音声ファイルがありません:", audioPath);
@@ -660,7 +663,8 @@
                 currentAudio = null;
             }
 
-            const firstPart = document.getElementById('kana-first');
+            const kanaEl = document.getElementById('kana-display');
+            kanaEl.style.opacity = "1";
 
             let audio1 = new Audio(path1);
             currentAudio = audio1;
@@ -691,6 +695,7 @@
         }
 
         function inputNumber(num) {
+            if (isAnswered) return; // 正解判定中は入力を受け付けない
             if (userInputString.length >= 2) return;
             userInputString += num.toString();
             updateInputDisplay();
@@ -699,13 +704,20 @@
             const correctAnswer = prob.a * prob.b;
             const userAns = parseInt(userInputString, 10);
 
-            // 1桁の答えなら1文字入力時、2桁の答えなら2文字入力時に自動判定
             const targetLength = correctAnswer >= 10 ? 2 : 1;
 
             if (userInputString.length === targetLength) {
                 if (userAns === correctAnswer) {
+                    isAnswered = true;
                     showPopup("せいかい！🎉");
                     
+                    // 表示を「2 × 7 ＝ 14」と、対応する「にしちじゅうし」に変更
+                    document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b} ＝ ${correctAnswer}`;
+                    if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
+                        const data = kukuData[prob.a][prob.b];
+                        document.getElementById('kana-display').textContent = data.first + data.second;
+                    }
+
                     const monsterEl = document.getElementById('monster-emoji');
                     monsterEl.classList.add('attacked');
 
@@ -729,6 +741,7 @@
         }
 
         function clearInput() {
+            if (isAnswered) return;
             userInputString = "";
             updateInputDisplay();
         }
