@@ -52,17 +52,28 @@
         <div id="problem-display">2 × 5 = ?</div>
         
         <!-- 音声をもう一度聞くボタン -->
-        <button class="btn-replay" onclick="playCurrentAudio()">🔊 もう一度聞く</button>
+        <button class="btn-replay" onclick="playCurrentAudio()">🔊 九九を聞く</button>
         
-        <!-- 音声認識（マイク）エリア -->
-        <div style="margin-bottom: 15px;">
-            <button id="mic-btn" class="btn" style="background-color: #e74c3c; font-size: 16px; padding: 10px 20px;" onclick="startVoiceInput()">🎤 マイクで唱える</button>
-            <p id="recognition-status" style="font-size: 15px; color: #7f8c8d; margin-top: 5px;">ボタンを押して「にくじゅうはち」のように唱えてね</p>
+        <!-- 入力されている答えの表示 -->
+        <div id="answer-display">こたえ：<span id="input-number">?</span></div>
+        
+        <p id="hint-text" style="font-size: 18px; color: #e67e22; font-weight: bold; min-height: 25px;"></p>
+        
+        <!-- 0〜9のテンキーパッド -->
+        <div class="tenkey-grid">
+            <button class="num-btn" onclick="inputNumber(1)">1</button>
+            <button class="num-btn" onclick="inputNumber(2)">2</button>
+            <button class="num-btn" onclick="inputNumber(3)">3</button>
+            <button class="num-btn" onclick="inputNumber(4)">4</button>
+            <button class="num-btn" onclick="inputNumber(5)">5</button>
+            <button class="num-btn" onclick="inputNumber(6)">6</button>
+            <button class="num-btn" onclick="inputNumber(7)">7</button>
+            <button class="num-btn" onclick="inputNumber(8)">8</button>
+            <button class="num-btn" onclick="inputNumber(9)">9</button>
+            <button class="num-btn" onclick="clearInput()" style="background-color: #e74c3c; color: white; font-size: 16px;">けす</button>
+            <button class="num-btn" onclick="inputNumber(0)">0</button>
+            <button class="num-btn" onclick="submitAnswer()" style="background-color: #27ae60; color: white; font-size: 16px;">OK</button>
         </div>
-        
-        <p id="hint-text" style="font-size: 20px; color: #e67e22; font-weight: bold; min-height: 30px;"></p>
-        
-        <div class="grid" id="choices-container"></div>
     </div>
 
     <!-- ステージクリア画面 -->

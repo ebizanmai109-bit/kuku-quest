@@ -20,8 +20,9 @@ def main():
 
     print("AivisSpeechからの音声生成を開始します...")
 
-    for key, text in kuku_data.items():
+    for key, data in kuku_data.items():
         wav_path = os.path.join(AUDIO_DIR, f"{key}.wav")
+        text = data["full"]
         
         if os.path.exists(wav_path):
             print(f"[スキップ] {key}.wav はすでに存在します。")
