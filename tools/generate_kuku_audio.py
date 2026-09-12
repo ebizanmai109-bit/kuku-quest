@@ -2,8 +2,8 @@ import os
 import json
 import requests
 
-BASE_URL = "http://127.0.0.1:10101"
-SPEAKER_ID = 0 
+BASE_URL = "http://127.0.0.1:50021"
+SPEAKER_ID = 119  # 夜語トバリ（明るい）のID
 
 AUDIO_DIR = os.path.join(os.path.dirname(__file__), "..", "audio")
 DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "kuku.json")

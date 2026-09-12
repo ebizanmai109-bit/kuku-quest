@@ -2,88 +2,301 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>九九マスター！算数わくわくゲーム</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>かけ算九九マスター</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --primary-hover: #FF5252;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --bg: #F7F9FC;
+            --card-bg: #FFFFFF;
+            --text: #2D3748;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* スタート画面 (ブラウザ自動再生制限対策) */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+        }
+
+        .start-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 24px 48px;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* メインゲームカード */
+        .game-card {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* 問題表示 */
+        .problem-display {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #1A365D;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        /* ひらがな読み上げ表示 (適度な間隔) */
+        .kana-display {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #4A5568;
+            margin-bottom: 30px;
+            min-height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px; /* 「しちは」と「ごじゅうろく」の間のしっかりした間隔 */
+            background: #EDF2F7;
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+        }
+
+        .kana-part {
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        /* 再生中・強調表示の演出用クラス */
+        .highlight {
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* もう一度聞くボタン (補助機能として控えめかつ分かりやすく) */
+        .replay-btn {
+            background-color: #E2E8F0;
+            color: #4A5568;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-bottom: 35px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .replay-btn:hover {
+            background-color: #CBD5E0;
+        }
+
+        .replay-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 「できた！」ボタン (最も大きくメインの操作) */
+        .next-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 22px;
+            font-size: 2.2rem;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(78, 205, 196, 0.4);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .next-btn:active {
+            transform: scale(0.97);
+            background-color: #3dbdb4;
+        }
+
+        /* 音声ファイルがない場合の控えめな通知 */
+        .audio-notice {
+            font-size: 0.85rem;
+            color: #A0AEC0;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container" id="app">
-    <!-- タイトル画面（最初だけ表示） -->
-    <div id="screen-home">
-        <div class="icon-header">📚✨</div>
-        <h1>九九マスター大冒険</h1>
-        <p>正しいリズムと音声で<br>九九を楽しく覚えましょう</p>
-        <button class="btn btn-primary" onclick="startMeaningScreen()">はじめから（意味の理解）</button>
-        <br>
-        <button class="btn btn-stage" onclick="startStageSelect()" style="width: auto; padding: 15px 30px;">ステージを選ぶ</button>
-    </div>
-
-    <!-- 1. かけ算の意味の理解画面（最初は非表示） -->
-    <div id="screen-meaning" class="hidden" style="display: none;">
-        <h1>🍎 かけ算の意味を知ろう 🍎</h1>
-        <p id="meaning-text">「2つの お皿」に「3個ずつ」りんごが乗っています。<br>りんごのぜんぶの数はいくつかな？</p>
-        <div id="meaning-visual" style="font-size: 40px; margin: 20px;">🍎🍎 🍎🍎 🍎🍎</div>
-        <p style="font-size: 18px; font-weight: bold; color: #27ae60;">「 2 × 3 」は 「 2が 3つ分 」という意味だよ！</p>
-        <button class="btn btn-primary" onclick="nextMeaningStep()">次へ進む</button>
-    </div>
-
-    <!-- ステージ選択画面（最初は非表示） -->
-    <div id="screen-stages" class="hidden" style="display: none;">
-        <h1>🗺️ ステージを選んでね</h1>
-        <div class="stage-grid">
-            <button class="btn btn-stage" onclick="startStage(2)">2の段</button>
-            <button class="btn btn-stage" onclick="startStage(5)">5の段</button>
-            <button class="btn btn-stage" onclick="startStage(3)">3の段</button>
-            <button class="btn btn-stage" onclick="startStage(4)">4の段</button>
-            <button class="btn btn-stage" onclick="startStage(6)">6の段</button>
-            <button class="btn btn-stage" onclick="startStage(7)">7の段</button>
-            <button class="btn btn-stage" onclick="startStage(8)">8の段</button>
-            <button class="btn btn-stage" onclick="startStage(9)">9の段</button>
-            <button class="btn btn-stage" onclick="startStage(1)">1の段</button>
-        </div>
-        <br>
-        <button class="btn" onclick="goHome()" style="background-color: #95a5a6; color:white;">ホームに戻る</button>
-    </div>
-
-    <!-- ゲームプレイ画面（最初は非表示） -->
-    <div id="screen-game" class="hidden" style="display: none;">
-        <div class="score-board" id="score-board">もんだい 1 / 5</div>
-        <div id="problem-display">2 × 5 = ?</div>
-        
-        <button class="btn-replay" onclick="playCurrentAudio()">🔊 九九を聞く</button>
-        
-        <div id="answer-display">こたえ：<span id="input-number">?</span></div>
-        
-        <p id="hint-text" style="font-size: 18px; color: #e67e22; font-weight: bold; min-height: 25px;"></p>
-        
-        <div class="tenkey-grid">
-            <button class="num-btn" onclick="inputNumber(1)">1</button>
-            <button class="num-btn" onclick="inputNumber(2)">2</button>
-            <button class="num-btn" onclick="inputNumber(3)">3</button>
-            <button class="num-btn" onclick="inputNumber(4)">4</button>
-            <button class="num-btn" onclick="inputNumber(5)">5</button>
-            <button class="num-btn" onclick="inputNumber(6)">6</button>
-            <button class="num-btn" onclick="inputNumber(7)">7</button>
-            <button class="num-btn" onclick="inputNumber(8)">8</button>
-            <button class="num-btn" onclick="inputNumber(9)">9</button>
-            <button class="num-btn" onclick="clearInput()" style="background-color: #e74c3c; color: white; font-size: 16px;">けす</button>
-            <button class="num-btn" onclick="inputNumber(0)">0</button>
-            <button class="num-btn" onclick="submitAnswer()" style="background-color: #27ae60; color: white; font-size: 16px;">OK</button>
+    <!-- スタート画面（自動再生制限回避用） -->
+    <div id="start-screen">
+        <div style="text-align: center; padding: 20px;">
+            <h2 style="font-size: 1.8rem; margin-bottom: 25px; color: #2D3748;">かけ算九九を はじめよう！</h2>
+            <button class="start-btn" id="start-game-btn">音声をONにして<br>はじめる</button>
         </div>
     </div>
 
-    <!-- ステージクリア画面（最初は非表示） -->
-    <div id="screen-clear" class="hidden" style="display: none;">
-        <div class="icon-header">🎉</div>
-        <h1>おめでとうございます！</h1>
-        <p id="clear-message">よくがんばりました！</p>
-        <button class="btn btn-primary" onclick="startStageSelect()">ほかの段も挑戦する</button>
-        <br>
-        <button class="btn" onclick="goHome()" style="background-color: #95a5a6; color:white;">ホームに戻る</button>
-    </div>
-</div>
+    <!-- メインゲーム画面 -->
+    <div class="game-card">
+        <!-- 九九の問題 -->
+        <div class="problem-display" id="problem-text">1 × 1</div>
 
-<script src="script.js"></script>
+        <!-- ひらがなの読み (間隔をあけたレイアウト) -->
+        <div class="kana-display">
+            <span class="kana-part" id="kana-first">いんいち</span>
+            <span class="kana-part" id="kana-second">がいち</span>
+        </div>
+
+        <!-- もう一度聞くボタン -->
+        <button class="replay-btn" id="replay-btn" onclick="playCurrentAudio()">
+            🔊 もういちど きく
+        </button>
+
+        <!-- 進むボタン -->
+        <button class="next-btn" onclick="nextProblem()">できた！</button>
+
+        <!-- フォールバック用メッセージ -->
+        <div class="audio-notice" id="audio-notice"></div>
+    </div>
+
+    <!-- 読みデータ定義ファイル読み込み -->
+    <script src="kuku.json"></script>
+    <script>
+        let currentA = 1;
+        let currentB = 1;
+        let currentAudio = null;
+
+        // 音声オン＆スタートボタン
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.opacity = '0';
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+            }, 300);
+
+            // 最初の問題をセットして自動再生
+            generateNewProblem();
+        });
+
+        // ランダムまたは順番に出題するロジック（今回はランダムまたは総当たり）
+        // ここでは子どもが取り組みやすいようにランダム出題ベース
+        function nextProblem() {
+            // 1〜9のランダムな掛け算 (または順番のループなど、お好みに合わせて変更可能)
+            currentA = Math.floor(Math.random() * 9) + 1;
+            currentB = Math.floor(Math.random() * 9) + 1;
+            
+            updateDisplay();
+            playCurrentAudio();
+        }
+
+        // 画面の更新
+        function updateDisplay() {
+            document.getElementById('problem-text').textContent = `${currentA} × ${currentB}`;
+            
+            // kuku.json から対応するデータを取得
+            const noticeEl = document.getElementById('audio-notice');
+            noticeEl.textContent = '';
+
+            if (typeof kukuData !== 'undefined' && kukuData[currentA] && kukuData[currentA][currentB]) {
+                const data = kukuData[currentA][currentB];
+                document.getElementById('kana-first').textContent = data.first;
+                document.getElementById('kana-second').textContent = data.second;
+            } else {
+                // フォールバック
+                document.getElementById('kana-first').textContent = `${currentA} × ${currentB}`;
+                document.getElementById('kana-second').textContent = '';
+            }
+        }
+
+        // 音声の自動再生処理
+        function playCurrentAudio() {
+            const noticeEl = document.getElementById('audio-notice');
+            const audioPath = `audio/${currentA}-${currentB}.wav`;
+            
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            currentAudio = new Audio(audioPath);
+            
+            // 再生開始時の視覚的強調アニメーション
+            const firstPart = document.getElementById('kana-first');
+            const secondPart = document.getElementById('kana-second');
+            
+            currentAudio.play().then(() => {
+                // 音声に合わせて文字をふわっと強調する演出
+                firstPart.classList.add('highlight');
+                setTimeout(() => {
+                    firstPart.classList.remove('highlight');
+                    secondPart.classList.add('highlight');
+                }, 600); // ざっくり前半が終わるタイミングの目安
+                
+                setTimeout(() => {
+                    secondPart.classList.remove('highlight');
+                }, 1400);
+
+            }).catch(e => {
+                // ファイルが存在しない場合や再生エラー時でもゲームを止めない
+                console.warn("音声ファイルの再生に失敗しました:", audioPath);
+                noticeEl.textContent = `(音声ファイル ${currentA}-${currentB}.wav がありませんが遊べます)`;
+            });
+        }
+
+        // ページ読み込み時の初期化（スタートボタン押下前は自動再生しない）
+        window.onload = function() {
+            // 初期値をセットしておく
+            currentA = 1;
+            currentB = 1;
+            updateDisplay();
+        };
+    </script>
 </body>
 </html>
