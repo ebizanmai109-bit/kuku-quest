@@ -42,7 +42,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(247, 249, 252, 0.98);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -92,7 +92,7 @@
             letter-spacing: 2px;
         }
 
-        /* ひらがな読み上げ表示 (適度な間隔) */
+        /* ひらがな読み上げ表示 */
         .kana-display {
             font-size: 2.2rem;
             font-weight: bold;
@@ -102,7 +102,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 24px; /* 「しちは」と「ごじゅうろく」の間のしっかりした間隔 */
+            gap: 24px;
             background: #EDF2F7;
             width: 100%;
             padding: 15px;
@@ -113,13 +113,13 @@
             transition: color 0.2s, transform 0.2s;
         }
 
-        /* 再生中・強調表示の演出用クラス */
+        /* 強調表示 */
         .highlight {
             color: var(--primary);
             transform: scale(1.05);
         }
 
-        /* もう一度聞くボタン (補助機能として控えめかつ分かりやすく) */
+        /* もう一度聞くボタン */
         .replay-btn {
             background-color: #E2E8F0;
             color: #4A5568;
@@ -144,7 +144,7 @@
             transform: scale(0.96);
         }
 
-        /* 「できた！」ボタン (最も大きくメインの操作) */
+        /* 「できた！」ボタン */
         .next-btn {
             background-color: var(--secondary);
             color: white;
@@ -164,7 +164,6 @@
             background-color: #3dbdb4;
         }
 
-        /* 音声ファイルがない場合の控えめな通知 */
         .audio-notice {
             font-size: 0.85rem;
             color: #A0AEC0;
@@ -178,42 +177,35 @@
     <!-- スタート画面（自動再生制限回避用） -->
     <div id="start-screen">
         <div style="text-align: center; padding: 20px;">
-            <h2 style="font-size: 1.8rem; margin-bottom: 25px; color: #2D3748;">かけ算九九を はじめよう！</h2>
+            <h2 style="font-size: 2rem; margin-bottom: 25px; color: #2D3748;">かけ算九九を はじめよう！</h2>
             <button class="start-btn" id="start-game-btn">音声をONにして<br>はじめる</button>
         </div>
     </div>
 
     <!-- メインゲーム画面 -->
     <div class="game-card">
-        <!-- 九九の問題 -->
         <div class="problem-display" id="problem-text">1 × 1</div>
 
-        <!-- ひらがなの読み (間隔をあけたレイアウト) -->
         <div class="kana-display">
             <span class="kana-part" id="kana-first">いんいち</span>
             <span class="kana-part" id="kana-second">がいち</span>
         </div>
 
-        <!-- もう一度聞くボタン -->
         <button class="replay-btn" id="replay-btn" onclick="playCurrentAudio()">
             🔊 もういちど きく
         </button>
 
-        <!-- 進むボタン -->
         <button class="next-btn" onclick="nextProblem()">できた！</button>
 
-        <!-- フォールバック用メッセージ -->
         <div class="audio-notice" id="audio-notice"></div>
     </div>
 
-    <!-- 読みデータ定義ファイル読み込み -->
     <script src="kuku.json"></script>
     <script>
         let currentA = 1;
         let currentB = 1;
         let currentAudio = null;
 
-        // 音声オン＆スタートボタン
         document.getElementById('start-game-btn').addEventListener('click', () => {
             const startScreen = document.getElementById('start-screen');
             startScreen.style.opacity = '0';
@@ -221,14 +213,10 @@
                 startScreen.style.display = 'none';
             }, 300);
 
-            // 最初の問題をセットして自動再生
-            generateNewProblem();
+            nextProblem();
         });
 
-        // ランダムまたは順番に出題するロジック（今回はランダムまたは総当たり）
-        // ここでは子どもが取り組みやすいようにランダム出題ベース
         function nextProblem() {
-            // 1〜9のランダムな掛け算 (または順番のループなど、お好みに合わせて変更可能)
             currentA = Math.floor(Math.random() * 9) + 1;
             currentB = Math.floor(Math.random() * 9) + 1;
             
@@ -236,11 +224,9 @@
             playCurrentAudio();
         }
 
-        // 画面の更新
         function updateDisplay() {
             document.getElementById('problem-text').textContent = `${currentA} × ${currentB}`;
             
-            // kuku.json から対応するデータを取得
             const noticeEl = document.getElementById('audio-notice');
             noticeEl.textContent = '';
 
@@ -249,13 +235,11 @@
                 document.getElementById('kana-first').textContent = data.first;
                 document.getElementById('kana-second').textContent = data.second;
             } else {
-                // フォールバック
                 document.getElementById('kana-first').textContent = `${currentA} × ${currentB}`;
                 document.getElementById('kana-second').textContent = '';
             }
         }
 
-        // 音声の自動再生処理
         function playCurrentAudio() {
             const noticeEl = document.getElementById('audio-notice');
             const audioPath = `audio/${currentA}-${currentB}.wav`;
@@ -267,32 +251,27 @@
 
             currentAudio = new Audio(audioPath);
             
-            // 再生開始時の視覚的強調アニメーション
             const firstPart = document.getElementById('kana-first');
             const secondPart = document.getElementById('kana-second');
             
             currentAudio.play().then(() => {
-                // 音声に合わせて文字をふわっと強調する演出
                 firstPart.classList.add('highlight');
                 setTimeout(() => {
                     firstPart.classList.remove('highlight');
                     secondPart.classList.add('highlight');
-                }, 600); // ざっくり前半が終わるタイミングの目安
+                }, 600);
                 
                 setTimeout(() => {
                     secondPart.classList.remove('highlight');
                 }, 1400);
 
-            }).catch(e => {
-                // ファイルが存在しない場合や再生エラー時でもゲームを止めない
+            }.catch(e => {
                 console.warn("音声ファイルの再生に失敗しました:", audioPath);
                 noticeEl.textContent = `(音声ファイル ${currentA}-${currentB}.wav がありませんが遊べます)`;
             });
         }
 
-        // ページ読み込み時の初期化（スタートボタン押下前は自動再生しない）
         window.onload = function() {
-            // 初期値をセットしておく
             currentA = 1;
             currentB = 1;
             updateDisplay();
