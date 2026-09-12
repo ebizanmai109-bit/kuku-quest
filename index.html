@@ -9,7 +9,7 @@
 <body>
 
 <div class="container" id="app">
-    <!-- タイトル画面 -->
+    <!-- タイトル画面（最初だけ表示） -->
     <div id="screen-home">
         <div class="icon-header">📚✨</div>
         <h1>九九マスター大冒険</h1>
@@ -19,8 +19,8 @@
         <button class="btn btn-stage" onclick="startStageSelect()" style="width: auto; padding: 15px 30px;">ステージを選ぶ</button>
     </div>
 
-    <!-- 1. かけ算の意味の理解画面 -->
-    <div id="screen-meaning" class="hidden">
+    <!-- 1. かけ算の意味の理解画面（最初は非表示） -->
+    <div id="screen-meaning" class="hidden" style="display: none;">
         <h1>🍎 かけ算の意味を知ろう 🍎</h1>
         <p id="meaning-text">「2つの お皿」に「3個ずつ」りんごが乗っています。<br>りんごのぜんぶの数はいくつかな？</p>
         <div id="meaning-visual" style="font-size: 40px; margin: 20px;">🍎🍎 🍎🍎 🍎🍎</div>
@@ -28,8 +28,8 @@
         <button class="btn btn-primary" onclick="nextMeaningStep()">次へ進む</button>
     </div>
 
-    <!-- ステージ選択画面 -->
-    <div id="screen-stages" class="hidden">
+    <!-- ステージ選択画面（最初は非表示） -->
+    <div id="screen-stages" class="hidden" style="display: none;">
         <h1>🗺️ ステージを選んでね</h1>
         <div class="stage-grid">
             <button class="btn btn-stage" onclick="startStage(2)">2の段</button>
@@ -46,20 +46,17 @@
         <button class="btn" onclick="goHome()" style="background-color: #95a5a6; color:white;">ホームに戻る</button>
     </div>
 
-    <!-- ゲームプレイ画面 -->
-    <div id="screen-game" class="hidden">
+    <!-- ゲームプレイ画面（最初は非表示） -->
+    <div id="screen-game" class="hidden" style="display: none;">
         <div class="score-board" id="score-board">もんだい 1 / 5</div>
         <div id="problem-display">2 × 5 = ?</div>
         
-        <!-- 音声をもう一度聞くボタン -->
         <button class="btn-replay" onclick="playCurrentAudio()">🔊 九九を聞く</button>
         
-        <!-- 入力されている答えの表示 -->
         <div id="answer-display">こたえ：<span id="input-number">?</span></div>
         
         <p id="hint-text" style="font-size: 18px; color: #e67e22; font-weight: bold; min-height: 25px;"></p>
         
-        <!-- 0〜9のテンキーパッド -->
         <div class="tenkey-grid">
             <button class="num-btn" onclick="inputNumber(1)">1</button>
             <button class="num-btn" onclick="inputNumber(2)">2</button>
@@ -76,8 +73,8 @@
         </div>
     </div>
 
-    <!-- ステージクリア画面 -->
-    <div id="screen-clear" class="hidden">
+    <!-- ステージクリア画面（最初は非表示） -->
+    <div id="screen-clear" class="hidden" style="display: none;">
         <div class="icon-header">🎉</div>
         <h1>おめでとうございます！</h1>
         <p id="clear-message">よくがんばりました！</p>
