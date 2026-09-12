@@ -952,9 +952,10 @@
         <div id="special-practice-screen" class="screen">
             <div class="battle-header"><button class="back-home-btn" onclick="showSpecialPracticeInfo()">◀ やめる</button><span>とっくん</span><span id="special-practice-counter">1</span></div>
             <div class="rpg-window" style="margin-top:20px;"><div class="rpg-kana" id="special-practice-kana"></div><div class="rpg-problem" id="special-practice-problem">7 × 8</div></div>
+            <button class="retro-btn secondary" onclick="playSpecialPracticeAudio()" style="font-size:0.95rem; padding:9px; margin-top:8px;">🔊 おんせいを もういちど きく</button>
             <div class="input-screen-box" id="special-practice-input">-</div>
-            <div class="pixel-keypad">
-                <button class="pixel-key" onclick="inputSpecialPracticeNumber(1)">1</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(2)">2</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(3)">3</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(4)">4</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(5)">5</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(6)">6</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(7)">7</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(8)">8</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(9)">9</button><button class="pixel-key clear-key" onclick="clearSpecialPracticeInput()">けす</button><button class="pixel-key" onclick="inputSpecialPracticeNumber(0)">0</button>
+            <div class="pixel-keypad" id="special-practice-keypad">
+                <button class="pixel-key" id="spkey-1" onclick="inputSpecialPracticeNumber(1)">1</button><button class="pixel-key" id="spkey-2" onclick="inputSpecialPracticeNumber(2)">2</button><button class="pixel-key" id="spkey-3" onclick="inputSpecialPracticeNumber(3)">3</button><button class="pixel-key" id="spkey-4" onclick="inputSpecialPracticeNumber(4)">4</button><button class="pixel-key" id="spkey-5" onclick="inputSpecialPracticeNumber(5)">5</button><button class="pixel-key" id="spkey-6" onclick="inputSpecialPracticeNumber(6)">6</button><button class="pixel-key" id="spkey-7" onclick="inputSpecialPracticeNumber(7)">7</button><button class="pixel-key" id="spkey-8" onclick="inputSpecialPracticeNumber(8)">8</button><button class="pixel-key" id="spkey-9" onclick="inputSpecialPracticeNumber(9)">9</button><button class="pixel-key clear-key" onclick="clearSpecialPracticeInput()">けす</button><button class="pixel-key" id="spkey-0" onclick="inputSpecialPracticeNumber(0)">0</button>
             </div>
         </div>
 
@@ -2370,13 +2371,39 @@
             loadSpecialPracticeProblem();
         }
 
+        function clearSpecialPracticeKeyGlow() {
+            document.querySelectorAll('#special-practice-keypad .pixel-key').forEach(k => k.classList.remove('hint-glow'));
+        }
+
+        function showSpecialPracticeHint() {
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            if (!p) return;
+            const ansStr = String(p.a * p.b);
+            for (const char of ansStr) {
+                const btn = document.getElementById(`spkey-${char}`);
+                if (btn) btn.classList.add('hint-glow');
+            }
+        }
+
+        function playSpecialPracticeAudio() {
+            if (!specialPracticeProblems.length) return;
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            const audioPath = `audio/${p.a}-${p.b}_1.wav`;
+            if (currentAudio) currentAudio.pause();
+            currentAudio = new Audio(audioPath);
+            currentAudio.play().catch(e => {});
+        }
+
         function loadSpecialPracticeProblem() {
             if (!specialPracticeProblems.length) return;
             const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
             document.getElementById('special-practice-counter').textContent = `${specialPracticeIndex + 1}`;
             document.getElementById('special-practice-problem').textContent = `${p.a} × ${p.b}`;
-            document.getElementById('special-practice-kana').textContent = kukuData[p.a][p.b].first + kukuData[p.a][p.b].second;
-            specialPracticeInput = ''; specialPracticeLocked = false; updateSpecialPracticeInput();
+            document.getElementById('special-practice-kana').textContent = (kukuData[p.a] && kukuData[p.a][p.b]) ? kukuData[p.a][p.b].first : '';
+            specialPracticeInput = ''; specialPracticeLocked = false;
+            clearSpecialPracticeKeyGlow();
+            updateSpecialPracticeInput();
+            playSpecialPracticeAudio();
         }
 
         function inputSpecialPracticeNumber(num) {
@@ -2389,6 +2416,11 @@
                 if (Number(specialPracticeInput) === answer) {
                     const key = p.key;
                     const mastery = Number(saveData.practiceMastery[key] || 0) + 1;
+                    clearSpecialPracticeKeyGlow();
+                    const audioPath = `audio/${p.a}-${p.b}_2.wav`;
+                    if (currentAudio) currentAudio.pause();
+                    currentAudio = new Audio(audioPath);
+                    currentAudio.play().catch(e => {});
                     saveData.practiceMastery[key] = mastery;
                     if (mastery >= 3) { delete saveData.mistakeProblems[key]; delete saveData.practiceMastery[key]; showPopup(`${p.a}×${p.b}を とっくん クリア！`); } else { showPopup('せいかい！'); }
                     saveGameData();
@@ -2400,7 +2432,9 @@
                     }, 650);
                 } else {
                     saveData.mistakeProblems[p.key] = Number(saveData.mistakeProblems[p.key] || 0) + 1;
-                    saveData.practiceMastery[p.key] = 0; saveGameData(); showPopup('ざんねん！ もういちど とっくんじゃ！');
+                    saveData.practiceMastery[p.key] = 0; saveGameData();
+                    showPopup('ざんねん！ もういちど とっくんじゃ！');
+                    showSpecialPracticeHint();
                     setTimeout(() => { specialPracticeInput=''; specialPracticeLocked=false; updateSpecialPracticeInput(); }, 650);
                 }
             }
