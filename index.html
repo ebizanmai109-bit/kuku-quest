@@ -779,9 +779,18 @@
                 <h1>ゆうしゃの いえ</h1>
                 <p class="subtitle">きょうも くくの しゅぎょうじゃ！</p>
             </div>
-            <div class="field-box" style="height: 150px;">
-                <img id="home-hero-icon" class="hero-img" src="image/boy-1.png" alt="主人公">
-                <p id="home-last-adventure" style="font-size: 0.78rem; color: #8ef; margin-top: 5px;">さいごの ぼうけん：まだ ありません</p>
+            <div class="field-box" style="height: 150px; padding: 8px;">
+                <div style="display:flex; justify-content:center; align-items:flex-end; gap:18px; width:100%;">
+                    <div style="text-align:center;">
+                        <img id="home-hero-icon" class="hero-img" src="image/boy-1.png" alt="主人公">
+                        <div style="font-size:0.7rem; color:#aaa;">しゅじんこう</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <img id="home-companion-icon" class="hero-img" src="image/pet-1.png" alt="あいぼう">
+                        <div style="font-size:0.7rem; color:#aaa;">あいぼう</div>
+                    </div>
+                </div>
+                <p id="home-last-adventure" style="font-size: 0.78rem; color: #8ef; margin-top: 3px;">さいごの ぼうけん：まだ ありません</p>
             </div>
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
@@ -801,8 +810,18 @@
             </div>
 
             <div class="profile-card">
-                <div class="profile-hero" id="profile-hero-icon">🦭</div>
+                <div class="profile-characters" style="display:flex; justify-content:center; align-items:flex-end; gap:18px; margin-bottom:8px;">
+                    <div style="text-align:center;">
+                        <img id="profile-hero-icon" class="hero-img" src="image/boy-1.png" alt="主人公">
+                        <div style="font-size:0.7rem; color:#aaa;">しゅじんこう</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <img id="profile-companion-icon" class="hero-img" src="image/pet-1.png" alt="あいぼう">
+                        <div style="font-size:0.7rem; color:#aaa;">あいぼう</div>
+                    </div>
+                </div>
                 <button class="retro-btn secondary" onclick="openCharacterSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">👥 キャラクターをかえる</button>
+                <button class="retro-btn secondary" onclick="openCompanionSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🐾 あいぼうをえらぶ</button>
                 <div class="profile-name" id="profile-name">ゆうしゃ</div>
                 <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
 
@@ -1277,9 +1296,11 @@
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
             playerName: "ゆうしゃ",
             heroIcon: "image/boy-1.png",
+            companionIcon: "image/pet-1.png",
             lastAdventureAt: null,
             unlockedStages: [1],
             clearedStages: [],
+            stageClearCounts: {},
             randomClearCounts: {},
             level: 1,
             exp: 0,
@@ -1288,6 +1309,7 @@
             failedIsNextWorld: false,
             failedNextLevel: 1,
             clearedNextLevels: [],
+            nextWorldClearCounts: {},
             totalCorrect: 0,
             totalAnswered: 0,
             bestCombo: 0,
@@ -1295,7 +1317,10 @@
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.heroIcon === 'undefined') saveData.heroIcon = "image/boy-1.png";
+        if (typeof saveData.companionIcon === 'undefined') saveData.companionIcon = "image/pet-1.png";
         if (typeof saveData.lastAdventureAt === 'undefined') saveData.lastAdventureAt = null;
+        if (!saveData.stageClearCounts) saveData.stageClearCounts = {};
+        if (!saveData.nextWorldClearCounts) saveData.nextWorldClearCounts = {};
         if (typeof saveData.level === 'undefined') saveData.level = 1;
         if (typeof saveData.exp === 'undefined') saveData.exp = 0;
         if (typeof saveData.hp === 'undefined') saveData.hp = 5;
@@ -1316,6 +1341,8 @@
         let currentNextLevel = 1;
         let currentMultiplierIndex = 0;
         let currentAudio = null;
+        // 連続正解数。画面には表示せず、最高記録だけ保存します。
+        let currentCombo = 0;
         let startTime = 0;
         let userInputString = "";
         let problemsQueue = [];
@@ -1436,6 +1463,11 @@
                 hero.src = saveData.heroIcon || "image/boy-1.png";
             }
 
+            const companion = document.getElementById('home-companion-icon');
+            if (companion) {
+                companion.src = saveData.companionIcon || "image/pet-1.png";
+            }
+
             if (lastAdventure) {
                 if (saveData.lastAdventureAt) {
                     const d = new Date(saveData.lastAdventureAt);
@@ -1493,8 +1525,13 @@
 
                 const btn = document.createElement('div');
                 btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? "" : " [🔒]");
-                
+                const clearCount = isCleared
+                    ? Math.max(1, Number(saveData.stageClearCounts?.[stageNum]) || 0)
+                    : 0;
+                const clearMark = isCleared ? " ★" : "";
+                const countText = isCleared ? ` (${clearCount}回クリア)` : " (0回クリア)";
+                btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? `${clearMark}${countText}` : " [🔒]");
+
                 if (isUnlocked) {
                     btn.onclick = () => startBattle(stageNum, false, false);
                 }
@@ -1539,7 +1576,14 @@
 
                 const btn = document.createElement('div');
                 btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                btn.textContent = isUnlocked ? `Lv.${lvl} ${nwMonster.name} (${count}もん)` : `Lv.${lvl} ${nwMonster.name} [🔒 まえのレベルをクリアしてね]`;
+                const clearCount = isCleared
+                    ? Math.max(1, Number(saveData.nextWorldClearCounts?.[lvl]) || 0)
+                    : 0;
+                const clearMark = isCleared ? " ★" : "";
+                const countText = isCleared ? ` (${clearCount}回クリア)` : " (0回クリア)";
+                btn.textContent = isUnlocked
+                    ? `Lv.${lvl} ${nwMonster.name} (${count}もん)${clearMark}${countText}`
+                    : `Lv.${lvl} ${nwMonster.name} [🔒 まえのレベルをクリアしてね]`;
                 
                 if (isUnlocked) {
                     btn.onclick = () => startNextWorldBattle(lvl);
@@ -1827,10 +1871,14 @@
                 if (!saveData.clearedNextLevels.includes(currentNextLevel)) {
                     saveData.clearedNextLevels.push(currentNextLevel);
                 }
+                    saveData.nextWorldClearCounts[currentNextLevel] =
+                        (Number(saveData.nextWorldClearCounts[currentNextLevel]) || 0) + 1;
             } else {
                 if (!saveData.clearedStages.includes(currentStage)) {
                     saveData.clearedStages.push(currentStage);
                 }
+                    saveData.stageClearCounts[currentStage] =
+                        (Number(saveData.stageClearCounts[currentStage]) || 0) + 1;
                 const currentIdx = STAGE_ORDER.indexOf(currentStage);
                 if (currentIdx < STAGE_ORDER.length - 1) {
                     const nextStageNum = STAGE_ORDER[currentIdx + 1];
@@ -2087,29 +2135,29 @@
         // Lv.10以降は節目のレベルで特別な姿を解放します。
 
         const AVAILABLE_CHARACTERS = [
-            { path: "image/girl-1.png", name: "女の子 1", minLevel: 1 },
-            { path: "image/boy-1.png",  name: "男の子 1", minLevel: 1 },
+            { path: "image/girl-1.png", name: "ククリン", minLevel: 1 },
+            { path: "image/boy-1.png",  name: "ククル", minLevel: 1 },
 
-            { path: "image/girl-2.png", name: "女の子 2", minLevel: 3 },
-            { path: "image/boy-2.png",  name: "男の子 2", minLevel: 3 },
+            { path: "image/girl-2.png", name: "ククリン", minLevel: 3 },
+            { path: "image/boy-2.png",  name: "ククル", minLevel: 3 },
 
-            { path: "image/girl-3.png", name: "女の子 3", minLevel: 5 },
-            { path: "image/boy-3.png",  name: "男の子 3", minLevel: 5 },
+            { path: "image/girl-3.png", name: "ククリン", minLevel: 5 },
+            { path: "image/boy-3.png",  name: "ククル", minLevel: 5 },
 
-            { path: "image/girl-4.png", name: "女の子 4", minLevel: 7 },
-            { path: "image/boy-4.png",  name: "男の子 4", minLevel: 7 },
+            { path: "image/girl-4.png", name: "ククリン", minLevel: 7 },
+            { path: "image/boy-4.png",  name: "ククル", minLevel: 7 },
 
-            { path: "image/girl-5.png", name: "女の子 5", minLevel: 9 },
-            { path: "image/boy-5.png",  name: "男の子 5", minLevel: 9 },
+            { path: "image/girl-5.png", name: "ククリン", minLevel: 9 },
+            { path: "image/boy-5.png",  name: "ククル", minLevel: 9 },
 
-            { path: "image/girl-6.png", name: "女の子 6", minLevel: 10 },
-            { path: "image/boy-6.png",  name: "男の子 6", minLevel: 10 },
+            { path: "image/girl-6.png", name: "ククリン", minLevel: 10 },
+            { path: "image/boy-6.png",  name: "ククル", minLevel: 10 },
 
-            { path: "image/girl-7.png", name: "女の子 7", minLevel: 15 },
-            { path: "image/boy-7.png",  name: "男の子 7", minLevel: 15 },
+            { path: "image/girl-7.png", name: "ククリン", minLevel: 15 },
+            { path: "image/boy-7.png",  name: "ククル", minLevel: 15 },
 
-            { path: "image/girl-8.png", name: "女の子 8", minLevel: 20 },
-            { path: "image/boy-8.png",  name: "男の子 8", minLevel: 20 }
+            { path: "image/girl-8.png", name: "ククリン", minLevel: 20 },
+            { path: "image/boy-8.png",  name: "ククル", minLevel: 20 }
         ];
         // 古いセーブデータで絵文字などが入っている場合は、最初の画像へ移行。
         if (!AVAILABLE_CHARACTERS.some(c => c.path === saveData.heroIcon)) {
@@ -2185,6 +2233,87 @@
             updateHomeScreen();
             closeCharacterSelect();
             showPopup(`${targetChar.name}に かえたよ！`);
+        }
+
+        const AVAILABLE_COMPANIONS = [
+            { path: "image/pet-1.png", name: "あいぼう 1", minLevel: 1 },
+            { path: "image/pet-2.png", name: "あいぼう 2", minLevel: 3 },
+            { path: "image/pet-3.png", name: "あいぼう 3", minLevel: 5 },
+            { path: "image/pet-4.png", name: "あいぼう 4", minLevel: 7 },
+            { path: "image/pet-5.png", name: "あいぼう 5", minLevel: 10 },
+            { path: "image/pet-6.png", name: "あいぼう 6", minLevel: 15 }
+        ];
+        if (!AVAILABLE_COMPANIONS.some(c => c.path === saveData.companionIcon)) {
+            saveData.companionIcon = "image/pet-1.png";
+            saveGameData();
+        }
+
+
+        function openCompanionSelect() {
+            renderCompanionSelect();
+            document.getElementById('companion-modal').classList.add('show');
+        }
+
+        function closeCompanionSelect() {
+            document.getElementById('companion-modal').classList.remove('show');
+        }
+
+        function closeCompanionSelectIfOutside(event) {
+            if (event.target.id === 'companion-modal') {
+                closeCompanionSelect();
+            }
+        }
+
+        function renderCompanionSelect() {
+            const currentLevel = Number(saveData.level) || 1;
+            const currentCompanion = saveData.companionIcon || "image/pet-1.png";
+            const grid = document.getElementById('companion-grid');
+
+            document.getElementById('companion-modal-subtitle').textContent =
+                `いまは Lv.${currentLevel}。レベルアップで あたらしい あいぼうが ひらくよ！`;
+
+            grid.innerHTML = AVAILABLE_COMPANIONS.map((item) => {
+                const isUnlocked = currentLevel >= item.minLevel;
+                const isCurrent = currentCompanion === item.path;
+
+                let statusText;
+                if (isCurrent) {
+                    statusText = "★ いまの あいぼう";
+                } else if (isUnlocked) {
+                    statusText = "えらべる！";
+                } else {
+                    statusText = `🔒 Lv.${item.minLevel}で解放`;
+                }
+
+                return `
+                    <button
+                        class="character-choice ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}"
+                        ${isUnlocked ? `onclick="selectCompanion('${item.path}')"` : 'disabled'}
+                    >
+                        <img src="${item.path}" alt="${item.name}">
+                        <div class="char-name">${item.name}</div>
+                        <div class="char-status">${statusText}</div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectCompanion(path) {
+            const target = AVAILABLE_COMPANIONS.find(c => c.path === path);
+            if (!target) return;
+
+            const currentLevel = Number(saveData.level) || 1;
+            if (currentLevel < target.minLevel) {
+                showPopup(`Lv.${target.minLevel}で ひらくよ！`);
+                return;
+            }
+
+            saveData.companionIcon = target.path;
+            saveGameData();
+            updateProfileScreen();
+            updateHomeScreen();
+            closeCompanionSelect();
+            showPopup(`${target.name}を えらんだよ！`);
         }
 
         const PROFILE_TITLES = [
@@ -2284,9 +2413,16 @@
 
         function registerProfileAnswer(isCorrect) {
             saveData.totalAnswered = (Number(saveData.totalAnswered) || 0) + 1;
+
             if (isCorrect) {
                 saveData.totalCorrect = (Number(saveData.totalCorrect) || 0) + 1;
+                currentCombo++;
+                updateBestCombo(currentCombo);
+            } else {
+                currentCombo = 0;
             }
+
+            saveGameData();
         }
 
         function updateBestCombo(combo) {
@@ -2342,5 +2478,15 @@
             updateHomeScreen();
         });
     </script>
+
+    <div id="companion-modal" class="character-modal" onclick="closeCompanionSelectIfOutside(event)">
+        <div class="character-modal-window" onclick="event.stopPropagation()">
+            <div class="character-modal-title">あいぼうを えらぼう！</div>
+            <div class="character-modal-subtitle" id="companion-modal-subtitle">レベルが あがると あたらしい あいぼうが ひらくよ。</div>
+            <div id="companion-grid" class="character-grid"></div>
+            <button class="retro-btn character-close-btn" onclick="closeCompanionSelect()">もどる</button>
+        </div>
+    </div>
+
 </body>
 </html>
