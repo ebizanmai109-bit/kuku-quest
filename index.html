@@ -3,101 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>魔王城の九九クエスト</title>
+    <title>くくの ぼうけん -- RETRO KUKU RPG --</title>
     <style>
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #f0f0f0;
+            font-family: 'Courier New', Courier, monospace, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #111;
+            color: #eee;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
         }
-        .container {
-            background-color: #2a2a2a;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        .window {
+            background-color: #1a1a2e;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 4px #000, 0 8px 20px rgba(0,0,0,0.8);
+            padding: 20px;
+            width: 420px;
+            box-sizing: border-box;
             text-align: center;
-            width: 350px;
+            position: relative;
         }
-        h1 {
-            font-size: 1.5rem;
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .title {
             color: #ffcc00;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        .subtitle {
+            color: #aaa;
+            font-size: 0.8rem;
             margin-bottom: 20px;
         }
-        .info {
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+        .input-box {
+            background-color: #2a2a3e;
+            border: 2px dashed #777;
+            padding: 15px;
+            margin: 15px 0;
         }
-        .question {
-            font-size: 2.5rem;
-            margin: 20px 0;
-            color: #00ffcc;
-        }
-        input[type="number"] {
+        input[type="text"], input[type="number"] {
             font-size: 1.5rem;
-            width: 120px;
+            width: 80%;
             text-align: center;
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #333;
+            padding: 8px;
+            background-color: #111;
             color: #fff;
+            border: 2px solid #ffcc00;
+            font-family: inherit;
+            outline: none;
         }
-        button {
-            margin-top: 15px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: #ff4444;
+        .btn {
+            background-color: #cc0000;
             color: white;
-            border: none;
-            border-radius: 5px;
+            border: 3px solid #ff6666;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
             cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-family: inherit;
+            box-shadow: 0 4px 0 #880000;
         }
-        button:hover {
-            background-color: #ff6666;
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .game-screen {
+            display: none;
+        }
+        .status-panel {
+            display: flex;
+            justify-content: space-between;
+            background-color: #111;
+            border: 2px solid #444;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        .question-box {
+            font-size: 3rem;
+            color: #00ffcc;
+            margin: 25px 0;
+            font-weight: bold;
         }
         #message {
-            margin-top: 15px;
+            height: 2rem;
             font-weight: bold;
-            height: 1.5rem;
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+        .bgm-toggle {
+            background: #333;
+            color: #fff;
+            border: 1px solid #777;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
 
-<div class="container" id="game-container">
-    <h1>魔王城の九九クエスト</h1>
-    <div class="info" id="level-info">レベル 1</div>
-    <div class="info" id="score-info">スコア: 0 / 10</div>
-    <div class="question" id="question-text">? × ?</div>
-    <div id="quiz-area">
-        <input type="number" id="answer-input" autofocus autocomplete="off">
-        <br>
-        <button onclick="checkAnswer()">こうげき！</button>
+<div class="window">
+    <div class="header-bar">
+        <span>🎵 ファミコンちびっこBGM</span>
+        <button class="bgm-toggle" id="bgm-btn" onclick="toggleBGM()">BGM: OFF</button>
     </div>
-    <div id="message"></div>
+
+    <!-- スタート画面（名前入力） -->
+    <div id="start-screen">
+        <div class="title">くくの ぼうけん</div>
+        <div class="subtitle">-- RETRO KUKU RPG --</div>
+        
+        <div class="input-box">
+            <div style="margin-bottom: 10px; font-size: 0.9rem;">🏠 ✨</div>
+            <div style="font-size: 0.9rem; margin-bottom: 10px;">きみの なまえを おしえてね！</div>
+            <input type="text" id="player-name" value="ゆうしゃ" maxlength="8">
+        </div>
+
+        <button class="btn" onclick="startGame()">ぼうけんを はじめる</button>
+    </div>
+
+    <!-- ゲームプレイ画面 -->
+    <div id="game-screen" class="game-screen">
+        <div class="status-panel">
+            <span id="player-status">ゆうしゃ Lv.1</span>
+            <span id="score-status">もんだい: 1/10</span>
+        </div>
+
+        <div class="question-box" id="question-text">? × ?</div>
+
+        <div id="quiz-area">
+            <input type="number" id="answer-input" autocomplete="off">
+            <br>
+            <button class="btn" onclick="checkAnswer()">こうげき！</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
 </div>
 
 <script>
+    let playerName = "ゆうしゃ";
     let currentLevel = 1;
-    let currentScore = 0;
     let currentQuestionCount = 0;
-    const MAX_QUESTIONS_PER_LEVEL = 10; // 現在の問題数を維持
+    const MAX_QUESTIONS_PER_LEVEL = 10;
     let currentA = 0;
     let currentB = 0;
+    let isBgmOn = false;
 
-    const levelInfo = document.getElementById('level-info');
-    const scoreInfo = document.getElementById('score-info');
-    const questionText = document.getElementById('question-text');
-    const answerInput = document.getElementById('answer-input');
-    const message = document.getElementById('message');
+    // Web Audio APIによる簡単なファミコン風効果音・BGM簡易対応
+    let audioCtx = null;
 
-    // レベルごとの出題段の定義
+    function toggleBGM() {
+        isBgmOn = !isBgmOn;
+        document.getElementById('bgm-btn').innerText = isBgmOn ? "BGM: ON" : "BGM: OFF";
+        document.getElementById('bgm-btn').style.background = isBgmOn ? "#008800" : "#333";
+    }
+
+    function playSound(type) {
+        if (!isBgmOn) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            let now = audioCtx.currentTime;
+            if (type === 'hit') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'level') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'miss') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        } catch (e) {
+            // AudioContextエラー防止
+        }
+    }
+
+    function startGame() {
+        const inputName = document.getElementById('player-name').value.trim();
+        if (inputName !== "") {
+            playerName = inputName;
+        }
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-screen').style.display = 'block';
+        
+        loadQuestion();
+    }
+
+    // レベルごとの出題ルール設定
     function getTablesForLevel(level) {
         if (level === 1) return [1, 2, 5];
         if (level === 2) return [2, 5, 3];
@@ -108,83 +237,76 @@
         if (level === 7) return [8, 6, 4, 7];
         
         // レベル8以上：6〜8多め、9わりと、1〜5少しずつ
-        const pool = [
-            1, 2, 3, 4, 5, // 少しずつ
-            9, 9,          // わりと (重み付け)
-            6, 6, 6,       // 多め
-            7, 7, 7,       // 多め
-            8, 8, 8        // 多め
+        return [
+            1, 2, 3, 4, 5,       // 少しずつ
+            9, 9,                // わりと
+            6, 6, 6,             // 多め
+            7, 7, 7,             // 多め
+            8, 8, 8              // 多め
         ];
-        return pool;
     }
 
     function getRandomElement(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    function generateQuestion() {
+    function loadQuestion() {
         if (currentQuestionCount >= MAX_QUESTIONS_PER_LEVEL) {
-            // レベルクリア処理
             currentLevel++;
             currentQuestionCount = 0;
-            message.style.color = "#00ffcc";
-            message.innerText = `レベルアップ！ 次は レベル ${currentLevel} だ！`;
-            setTimeout(nextLevelStart, 1500);
+            playSound('level');
+            document.getElementById('message').style.color = "#00ffcc";
+            document.getElementById('message').innerText = `レベルアップ！ レベル ${currentLevel} になった！`;
+            setTimeout(loadQuestion, 2000);
             return;
         }
 
         const tables = getTablesForLevel(currentLevel);
-        
-        if (currentLevel >= 8) {
-            // レベル8以上はプールから段を選ぶ
-            currentA = getRandomElement(tables);
-        } else {
-            // レベル1〜7は指定された配列からランダムに選ぶ
-            currentA = getRandomElement(tables);
-        }
-        
-        // かける数は 1〜9 の中からランダム
+        currentA = getRandomElement(tables);
         currentB = Math.floor(Math.random() * 9) + 1;
 
-        questionText.innerText = `${currentA} × ${currentB}`;
+        document.getElementById('question-text').innerText = `${currentA} × ${currentB}`;
+        const answerInput = document.getElementById('answer-input');
         answerInput.value = '';
         answerInput.focus();
-        levelInfo.innerText = `レベル ${currentLevel}`;
-        scoreInfo.innerText = `もんだい: ${currentQuestionCount + 1} / ${MAX_QUESTIONS_PER_LEVEL}`;
-        message.innerText = '';
-    }
 
-    function nextLevelStart() {
-        generateQuestion();
+        document.getElementById('player-status').innerText = `${playerName} Lv.${currentLevel}`;
+        document.getElementById('score-status').innerText = `もんだい: ${currentQuestionCount + 1}/${MAX_QUESTIONS_PER_LEVEL}`;
+        document.getElementById('message').innerText = '';
     }
 
     function checkAnswer() {
+        const answerInput = document.getElementById('answer-input');
         const userAnswer = parseInt(answerInput.value, 10);
         const correctAnswer = currentA * currentB;
+        const msgElem = document.getElementById('message');
 
         if (userAnswer === correctAnswer) {
-            currentScore++;
+            playSound('hit');
             currentQuestionCount++;
-            message.style.color = "#00ff00";
-            message.innerText = "せいかい！ 魔王にダメージを与えた！";
-            setTimeout(generateQuestion, 1000);
+            msgElem.style.color = "#00ff00";
+            msgElem.innerText = "せいかい！ まおうに ダメージ！";
+            setTimeout(loadQuestion, 1000);
         } else {
-            message.style.color = "#ff4444";
-            message.innerText = `ざんねん！ 正解は ${correctAnswer} だ！`;
+            playSound('miss');
             currentQuestionCount++;
-            setTimeout(generateQuestion, 1500);
+            msgElem.style.color = "#ff4444";
+            msgElem.innerText = `ざんねん！ 正解は ${correctAnswer} だ！`;
+            setTimeout(loadQuestion, 1500);
         }
     }
 
-    // Enterキーでも回答できるようにする
-    answerInput.addEventListener('keypress', function (e) {
+    // Enterキー対応
+    document.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-            checkAnswer();
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen.style.display !== 'none') {
+                startGame();
+            } else {
+                checkAnswer();
+            }
         }
     });
-
-    // ゲーム開始
-    generateQuestion();
 </script>
 
 </body>
