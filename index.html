@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>九九クエスト - 小学校2年生向け九九ゲーム</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- スタート画面 -->
+        <div id="start-screen" class="screen active">
+            <h1>✨ 九九クエスト ✨</h1>
+            <p class="subtitle">こえをだして、モンスターをたおそう！</p>
+            <div class="menu-box">
+                <button id="start-btn" class="big-btn primary">ぼうけんを はじめる</button>
+                <button id="teacher-btn" class="big-btn secondary">きょうしゅうしゃモード（せいきゅう・せってい）</button>
+                <button id="demo-btn" class="big-btn sub">マイクなし（デモモード）</button>
+            </div>
+        </div>
+
+        <!-- マイク許可画面 -->
+        <div id="mic-screen" class="screen">
+            <h2>マイクのじゅんび</h2>
+            <p>このゲームは、マイクにむかって九九（くく）を声に出してあそびます。<br>マイクのきょかがでたら、「きょかする」をタッチしてね。</p>
+            <button id="mic-ok-btn" class="big-btn primary">マイクをつかう</button>
+        </div>
+
+        <!-- ステージセレクト画面 -->
+        <div id="stage-screen" class="screen">
+            <h2>だんを選んでね</h2>
+            <div id="stage-list" class="stage-grid">
+                <!-- JavaScriptで動的に生成 -->
+            </div>
+            <button id="back-to-title" class="back-btn">もどる</button>
+        </div>
+
+        <!-- バトル（ゲーム本編）画面 -->
+        <div id="battle-screen" class="screen">
+            <div class="top-status">
+                <span id="current-stage-title">2のだん</span>
+                <span id="score-display">せいかい: 0</span>
+                <span id="combo-display">コンボ: 0</span>
+            </div>
+
+            <div class="battle-field">
+                <div class="monster-area">
+                    <div id="monster-img" class="monster">👾</div>
+                    <div class="hp-bar-container">
+                        <div id="monster-hp" class="hp-bar"></div>
+                    </div>
+                </div>
+
+                <div class="question-board">
+                    <div id="question-text" class="question">3 × 7</div>
+                    <div id="feedback-text" class="feedback">大きな声で「さんしち にじゅういち！」</div>
+                </div>
+            </div>
+
+            <div class="mic-status-box">
+                <div id="mic-icon" class="mic-icon">🎤</div>
+                <div id="speech-result" class="speech-result">ききとり中...（声を出してね）</div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="skip-btn" class="small-btn">わからないときは？（ひきわけ）</button>
+                <button id="quit-battle-btn" class="small-btn">やめる</button>
+            </div>
+        </div>
+
+        <!-- リザルト（クリア）画面 -->
+        <div id="result-screen" class="screen">
+            <h2>🎉 よくがんばりました！ 🎉</h2>
+            <div id="result-summary" class="result-summary">
+                <p id="result-message">おめでとう！〇のだんマスターになったよ！</p>
+                <p>せいかいすう: <span id="res-correct">0</span></p>
+                <p>さいだいコンボ: <span id="res-combo">0</span></p>
+            </div>
+            <button id="to-stages-btn" class="big-btn primary">ほかのステージをやる</button>
+        </div>
+
+        <!-- 教師用画面 -->
+        <div id="teacher-screen" class="screen">
+            <h2>👩‍🏫 きょうしゅうしゃモード</h2>
+            <div class="teacher-stats">
+                <p>本日の累計正解数: <span id="t-total-correct">0</span></p>
+                <p>これまでの最高コンボ: <span id="t-max-combo">0</span></p>
+                <h3>まちがいが多い九九（ランキング・苦手分析）</h3>
+                <ul id="t-mistake-list">
+                    <!-- 動的生成 -->
+                </ul>
+            </div>
+            <div class="teacher-actions">
+                <button id="reset-data-btn" class="danger-btn">データをリセットする</button>
+                <button id="close-teacher-btn" class="big-btn secondary">もどる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
