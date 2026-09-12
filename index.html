@@ -1240,31 +1240,33 @@
         }
 
         function registerNameAndStart() {
-            const input = document.getElementById('player-name-input').value;
-            const safeName = getSafePlayerName(input);
+            initAudioContext();
+
+            const inputVal = document.getElementById('player-name-input').value.trim();
+            const safeName = getSafePlayerName(inputVal);
+
             if (safeName === null) return;
 
-            saveData.playerName = safeName;
-            saveGameData();
-            document.getElementById('persistent-status').style.display = 'flex';
-            updatePersistentStatus();
-            showHome();
-        }
+            if (safeName !== "") {
+                saveData.playerName = safeName;
+            }
+
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             showHome();
         }
 
         function openNameChange() {
-            const input = prompt("あたらしい なまえを いれてね！", saveData.playerName || "ゆうしゃ");
-            if (input === null) return;
-            const safeName = getSafePlayerName(input);
+            const newName = prompt("あたらしい なまえを 入力してね（8文字まで）:", saveData.playerName);
+            if (newName === null) return;
+
+            const safeName = getSafePlayerName(newName);
             if (safeName === null) return;
+
             saveData.playerName = safeName;
-            saveGameData();
+            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             updatePersistentStatus();
             updateProfileScreen();
-            alert(`なまえを「${safeName}」に かえたよ！`);
-        }
+            showPopup("なまえを かえたよ！");
         }
 
         function getNextLevelExp(level) {
