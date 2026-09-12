@@ -298,6 +298,13 @@
             transition: transform 0.1s, filter 0.1s, opacity 0.2s;
         }
 
+        .hero-img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
         @keyframes dot-bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-4px); }
@@ -454,6 +461,10 @@
             font-size: 3.6rem;
             line-height: 1;
             margin: 2px 0 4px;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .profile-name {
@@ -688,8 +699,8 @@
             </div>
 
             <div class="profile-card">
-                <div class="profile-hero" id="profile-hero-icon" style="cursor: pointer;" onclick="openCharacterSelect()" title="タッチしてキャラクターをかえる">🦭</div>
-                <div style="font-size: 0.75rem; color: var(--accent-color); margin-bottom: 4px;">▼ タップしてキャラ変更 ▼</div>
+                <div class="profile-hero" id="profile-hero-icon">🦭</div>
+                <button class="retro-btn secondary" onclick="openCharacterSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">👥 キャラクターをかえる</button>
                 <div class="profile-name" id="profile-name">ゆうしゃ</div>
                 <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
 
@@ -708,12 +719,12 @@
             </div>
 
             <div class="profile-section">
-                <div class="profile-section-title">🏅 しょうごう (タップしてキャラ変更)</div>
+                <div class="profile-section-title">🏅 しょうごう</div>
                 <div id="profile-titles" class="collection-grid"></div>
             </div>
 
             <div class="profile-section">
-                <div class="profile-section-title">🎖️ バッジ (タップしてキャラ変更)</div>
+                <div class="profile-section-title">🎖️ バッジ</div>
                 <div id="profile-badges" class="collection-grid"></div>
             </div>
 
@@ -1163,7 +1174,7 @@
 
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
             playerName: "ゆうしゃ",
-            heroIcon: "🦭",
+            heroIcon: "image/boy-1.png",
             unlockedStages: [1],
             clearedStages: [],
             randomClearCounts: {},
@@ -1180,7 +1191,7 @@
             playCount: 0
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
-        if (typeof saveData.heroIcon === 'undefined') saveData.heroIcon = "🦭";
+        if (typeof saveData.heroIcon === 'undefined') saveData.heroIcon = "image/boy-1.png";
         if (typeof saveData.level === 'undefined') saveData.level = 1;
         if (typeof saveData.exp === 'undefined') saveData.exp = 0;
         if (typeof saveData.hp === 'undefined') saveData.hp = 5;
@@ -1922,35 +1933,39 @@
         }
 
         // ========================================
-        // ぼうけんしゃカード ＆ キャラクター選択
+        // ぼうけんしゃカード ＆ キャラクター選択 (画像対応版)
         // ========================================
 
-        const AVAILABLE_HERO_ICONS = [
-            { icon: "🦭", name: "アザラシくん" },
-            { icon: "🧑‍💻", name: "プログラマー" },
-            { icon: "🐱", name: "ネコたん" },
-            { icon: "🦊", name: "キツネさん" },
-            { icon: "🤖", name: "ロボット" },
-            { icon: "🧙‍♂️", name: "まほうつかい" },
-            { icon: "🦸‍♂️", name: "ゆうしゃ" },
-            { icon: "🐲", name: "ドラゴン" },
-            { icon: "⭐", name: "スター" }
+        const AVAILABLE_CHARACTERS = [
+            { path: "image/girl-1.png", name: "女の子 (Lv.1)", minLevel: 1 },
+            { path: "image/boy-1.png", name: "男の子 (Lv.1)", minLevel: 1 },
+            { path: "image/girl-2.png", name: "女の子 Lv.3", minLevel: 3 },
+            { path: "image/boy-2.png", name: "男の子 Lv.3", minLevel: 3 }
         ];
 
         function openCharacterSelect() {
-            let listHtml = AVAILABLE_HERO_ICONS.map((item, idx) => 
-                `${idx + 1}: ${item.icon} ${item.name}`
-            ).join("\n");
+            const currentLevel = Number(saveData.level) || 1;
+            
+            let listHtml = AVAILABLE_CHARACTERS.map((item, idx) => {
+                const isUnlocked = currentLevel >= item.minLevel;
+                const statusStr = isUnlocked ? "【えらべる】" : `【🔒 Lv.${item.minLevel}でアンロック】`;
+                return `${idx + 1}: ${item.name} ${statusStr}`;
+            }).join("\n");
 
             let selectNum = prompt(`どのキャラクターに する？（番号を入力してね）\n\n${listHtml}`, "1");
             if (selectNum === null) return;
 
             let index = parseInt(selectNum, 10) - 1;
-            if (index >= 0 && index < AVAILABLE_HERO_ICONS.length) {
-                saveData.heroIcon = AVAILABLE_HERO_ICONS[index].icon;
-                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-                updateProfileScreen();
-                showPopup(`${AVAILABLE_HERO_ICONS[index].name}に えらんだよ！`);
+            if (index >= 0 && index < AVAILABLE_CHARACTERS.length) {
+                const targetChar = AVAILABLE_CHARACTERS[index];
+                if (currentLevel >= targetChar.minLevel) {
+                    saveData.heroIcon = targetChar.path;
+                    localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                    updateProfileScreen();
+                    showPopup(`${targetChar.name}に かえたよ！`);
+                } else {
+                    alert(`レベルが たりません！ (Lv.${targetChar.minLevel}以上でアンロック)`);
+                }
             } else {
                 alert("ただしい 番号を 入力してね！");
             }
@@ -1998,7 +2013,15 @@
             const expPercent = Math.min(100, Math.round((exp / expNeeded) * 100));
             const cleared = Array.isArray(saveData.clearedStages) ? saveData.clearedStages.length : 0;
 
-            document.getElementById('profile-hero-icon').textContent = saveData.heroIcon || "🦭";
+            const heroContainer = document.getElementById('profile-hero-icon');
+            const currentHero = saveData.heroIcon || "image/boy-1.png";
+            
+            if (currentHero.includes('.')) {
+                heroContainer.innerHTML = `<img src="${currentHero}" class="hero-img" alt="キャラ">`;
+            } else {
+                heroContainer.textContent = currentHero;
+            }
+
             document.getElementById('profile-name').textContent = saveData.playerName || 'ゆうしゃ';
             document.getElementById('profile-title').textContent = `${title.icon} ${title.name}`;
             document.getElementById('profile-level').textContent = level;
@@ -2012,7 +2035,7 @@
             const titlesEl = document.getElementById('profile-titles');
             titlesEl.innerHTML = PROFILE_TITLES.map(t => {
                 const earned = t.condition();
-                return `<div class="collection-item ${earned ? 'earned' : 'locked'}" ${earned ? `onclick="changeHeroIcon('${t.icon}')"` : ''}>
+                return `<div class="collection-item ${earned ? 'earned' : 'locked'}">
                     <div class="collection-icon">${earned ? t.icon : '？'}</div>
                     <div class="collection-name">${earned ? t.name : 'ひみつの しょうごう'}</div>
                 </div>`;
@@ -2021,7 +2044,7 @@
             const badgesEl = document.getElementById('profile-badges');
             badgesEl.innerHTML = PROFILE_BADGES.map(b => {
                 const earned = b.condition();
-                return `<div class="collection-item ${earned ? 'earned' : 'locked'}" ${earned ? `onclick="changeHeroIcon('${b.icon}')"` : ''}>
+                return `<div class="collection-item ${earned ? 'earned' : 'locked'}">
                     <div class="collection-icon">${earned ? b.icon : '？'}</div>
                     <div class="collection-name">${earned ? b.name : '？？？'}</div>
                 </div>`;
@@ -2037,13 +2060,6 @@
                     <span>${status}</span>
                 </div>`;
             }).join('');
-        }
-
-        function changeHeroIcon(iconSymbol) {
-            saveData.heroIcon = iconSymbol;
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-            updateProfileScreen();
-            showPopup("キャラクターを かえたよ！");
         }
 
         function saveGameData() {
