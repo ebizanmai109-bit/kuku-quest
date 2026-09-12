@@ -299,8 +299,8 @@
         }
 
         .hero-img {
-            width: 72px;
-            height: 72px;
+            width: 126px;
+            height: 126px;
             object-fit: contain;
             image-rendering: pixelated;
         }
@@ -697,8 +697,8 @@
             filter: grayscale(1);
         }
         .character-choice img {
-            width: 72px;
-            height: 72px;
+            width: 126px;
+            height: 126px;
             object-fit: contain;
             image-rendering: pixelated;
             display: block;
@@ -981,7 +981,7 @@
             <div class="battle-header">
                 <button class="back-home-btn" onclick="leaveBattleToSelect()">◀ にげる</button>
                 <span id="current-stage-title">1のだんの はらっぱ</span>
-                <span></span>
+                <span id="battle-timer-display" style="display:none;font-weight:bold;">⏱️ 90びょう</span>
             </div>
 
             <div class="field-box" id="battle-field-box">
@@ -1410,9 +1410,12 @@
         let currentNextLevel = 1;
         let currentMultiplierIndex = 0;
         let currentAudio = null;
-        // 連続正解数。画面には表示せず、最高記録だけ保存します。
+        // 連続正解数。ステージをまたいで継続し、まちがえた時だけ0に戻します。
         let currentCombo = 0;
         let startTime = 0;
+        let battleTimerInterval = null;
+        let battleTimeLimit = 90;
+        let battleTimeLimitRemaining = 90;
         let userInputString = "";
         let problemsQueue = [];
         let isAnswered = false;
@@ -1718,10 +1721,13 @@
             updateBattleStatusDisplay();
             switchScreen('battle-screen');
             startTime = Date.now();
+            if (lvl === 10) startBattleTimer(90);
+            else clearBattleTimer();
             loadCurrentProblem();
         }
 
         function startBattle(stageNum, randomMode, nextWorld = false) {
+            clearBattleTimer();
             // 冒険を始めた日時を保存。トップページで「前回の冒険」として表示します。
             saveData.lastAdventureAt = new Date().toISOString();
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
@@ -1769,6 +1775,51 @@
             switchScreen('battle-screen');
             startTime = Date.now();
             loadCurrentProblem();
+        }
+
+        function startBattleTimer(seconds) {
+            clearBattleTimer();
+            battleTimeLimit = seconds;
+            battleTimeLimitRemaining = seconds;
+            const el = document.getElementById("battle-timer-display");
+            if (!el) return;
+            el.style.display = "inline-block";
+            updateBattleTimerDisplay();
+            battleTimerInterval = setInterval(() => {
+                const remaining = battleTimeLimit - Math.floor((Date.now() - startTime) / 1000);
+                battleTimeLimitRemaining = Math.max(0, remaining);
+                updateBattleTimerDisplay();
+                if (remaining <= 0) {
+                    clearBattleTimer();
+                    timeLimitReached();
+                }
+            }, 250);
+        }
+
+        function updateBattleTimerDisplay() {
+            const el = document.getElementById("battle-timer-display");
+            if (!el) return;
+            const remaining = Math.max(0, battleTimeLimit - Math.floor((Date.now() - startTime) / 1000));
+            el.textContent = `⏱️ ${remaining}びょう`;
+        }
+
+        function clearBattleTimer() {
+            if (battleTimerInterval) {
+                clearInterval(battleTimerInterval);
+                battleTimerInterval = null;
+            }
+            const el = document.getElementById("battle-timer-display");
+            if (el) el.style.display = "none";
+        }
+
+        function timeLimitReached() {
+            if (isAnswered) return;
+            isAnswered = true;
+            showPopup("じかんぎれ！ 90びょういないに クリアを めざそう！");
+            setTimeout(() => {
+                if (isNextWorldMode) showNextWorldSelect();
+                else showStageSelect();
+            }, 900);
         }
 
         function updateBattleStatusDisplay() {
@@ -1873,9 +1924,9 @@
                             stopBGM();
                             playVictoryFanfare();
                             setTimeout(() => { completeStage(); }, 1200);
-} else {
-    loadCurrentProblem();
-}
+                        } else {
+                            loadCurrentProblem();
+                        }
                     });
                 } else {
                     playDamageSound();
@@ -1926,6 +1977,7 @@
         }
 
         function completeStage() {
+            clearBattleTimer();
             const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('clear-time-display').textContent = `${elapsedTime}びょう`;
             document.getElementById('earned-exp-display').textContent = `けいけんち +${stageEarnedExp} EXPを ゲット！`;
@@ -1970,6 +2022,7 @@
         }
 
         function leaveBattleToSelect() {
+            clearBattleTimer();
             if (isNextWorldMode) {
                 showNextWorldSelect();
             } else {
