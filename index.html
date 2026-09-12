@@ -50,11 +50,6 @@
             display: flex;
         }
 
-        /* スタート画面専用のレイアウト */
-        #start-screen {
-            background-color: var(--card-bg);
-        }
-
         h1 {
             font-size: 2.3rem;
             color: #1A365D;
@@ -77,12 +72,7 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
-            transition: transform 0.1s;
             margin-top: 20px;
-        }
-
-        .start-btn:active {
-            transform: scale(0.95);
         }
 
         .adventure-btn {
@@ -95,14 +85,8 @@
             border-radius: 50px;
             cursor: pointer;
             box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
-            transition: transform 0.1s;
         }
 
-        .adventure-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ステージ選択画面 */
         .stage-title {
             font-size: 1.6rem;
             color: #1A365D;
@@ -152,7 +136,6 @@
             font-size: 1rem;
         }
 
-        /* バトル画面 */
         .battle-header {
             width: 100%;
             display: flex;
@@ -222,27 +205,17 @@
         }
 
         .problem-text {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 900;
             color: #1A365D;
-            margin-bottom: 2px;
         }
 
         .kana-display {
             font-size: 1.3rem;
             font-weight: bold;
-            color: #4A5568;
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .kana-part {
-            transition: color 0.2s;
-        }
-
-        .kana-part.highlight {
             color: var(--primary);
+            margin-bottom: 4px;
+            transition: opacity 0.2s;
         }
 
         .keypad {
@@ -274,11 +247,7 @@
         .key-btn.clear {
             background-color: #FED7D7;
             color: #C53030;
-        }
-
-        .key-btn.enter {
-            background-color: var(--secondary);
-            color: white;
+            grid-column: span 2;
         }
 
         .control-row {
@@ -298,7 +267,6 @@
             cursor: pointer;
         }
 
-        /* リザルト画面 */
         .result-title {
             font-size: 2rem;
             color: #D69E2E;
@@ -336,7 +304,6 @@
             margin-top: 10px;
         }
 
-        /* ポップアップ */
         #popup-msg {
             position: fixed;
             top: 50%;
@@ -363,7 +330,6 @@
 
     <div id="popup-msg">せいかい！🎉</div>
 
-    <!-- 0. 音声有効化スタート画面 -->
     <div id="start-screen" class="screen active">
         <h1>かけ算九九を はじめよう！</h1>
         <p class="subtitle">音声をオンにしてぼうけんに出かけよう</p>
@@ -371,7 +337,6 @@
         <button class="start-btn" onclick="initAudioAndStart()">音声をONにして<br>はじめる</button>
     </div>
 
-    <!-- 1. ホーム画面 -->
     <div id="home-screen" class="screen">
         <h1>九九のぼうけん</h1>
         <p class="subtitle">モンスターをたおして九九をきわめよう！</p>
@@ -379,18 +344,16 @@
         <button class="adventure-btn" onclick="showStageSelect()">ぼうけんに出る</button>
     </div>
 
-    <!-- 2. ステージ選択画面 -->
     <div id="stage-select-screen" class="screen">
         <div class="battle-header">
             <button class="back-home-btn" onclick="showHome()">＜ ホーム</button>
             <span>ステージを選ぼう</span>
             <span style="width: 40px;"></span>
         </div>
-        <h2 class="stage-title" style="margin-top: 10px;">ジュンバンレンシュウの森</h2>
+        <h2 class="stage-title" style="margin-top: 10px;">九九のぼうけんの森</h2>
         <div class="stage-list" id="stage-list-container"></div>
     </div>
 
-    <!-- 3. バトル画面 -->
     <div id="battle-screen" class="screen">
         <div class="battle-header">
             <button class="back-home-btn" onclick="showStageSelect()">＜ やめる</button>
@@ -406,11 +369,9 @@
         </div>
 
         <div class="problem-card">
+            <!-- 問題の上にひらがな読みを表示 -->
+            <div class="kana-display" id="kana-first">にいちが</div>
             <div class="problem-text" id="problem-display">2 × 1</div>
-            <div class="kana-display">
-                <span class="kana-part" id="kana-first">にいちが</span>
-                <span class="kana-part" id="kana-second">に</span>
-            </div>
         </div>
 
         <div style="background: #2D3748; color: #FFF; width: 100%; padding: 10px; border-radius: 12px; font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; letter-spacing: 4px; min-height: 50px; display: flex; justify-content: center; align-items: center;" id="user-input-display">
@@ -429,15 +390,13 @@
             <button class="key-btn" onclick="inputNumber(9)">9</button>
             <button class="key-btn clear" onclick="clearInput()">けす</button>
             <button class="key-btn" onclick="inputNumber(0)">0</button>
-            <button class="key-btn enter" onclick="submitAnswer()">こたえ</button>
         </div>
 
         <div class="control-row">
-            <button class="sub-action-btn" onclick="playCurrentAudio()">🔊 もういちど きく</button>
+            <button class="sub-action-btn" onclick="playFirstAudio()">🔊 もういちど きく</button>
         </div>
     </div>
 
-    <!-- 4. クリア・リザルト画面 -->
     <div id="result-screen" class="screen">
         <h2 class="result-title">ステージクリア！</h2>
         <div style="font-size: 3.5rem;">🏆✨</div>
@@ -448,10 +407,113 @@
         <button class="action-btn" onclick="showStageSelect()">ステージいちらんへ</button>
     </div>
 
-    <script src="kuku.json"></script>
     <script>
-        const STAGE_ORDER = [2, 5, 3, 4, 6, 7, 8, 9];
+        // 正しい読み方データを内蔵
+        const kukuData = {
+            1: {
+                1: { first: "いんいちが", second: "いち" },
+                2: { first: "いちにが", second: "に" },
+                3: { first: "いちさんが", second: "さん" },
+                4: { first: "いちしが", second: "し" },
+                5: { first: "いちごが", second: "ご" },
+                6: { first: "いちろくが", second: "ろく" },
+                7: { first: "いちしちが", second: "しち" },
+                8: { first: "いちはちが", second: "はち" },
+                9: { first: "いんくが", second: "く" }
+            },
+            2: {
+                1: { first: "にいちが", second: "に" },
+                2: { first: "ににんが", second: "し" },
+                3: { first: "にさんが", second: "ろく" },
+                4: { first: "にしが", second: "はち" },
+                5: { first: "にご", second: "じゅう" },
+                6: { first: "にろく", second: "じゅうに" },
+                7: { first: "にしち", second: "じゅうし" },
+                8: { first: "にはち", second: "じゅうろく" },
+                9: { first: "にく", second: "じゅうはち" }
+            },
+            3: {
+                1: { first: "さんいちが", second: "さん" },
+                2: { first: "さんにが", second: "ろく" },
+                3: { first: "さざんが", second: "く" },
+                4: { first: "さんし", second: "じゅうに" },
+                5: { first: "さんご", second: "じゅうご" },
+                6: { first: "さぶろく", second: "じゅうはち" },
+                7: { first: "さんしち", second: "にじゅういち" },
+                8: { first: "さんぱ", second: "にじゅうし" },
+                9: { first: "さんく", second: "にじゅうしち" }
+            },
+            4: {
+                1: { first: "しいちが", second: "し" },
+                2: { first: "しにが", second: "はち" },
+                3: { first: "しさん", second: "じゅうに" },
+                4: { first: "しし", second: "じゅうろく" },
+                5: { first: "しご", second: "にじゅう" },
+                6: { first: "しろく", second: "にじゅうし" },
+                7: { first: "ししち", second: "にじゅうはち" },
+                8: { first: "しは", second: "さんじゅうに" },
+                9: { first: "しく", second: "さんじゅうろく" }
+            },
+            5: {
+                1: { first: "ごいちが", second: "ご" },
+                2: { first: "ごに", second: "じゅう" },
+                3: { first: "ごさん", second: "じゅうご" },
+                4: { first: "ごし", second: "にじゅう" },
+                5: { first: "ごご", second: "にじゅうご" },
+                6: { first: "ごろく", second: "さんじゅう" },
+                7: { first: "ごしち", second: "さんじゅうご" },
+                8: { first: "ごは", second: "しじゅう" },
+                9: { first: "ごっく", second: "しじゅうご" }
+            },
+            6: {
+                1: { first: "ろくいちが", second: "ろく" },
+                2: { first: "ろくに", second: "じゅうに" },
+                3: { first: "ろくさん", second: "じゅうはち" },
+                4: { first: "ろくし", second: "にじゅうし" },
+                5: { first: "ろくご", second: "さんじゅう" },
+                6: { first: "ろくろく", second: "さんじゅうろく" },
+                7: { first: "ろくしち", second: "しじゅうに" },
+                8: { first: "ろくは", second: "しじゅうはち" },
+                9: { first: "ろっく", second: "ごじゅうし" }
+            },
+            7: {
+                1: { first: "しちいちが", second: "しち" },
+                2: { first: "しちに", second: "じゅうし" },
+                3: { first: "しちさん", second: "にじゅういち" },
+                4: { first: "しちし", second: "にじゅうはち" },
+                5: { first: "しちご", second: "さんじゅうご" },
+                6: { first: "しちろく", second: "しじゅうに" },
+                7: { first: "しちしち", second: "しじゅうく" },
+                8: { first: "しちは", second: "ごじゅうろく" },
+                9: { first: "しちく", second: "ろくじゅうさん" }
+            },
+            8: {
+                1: { first: "はちいちが", second: "はち" },
+                2: { first: "はちに", second: "じゅうろく" },
+                3: { first: "はちさん", second: "にじゅうし" },
+                4: { first: "はちし", second: "さんじゅうに" },
+                5: { first: "はちご", second: "しじゅう" },
+                6: { first: "はちろく", second: "しじゅうはち" },
+                7: { first: "はちしち", second: "ごじゅうろく" },
+                8: { first: "はっぱ", second: "ろくじゅうし" },
+                9: { first: "はっく", second: "しちじゅうに" }
+            },
+            9: {
+                1: { first: "くいちが", second: "く" },
+                2: { first: "くに", second: "じゅうはち" },
+                3: { first: "くさん", second: "にじゅうしち" },
+                4: { first: "くし", second: "さんじゅうろく" },
+                5: { first: "くご", second: "しじゅうご" },
+                6: { first: "くろく", second: "ごじゅうし" },
+                7: { first: "くしち", second: "ろくじゅうさん" },
+                8: { first: "くは", second: "しちじゅうに" },
+                9: { first: "くく", second: "はちじゅういち" }
+            }
+        };
+
+        const STAGE_ORDER = [1, 2, 5, 3, 4, 6, 7, 8, 9];
         const STAGE_NAMES = {
+            1: "1の段 (はじまりの原っぱ)",
             2: "2の段 (はじまりの森)",
             5: "5の段 (しずかな平原)",
             3: "3の段 (いばらの林)",
@@ -461,14 +523,14 @@
             8: "8の段 (吹雪の雪原)",
             9: "9の段 (竜の城門)"
         };
-        const MONSTER_ICONS = ["🟢", "👺", "💀", "👻", "👹", "🗿", "🦅", "🐲"];
+        const MONSTER_ICONS = ["🟡", "🟢", "👺", "💀", "👻", "👹", "🗿", "🦅", "🐲"];
 
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
-            unlockedStages: [2],
+            unlockedStages: [1],
             clearedStages: []
         };
 
-        let currentStage = 2;
+        let currentStage = 1;
         let currentMultiplierIndex = 0;
         let currentAudio = null;
         let startTime = 0;
@@ -481,7 +543,6 @@
         }
 
         function initAudioAndStart() {
-            // ブラウザの音声制限を解除するため空のオーディオを再生
             let dummy = new Audio();
             dummy.play().catch(() => {});
             showHome();
@@ -557,21 +618,19 @@
 
             document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b}`;
 
-            if (typeof kukuData !== 'undefined' && kukuData[prob.a] && kukuData[prob.a][prob.b]) {
+            if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
                 const data = kukuData[prob.a][prob.b];
                 document.getElementById('kana-first').textContent = data.first;
-                document.getElementById('kana-second').textContent = data.second;
             } else {
                 document.getElementById('kana-first').textContent = `${prob.a} × ${prob.b}`;
-                document.getElementById('kana-second').textContent = '';
             }
 
-            playCurrentAudio();
+            playFirstAudio();
         }
 
-        function playCurrentAudio() {
+        function playFirstAudio() {
             const prob = problemsQueue[currentMultiplierIndex];
-            const audioPath = `audio/${prob.a}-${prob.b}.wav`;
+            const audioPath = `audio/${prob.a}-${prob.b}_1.wav`;
 
             if (currentAudio) {
                 currentAudio.pause();
@@ -580,19 +639,54 @@
 
             currentAudio = new Audio(audioPath);
             const firstPart = document.getElementById('kana-first');
-            const secondPart = document.getElementById('kana-second');
 
             currentAudio.play().then(() => {
-                firstPart.classList.add('highlight');
-                setTimeout(() => {
-                    firstPart.classList.remove('highlight');
-                    secondPart.classList.add('highlight');
-                }, 600);
-                setTimeout(() => {
-                    secondPart.classList.remove('highlight');
-                }, 1400);
+                firstPart.style.opacity = "0.5";
+                currentAudio.onended = () => {
+                    firstPart.style.opacity = "1";
+                };
             }).catch(e => {
-                console.warn("音声ファイルがありません:", audioPath);
+                console.warn("前半の音声ファイルがありません:", audioPath);
+            });
+        }
+
+        function playSequenceAudio(callback) {
+            const prob = problemsQueue[currentMultiplierIndex];
+            const path1 = `audio/${prob.a}-${prob.b}_1.wav`;
+            const path2 = `audio/${prob.a}-${prob.b}_2.wav`;
+
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            const firstPart = document.getElementById('kana-first');
+
+            let audio1 = new Audio(path1);
+            currentAudio = audio1;
+
+            audio1.play().then(() => {
+                audio1.onended = () => {
+                    let audio2 = new Audio(path2);
+                    currentAudio = audio2;
+                    audio2.play().then(() => {
+                        audio2.onended = () => {
+                            if (callback) callback();
+                        };
+                    }).catch(e => {
+                        if (callback) callback();
+                    });
+                };
+            }).catch(e => {
+                let audio2 = new Audio(path2);
+                currentAudio = audio2;
+                audio2.play().then(() => {
+                    audio2.onended = () => {
+                        if (callback) callback();
+                    };
+                }).catch(err => {
+                    if (callback) callback();
+                });
             });
         }
 
@@ -600,6 +694,38 @@
             if (userInputString.length >= 2) return;
             userInputString += num.toString();
             updateInputDisplay();
+
+            const prob = problemsQueue[currentMultiplierIndex];
+            const correctAnswer = prob.a * prob.b;
+            const userAns = parseInt(userInputString, 10);
+
+            // 1桁の答えなら1文字入力時、2桁の答えなら2文字入力時に自動判定
+            const targetLength = correctAnswer >= 10 ? 2 : 1;
+
+            if (userInputString.length === targetLength) {
+                if (userAns === correctAnswer) {
+                    showPopup("せいかい！🎉");
+                    
+                    const monsterEl = document.getElementById('monster-emoji');
+                    monsterEl.classList.add('attacked');
+
+                    playSequenceAudio(() => {
+                        currentMultiplierIndex++;
+                        monsterEl.classList.remove('attacked');
+                        
+                        if (currentMultiplierIndex >= 9) {
+                            completeStage();
+                        } else {
+                            loadCurrentProblem();
+                        }
+                    });
+
+                } else {
+                    showPopup("ざんねん！");
+                    userInputString = "";
+                    updateInputDisplay();
+                }
+            }
         }
 
         function clearInput() {
@@ -612,44 +738,13 @@
             display.textContent = userInputString === "" ? "-" : userInputString;
         }
 
-        function submitAnswer() {
-            if (userInputString === "") return;
-
-            const prob = problemsQueue[currentMultiplierIndex];
-            const correctAnswer = prob.a * prob.b;
-            const userAns = parseInt(userInputString, 10);
-
-            if (userAns === correctAnswer) {
-                showPopup("せいかい！🎉");
-                
-                const monsterEl = document.getElementById('monster-emoji');
-                monsterEl.classList.add('attacked');
-
-                currentMultiplierIndex++;
-
-                setTimeout(() => {
-                    monsterEl.classList.remove('attacked');
-                    if (currentMultiplierIndex >= 9) {
-                        completeStage();
-                    } else {
-                        loadCurrentProblem();
-                    }
-                }, 500);
-
-            } else {
-                showPopup("ざんねん！もういちど");
-                userInputString = "";
-                updateInputDisplay();
-            }
-        }
-
         function showPopup(text) {
             const popup = document.getElementById('popup-msg');
             popup.textContent = text;
             popup.classList.add('show');
             setTimeout(() => {
                 popup.classList.remove('show');
-            }, 800);
+            }, 700);
         }
 
         function completeStage() {
