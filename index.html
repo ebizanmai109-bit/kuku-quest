@@ -849,7 +849,7 @@
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="showProfile()">📋️ ぼうけんしゃカード</button>
+                <button class="retro-btn" onclick="showProfile()">🦭 ぼうけんしゃカード</button>
                 <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
             </div>
         </div>
@@ -1209,15 +1209,15 @@
 
         const kukuData = {
             1: {
-                1: { first: "いんいちが", second: "いち" },
-                2: { first: "いんにが", second: "に" },
-                3: { first: "いんさんが", second: "さん" },
-                4: { first: "いんしが", second: "し" },
-                5: { first: "いんごが", second: "ご" },
-                6: { first: "いんろくが", second: "ろく" },
-                7: { first: "いんしちが", second: "しち" },
-                8: { first: "いんはちが", second: "はち" },
-                9: { first: "いんくが", second: "く" }
+                1: { first: "いんいちがいち", second: "いち" },
+                2: { first: "いんにがに", second: "に" },
+                3: { first: "いんさんがさん", second: "さん" },
+                4: { first: "いんしがし", second: "し" },
+                5: { first: "いんごがご", second: "ご" },
+                6: { first: "いんろくがろく", second: "ろく" },
+                7: { first: "いんしちがしち", second: "しち" },
+                8: { first: "いんはちがはち", second: "はち" },
+                9: { first: "いんくがく", second: "く" }
             },
             2: {
                 1: { first: "にいちが", second: "に" },
@@ -2196,29 +2196,22 @@
         // Lv.10以降は節目のレベルで特別な姿を解放します。
 
         const AVAILABLE_CHARACTERS = [
-            { path: "image/girl-1.png", name: "ククリン", minLevel: 1 },
-            { path: "image/boy-1.png",  name: "ククル", minLevel: 1 },
-
-            { path: "image/girl-2.png", name: "ククリン", minLevel: 3 },
-            { path: "image/boy-2.png",  name: "ククル", minLevel: 3 },
-
-            { path: "image/girl-3.png", name: "ククリン", minLevel: 5 },
-            { path: "image/boy-3.png",  name: "ククル", minLevel: 5 },
-
-            { path: "image/girl-4.png", name: "ククリン", minLevel: 7 },
-            { path: "image/boy-4.png",  name: "ククル", minLevel: 7 },
-
-            { path: "image/girl-5.png", name: "ククリン", minLevel: 9 },
-            { path: "image/boy-5.png",  name: "ククル", minLevel: 9 },
-
-            { path: "image/girl-6.png", name: "ククリン", minLevel: 10 },
-            { path: "image/boy-6.png",  name: "ククル", minLevel: 10 },
-
-            { path: "image/girl-7.png", name: "ククリン", minLevel: 15 },
-            { path: "image/boy-7.png",  name: "ククル", minLevel: 15 },
-
-            { path: "image/girl-8.png", name: "ククリン", minLevel: 20 },
-            { path: "image/boy-8.png",  name: "ククル", minLevel: 20 }
+            { path: "image/girl-1.png", name: "ククリン（しんまいゆうしゃのすがた）", minLevel: 1 },
+            { path: "image/boy-1.png",  name: "ククル（しんまいゆうしゃのすがた）", minLevel: 1 },
+            { path: "image/girl-2.png", name: "ククリン（かけだしゆうしゃのすがた）", minLevel: 2 },
+            { path: "image/boy-2.png",  name: "ククル（かけだしゆうしゃのすがた）", minLevel: 2 },
+            { path: "image/girl-3.png", name: "ククリン（たびするゆうしゃのすがた）", minLevel: 3 },
+            { path: "image/boy-3.png",  name: "ククル（たびするゆうしゃのすがた）", minLevel: 3 },
+            { path: "image/girl-4.png", name: "ククリン（せいちょうしたゆうしゃのすがた）", minLevel: 4 },
+            { path: "image/boy-4.png",  name: "ククル（せいちょうしたゆうしゃのすがた）", minLevel: 4 },
+            { path: "image/girl-5.png", name: "ククリン（たたかうゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/boy-5.png",  name: "ククル（たたかうゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/girl-6.png", name: "ククリン（まほうせんしのすがた）", minLevel: 6 },
+            { path: "image/boy-6.png",  name: "ククル（まほうせんしのすがた）", minLevel: 6 },
+            { path: "image/girl-7.png", name: "ククリン（きらめきのまほうせんしのすがた）", minLevel: 7 },
+            { path: "image/boy-7.png",  name: "ククル（きらめきのまほうせんしのすがた）", minLevel: 7 },
+            { path: "image/girl-8.png", name: "ククリン（でんせつのまほうせんしのすがた）", minLevel: 8 },
+            { path: "image/boy-8.png",  name: "ククル（でんせつのまほうせんしのすがた）", minLevel: 8 }
         ];
         // 古いセーブデータで絵文字などが入っている場合は、最初の画像へ移行。
         if (!AVAILABLE_CHARACTERS.some(c => c.path === saveData.heroIcon)) {
@@ -2297,11 +2290,11 @@
         }
 
         const AVAILABLE_COMPANIONS = [
-            { path: "image/pet-1.png", name: "あいぼう 1", minLevel: 1 },
-            { path: "image/pet-2.png", name: "あいぼう 2", minLevel: 5 },
-            { path: "image/pet-3.png", name: "あいぼう 3", minLevel: 10 },
-            { path: "image/pet-4.png", name: "あいぼう 4", minLevel: 15 },
-            { path: "image/pet-5.png", name: "あいぼう 5", minLevel: 20 }
+            { path: "image/pet-1.png", name: "えびざらし", minLevel: 1 },
+            { path: "image/pet-2.png", name: "わさびん", minLevel: 5 },
+            { path: "image/pet-3.png", name: "つよいえびざらし", minLevel: 10 },
+            { path: "image/pet-4.png", name: "えびざらしとわさびん", minLevel: 15 },
+            { path: "image/pet-5.png", name: "つよいえびざらしとわさびん", minLevel: 20 }
         ];
         if (!AVAILABLE_COMPANIONS.some(c => c.path === saveData.companionIcon)) {
             saveData.companionIcon = "image/pet-1.png";
@@ -2410,12 +2403,13 @@
 
             const heroContainer = document.getElementById('profile-hero-icon');
             const currentHero = saveData.heroIcon || "image/boy-1.png";
-            
-            if (currentHero.includes('.')) {
-                heroContainer.innerHTML = `<img src="${currentHero}" class="hero-img" alt="キャラ">`;
-            } else {
-                heroContainer.textContent = currentHero;
-            }
+            heroContainer.src = currentHero;
+            heroContainer.alt = "主人公";
+
+            const companionContainer = document.getElementById('profile-companion-icon');
+            const currentCompanion = saveData.companionIcon || "image/pet-1.png";
+            companionContainer.src = currentCompanion;
+            companionContainer.alt = "あいぼう";
 
             document.getElementById('profile-name').textContent = saveData.playerName || 'ゆうしゃ';
             document.getElementById('profile-title').textContent = `${title.icon} ${title.name}`;
