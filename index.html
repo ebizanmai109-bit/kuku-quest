@@ -132,11 +132,6 @@
             justify-content: space-between;
         }
 
-        .screen {
-            overflow-x: hidden;
-            min-width: 0;
-        }
-
         .screen.active {
             display: flex;
         }
@@ -237,6 +232,12 @@
             border-color: #55ccff;
             color: #55ccff;
             background-color: #002233;
+        }
+
+        .stage-item.practice-reverse {
+            border-color: #bb66ff;
+            color: #bb66ff;
+            background-color: #220033;
         }
 
         .stage-item.random-mode {
@@ -912,8 +913,6 @@
             <div class="profile-section">
                 <div class="profile-section-title">⏱️ ステージの さいたんタイム</div>
                 <div id="profile-stage-times" class="profile-map"></div>
-                <div class="profile-section-title" style="margin-top: 14px;">↔️ さかさまモードの さいたんタイム</div>
-                <div id="profile-reverse-times" class="profile-map"></div>
                 <div class="profile-section-title" style="margin-top: 14px;">🎲 ランダムモードの さいたんタイム</div>
                 <div id="profile-random-times" class="profile-map"></div>
                 <div class="profile-section-title" style="margin-top: 14px;">🏰 まおうじょうの さいたんタイム</div>
@@ -1064,10 +1063,10 @@
         </div>
 
         <!-- 全クリア画面 -->
-        <div id="all-clear-screen" class="screen" style="justify-content:center; overflow-y:auto; overflow-x:hidden; width:100%; max-width:100%; min-width:0;">
+        <div id="all-clear-screen" class="screen" style="justify-content:center; overflow-y:auto;">
             <h1 style="color:#ffcc00; margin-bottom:6px;">🎉 くくクエスト クリア！</h1>
-            <img src="image/clear.png" alt="クリア！" style="width:min(80%,420px); max-width:100%; max-height:32vh; object-fit:contain; image-rendering:auto; margin:4px auto 8px; display:block;">
-            <div class="rpg-window" style="max-width:100%; width:100%; min-width:0; margin:0 auto 10px; text-align:center; overflow-wrap:anywhere;">
+            <img src="image/clear.png" alt="クリア！" style="width:min(80vw,420px); max-height:32vh; object-fit:contain; image-rendering:auto; margin:4px auto 8px;">
+            <div class="rpg-window" style="max-width:720px; width:90%; margin:0 auto 10px; text-align:center;">
                 <p style="font-size:1.15rem; color:#fff; font-weight:bold;">九九のぼうけんを さいごまで クリアしたぞ！</p>
                 <p>ここまで、たくさんの九九を<br>何度もれんしゅうしてきたね。</p>
                 <p>まちがえても あきらめずに、<br>もう一度ちょうせんしたことが、<br>きみの力になっています。</p>
@@ -1452,6 +1451,7 @@
             totalCorrect: 0,
             totalAnswered: 0,
             bestCombo: 0,
+            currentCombo: 0,
             playCount: 0,
             mistakeProblems: {},
             practiceMastery: {}
@@ -1480,6 +1480,7 @@
         if (typeof saveData.totalCorrect === 'undefined') saveData.totalCorrect = 0;
         if (typeof saveData.totalAnswered === 'undefined') saveData.totalAnswered = 0;
         if (typeof saveData.bestCombo === 'undefined') saveData.bestCombo = 0;
+        if (typeof saveData.currentCombo === 'undefined') saveData.currentCombo = 0;
         if (typeof saveData.playCount === 'undefined') saveData.playCount = 0;
         if (!saveData.mistakeProblems || typeof saveData.mistakeProblems !== 'object') saveData.mistakeProblems = {};
         if (!saveData.practiceMastery || typeof saveData.practiceMastery !== 'object') saveData.practiceMastery = {};
@@ -1492,7 +1493,7 @@
         let currentMultiplierIndex = 0;
         let currentAudio = null;
         // 連続正解数。ステージをまたいで継続し、まちがえた時だけ0に戻します。
-        let currentCombo = 0;
+        let currentCombo = Number(saveData.currentCombo) || 0;
         let startTime = 0;
         let battleTimerInterval = null;
         let battleTimeLimit = 90;
@@ -1511,6 +1512,7 @@
         let springMistakeCount = 0;
 
         let practiceStage = 1;
+        let practiceReverseMode = false;
         let practiceIndex = 0;
         let flashcardState = 0;
         let specialPracticeProblems = [];
@@ -1846,8 +1848,8 @@
 
             problemsQueue = [];
             if (isReverseMode) {
-                // さかさまモードは「かける数」の順番だけを逆にする。
-                // 例：1のだん → 1×9 → 1×8 → … → 1×1
+                // さかさまモードは「○のだん」は固定し、かける数だけ 9→1 にする。
+                // 例：1×9 → 1×8 → … → 1×1
                 for (let b = 9; b >= 1; b--) {
                     problemsQueue.push({ a: currentStage, b: b });
                 }
@@ -2331,30 +2333,42 @@
             playBGM('home');
             const container = document.getElementById('practice-stage-list-container');
             container.innerHTML = '';
+            // れんしゅうは、冒険の解放状況に関係なく最初から1～9のだんをすべて選べる。
             for (let s = 1; s <= 9; s++) {
                 const btn = document.createElement('div');
                 btn.className = 'stage-item unlocked';
                 btn.textContent = `${s}のだんを れんしゅうする`;
-                btn.onclick = () => startPractice(s);
+                btn.onclick = () => startPractice(s, false);
                 container.appendChild(btn);
+
+                const reverseBtn = document.createElement('div');
+                reverseBtn.className = 'stage-item practice-reverse';
+                reverseBtn.textContent = `↔️ ${s}のだん さかさまを れんしゅうする`;
+                reverseBtn.onclick = () => startPractice(s, true);
+                container.appendChild(reverseBtn);
             }
             switchScreen('practice-stage-select-screen');
         }
 
-        function startPractice(stageNum) {
+        function startPractice(stageNum, reverseMode = false) {
             practiceStage = stageNum;
+            practiceReverseMode = reverseMode;
             practiceIndex = 0;
             flashcardState = 0;
             playBGM('practice');
 
-            document.getElementById('practice-stage-title').textContent = `${practiceStage}のだん`;
+            document.getElementById('practice-stage-title').textContent = reverseMode
+                ? `${practiceStage}のだん さかさまの じゅんび`
+                : `${practiceStage}のだんの じゅんび`;
             switchScreen('practice-screen');
             updateFlashcardDisplay();
             playPracticeCurrentAudio();
         }
 
         function updateFlashcardDisplay() {
-            const b = practiceIndex + 1;
+            // さかさま練習は、○のだんを固定し、かける数だけ 9→1 にする。
+            // 例：1×9 → 1×8 → … → 1×1
+            const b = practiceReverseMode ? 9 - practiceIndex : practiceIndex + 1;
             const data = kukuData[practiceStage][b];
             document.getElementById('practice-counter').textContent = `${practiceIndex + 1}/9`;
 
@@ -2368,8 +2382,10 @@
         }
 
         function playPracticeCurrentAudio() {
-            const b = practiceIndex + 1;
-            const filename = flashcardState === 0 ? `${practiceStage}-${b}_1.wav` : `${practiceStage}-${b}_2.wav`;
+            const b = practiceReverseMode ? 9 - practiceIndex : practiceIndex + 1;
+            const audioA = practiceStage;
+            const audioB = b;
+            const filename = flashcardState === 0 ? `${audioA}-${audioB}_1.wav` : `${audioA}-${audioB}_2.wav`;
             const audioPath = `audio/${filename}`;
             if (currentAudio) { currentAudio.pause(); }
             currentAudio = new Audio(audioPath);
@@ -2384,7 +2400,7 @@
             } else {
                 practiceIndex++;
                 if (practiceIndex >= 9) {
-                    alert(`${practiceStage}のだんの れんしゅうが おわったよ！`);
+                    alert(`${practiceStage}のだん${practiceReverseMode ? ' さかさま' : ''}の れんしゅうが おわったよ！`);
                     showPracticeStageSelect();
                 } else {
                     flashcardState = 0;
@@ -2766,18 +2782,6 @@
                 </div>`;
             }).join('');
 
-            const reverseTimesEl = document.getElementById('profile-reverse-times');
-            if (reverseTimesEl) {
-                reverseTimesEl.innerHTML = STAGE_ORDER.map((stage) => {
-                    const best = Number(saveData.reverseBestTimes?.[stage]);
-                    const timeText = Number.isFinite(best) ? `${best}びょう` : 'まだ クリアしていません';
-                    return `<div class="map-item ${Number.isFinite(best) ? 'cleared' : ''}">
-                        <span>↔️ ${STAGE_NAMES[stage]}</span>
-                        <span>⏱️ ${timeText}</span>
-                    </div>`;
-                }).join('');
-            }
-
             const randomTimesEl = document.getElementById('profile-random-times');
             if (randomTimesEl) {
                 randomTimesEl.innerHTML = STAGE_ORDER.map((stage) => {
@@ -2831,6 +2835,7 @@
                 // まちがえた時だけ連続正解をリセット。
                 currentCombo = 0;
             }
+            saveData.currentCombo = currentCombo;
 
             saveGameData();
         }
