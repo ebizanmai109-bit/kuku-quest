@@ -994,6 +994,8 @@
             <div class="profile-section">
                 <div class="profile-section-title">⏱️ ステージの さいたんタイム</div>
                 <div id="profile-stage-times" class="profile-map"></div>
+                <div class="profile-section-title" style="margin-top: 14px;">🔄 さかさまモードの さいたんタイム</div>
+                <div id="profile-reverse-times" class="profile-map"></div>
                 <div class="profile-section-title" style="margin-top: 14px;">🎲 ランダムモードの さいたんタイム</div>
                 <div id="profile-random-times" class="profile-map"></div>
                 <div class="profile-section-title" style="margin-top: 14px;">🏰 まおうじょうの さいたんタイム</div>
@@ -2973,6 +2975,18 @@
                     <span>⏱️ ${timeText}</span>
                 </div>`;
             }).join('');
+
+            const reverseTimesEl = document.getElementById('profile-reverse-times');
+            if (reverseTimesEl) {
+                reverseTimesEl.innerHTML = STAGE_ORDER.map((stage) => {
+                    const best = Number(saveData.reverseBestTimes?.[stage]);
+                    const timeText = Number.isFinite(best) ? `${best}びょう` : 'まだ クリアしていません';
+                    return `<div class="map-item ${Number.isFinite(best) ? 'cleared' : ''}">
+                        <span>🔄 ${STAGE_NAMES[stage]}</span>
+                        <span>⏱️ ${timeText}</span>
+                    </div>`;
+                }).join('');
+            }
 
             const randomTimesEl = document.getElementById('profile-random-times');
             if (randomTimesEl) {
