@@ -3,1716 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>くくのぼうけん - レトロRPG</title>
+    <title>魔王城の九九クエスト</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
-
-        :root {
-            --bg-color: #111111;
-            --screen-bg: #1a1a2e;
-            --border-color: #ffffff;
-            --accent-color: #ffcc00;
-            --danger-color: #ff4444;
-            --success-color: #44ff44;
-            --text-color: #ffffff;
-        }
-
-        /* まおうじょうエリア（暗黒世界）用のカラーテーマクラス */
-        body.world-next {
-            --screen-bg: #2d1226;
-            --border-color: #ff88ff;
-            --accent-color: #ff77ff;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'DotGothic16', monospace, sans-serif;
-            image-rendering: pixelated;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            padding: 10px;
+            height: 100vh;
+            margin: 0;
         }
-
-        .arcade-cabinet {
-            width: 100%;
-            max-width: 480px;
-            background-color: #222;
-            border: 4px solid #555;
-            box-shadow: 0 0 0 4px #000, 0 15px 30px rgba(0,0,0,0.8);
-            border-radius: 4px;
-            padding: 12px;
-            position: relative;
-        }
-
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #000;
-            border: 2px solid #555;
-            padding: 6px 10px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .bgm-toggle-btn {
-            background: #444;
-            color: #fff;
-            border: 2px solid #888;
-            padding: 2px 8px;
-            cursor: pointer;
-            font-family: 'DotGothic16';
-            font-size: 0.8rem;
-        }
-        .bgm-toggle-btn.active {
-            background: #00aa00;
-            border-color: #55ff55;
-        }
-
-        .persistent-status-bar {
-            background: #000;
-            border: 2px solid var(--accent-color);
-            width: 100%;
-            padding: 6px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-            font-size: 0.9rem;
-            color: var(--accent-color);
-            margin-bottom: 8px;
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .heart-container {
-            color: var(--danger-color);
-            font-size: 1.05rem;
-            letter-spacing: 1px;
-        }
-
-        .exp-gauge-bg {
-            width: 100%;
-            background: #222;
-            border: 1px solid #777;
-            height: 6px;
-            position: relative;
-            margin-top: 1px;
-        }
-        .exp-gauge-fill {
-            background: var(--success-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.4s steps(10);
-        }
-
-        .screen {
-            display: none;
-            width: 100%;
-            background-color: var(--screen-bg);
-            border: 4px solid var(--border-color);
-            padding: 15px 12px;
+        .container {
+            background-color: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             text-align: center;
-            flex-direction: column;
-            align-items: center;
-            min-height: 460px;
-            justify-content: space-between;
+            width: 350px;
         }
-
-        .screen.active {
-            display: flex;
-        }
-
         h1 {
-            font-size: 1.7rem;
-            color: var(--accent-color);
-            text-shadow: 3px 3px #000;
-            margin-bottom: 4px;
-            letter-spacing: 2px;
+            font-size: 1.5rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
         }
-
-        .subtitle {
-            font-size: 0.9rem;
-            color: #ccc;
-            margin-bottom: 8px;
+        .info {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
         }
-
-        .retro-btn {
+        .question {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            color: #00ffcc;
+        }
+        input[type="number"] {
+            font-size: 1.5rem;
+            width: 120px;
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #555;
             background-color: #333;
             color: #fff;
-            border: 3px solid #fff;
-            box-shadow: inset -3px -3px 0px #111, inset 3px 3px 0px #666;
-            padding: 12px 20px;
-            font-size: 1.1rem;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff6666;
+        }
+        #message {
+            margin-top: 15px;
             font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 6px;
-            font-family: 'DotGothic16';
-            text-transform: uppercase;
-        }
-
-        .retro-btn:active {
-            box-shadow: inset 3px 3px 0px #111;
-            transform: translate(2px, 2px);
-        }
-
-        .retro-btn.primary {
-            background-color: #aa0000;
-            border-color: #ff5555;
-            box-shadow: inset -3px -3px 0px #550000, inset 3px 3px 0px #ff8888;
-        }
-
-        .retro-btn.secondary {
-            background-color: #006666;
-            border-color: #44ffff;
-            box-shadow: inset -3px -3px 0px #003333, inset 3px 3px 0px #88ffff;
-        }
-
-        .retro-btn.spring-btn {
-            background-color: #0044aa;
-            border-color: #66ccff;
-            box-shadow: inset -3px -3px 0px #002255, inset 3px 3px 0px #88eeff;
-        }
-
-        .home-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            margin: auto 0;
-        }
-
-        .stage-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            width: 100%;
-            max-height: 280px;
-            overflow-y: auto;
-            border: 2px solid #555;
-            background: #000;
-            padding: 5px;
-            text-align: left;
-        }
-
-        .stage-item {
-            background-color: #111;
-            border: 2px solid #444;
-            color: #fff;
-            padding: 9px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'DotGothic16';
-        }
-
-        .stage-item.unlocked {
-            border-color: var(--accent-color);
-            color: var(--accent-color);
-            background-color: #222200;
-        }
-
-        .stage-item.random-mode {
-            border-color: #ff88ff;
-            color: #ff88ff;
-            background-color: #220022;
-        }
-
-        .stage-item.next-world {
-            border-color: #ff44ff;
-            color: #ff88ff;
-            background-color: #330033;
-            animation: next-world-pulse 1.5s infinite alternate;
-        }
-
-        @keyframes next-world-pulse {
-            0% { border-color: #ff44ff; box-shadow: 0 0 5px #ff44ff; }
-            100% { border-color: #ffff00; box-shadow: 0 0 15px #ff00ff; }
-        }
-
-        .stage-item.locked {
-            color: #666;
-            border-color: #333;
-            cursor: not-allowed;
-            background-color: #111;
-        }
-
-        .stage-item.cleared::after {
-            content: " ★";
-            color: #ffcc00;
-        }
-
-        .battle-header {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #555;
-            padding-bottom: 5px;
-            margin-bottom: 6px;
-            font-size: 0.85rem;
-        }
-
-        .back-home-btn {
-            background: none;
-            border: 1px solid #aaa;
-            color: #aaa;
-            padding: 3px 6px;
-            cursor: pointer;
-            font-family: 'DotGothic16';
-        }
-
-        .field-box {
-            background: #000;
-            border: 4px ridge #666;
-            width: 100%;
-            height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-bottom: 6px;
-            overflow: hidden;
-        }
-
-        .dot-graphic {
-            font-size: 3rem;
-            animation: dot-bounce 1s infinite steps(2);
-            transition: transform 0.1s, filter 0.1s, opacity 0.2s;
-        }
-
-        @keyframes dot-bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
-        }
-
-        .dot-graphic.hit {
-            transform: scale(1.3) rotate(-10deg);
-            filter: brightness(3) sepia(1) hue-rotate(-50deg);
-        }
-
-        .dot-graphic.defeated {
-            transform: scale(0) rotate(360deg);
-            opacity: 0;
-        }
-
-        .enemy-info {
-            width: 80%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-            color: #ff8888;
-            margin-bottom: 3px;
-        }
-
-        .pixel-gauge-bg {
-            width: 80%;
-            background: #333;
-            border: 2px solid #fff;
-            height: 9px;
-            position: relative;
-        }
-        .pixel-gauge-fill {
-            background: var(--danger-color);
-            height: 100%;
-            width: 100%;
-            transition: width 0.3s linear;
-        }
-
-        .rpg-window {
-            background: #000;
-            border: 4px solid #fff;
-            box-shadow: inset 0 0 0 2px #000;
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 6px;
-            text-align: center;
-            position: relative;
-        }
-
-        .streak-banner {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ffcc00;
-            color: #000;
-            font-size: 0.75rem;
-            padding: 1px 8px;
-            border: 2px solid #fff;
-            font-weight: bold;
-            display: none;
-            animation: streak-jump 0.3s infinite alternate;
-            z-index: 10;
-        }
-
-        @keyframes streak-jump {
-            0% { transform: translateX(-50%) translateY(0); }
-            100% { transform: translateX(-50%) translateY(-2px); }
-        }
-
-        .rpg-kana {
-            font-size: 0.95rem;
-            color: var(--accent-color);
-            margin-bottom: 2px;
-            min-height: 18px;
-        }
-
-        .rpg-problem {
-            font-size: 1.7rem;
-            color: #fff;
-            letter-spacing: 2px;
-        }
-
-        .input-screen-box {
-            background: #111;
-            border: 2px solid #888;
-            color: #ffcc00;
-            font-size: 1.3rem;
-            padding: 3px;
-            width: 100%;
-            margin-bottom: 6px;
-            letter-spacing: 6px;
-            min-height: 36px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .pixel-keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            width: 100%;
-            margin-bottom: 4px;
-        }
-
-        .pixel-key {
-            background: #444;
-            color: #fff;
-            border: 2px solid #888;
-            box-shadow: inset -2px -2px 0px #222, inset 2px 2px 0px #666;
-            padding: 7px 0;
-            font-size: 1.2rem;
-            font-family: 'DotGothic16';
-            cursor: pointer;
-            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-        }
-        .pixel-key:active {
-            box-shadow: inset 2px 2px 0px #222;
-        }
-        .pixel-key.clear-key {
-            background: #622;
-            border-color: #f55;
-            grid-column: span 2;
-        }
-
-        .pixel-key.hint-glow {
-            background: #ffcc00 !important;
-            color: #000 !important;
-            border-color: #ffffff !important;
-            animation: hint-flash 0.4s infinite alternate;
-        }
-
-        @keyframes hint-flash {
-            0% { transform: scale(1); box-shadow: 0 0 5px #ffcc00; }
-            100% { transform: scale(1.05); box-shadow: 0 0 15px #ffff00; }
-        }
-
-        .flashcard-box {
-            background: #000;
-            border: 4px solid var(--accent-color);
-            width: 100%;
-            padding: 15px 10px;
-            margin: 8px 0;
-            cursor: pointer;
-            box-shadow: inset 0 0 10px rgba(255,204,0,0.2);
-        }
-
-        .name-input {
-            background: #000;
-            color: #ffcc00;
-            border: 3px solid #ffcc00;
-            font-size: 1.4rem;
-            padding: 8px;
-            text-align: center;
-            width: 100%;
-            margin: 10px 0;
-            font-family: 'DotGothic16';
-            outline: none;
-        }
-
-        #popup-msg {
-            position: fixed;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background-color: #000;
-            color: var(--accent-color);
-            border: 4px solid #fff;
-            font-size: 1.6rem;
-            padding: 12px 20px;
-            z-index: 999;
-            transition: transform 0.1s;
-        }
-        #popup-msg.show {
-            transform: translate(-50%, -50%) scale(1);
+            height: 1.5rem;
         }
     </style>
 </head>
-<body id="body-root">
+<body>
 
-    <div id="popup-msg">せいかい！</div>
-
-    <div class="arcade-cabinet">
-        <div class="top-bar">
-            <span>🎵 ファミコンちびっこBGM</span>
-            <button id="bgm-btn" class="bgm-toggle-btn" onclick="toggleBGM()">BGM: OFF</button>
-        </div>
-
-        <div class="persistent-status-bar" id="persistent-status" style="display: none;">
-            <div class="status-row">
-                <span id="p-status-name-level">Lv.1 ゆうしゃ</span>
-                <span id="p-status-hearts" class="heart-container">♥♥♥♥♥</span>
-            </div>
-            <div class="status-row" style="font-size: 0.8rem; color: #aaa;">
-                <span id="p-status-exp">EXP: 0 / 20</span>
-                <span id="p-status-next">つぎまであと20</span>
-            </div>
-            <div class="exp-gauge-bg">
-                <div class="exp-gauge-fill" id="p-status-exp-fill"></div>
-            </div>
-        </div>
-
-        <!-- スタート画面 -->
-        <div id="start-screen" class="screen active">
-            <div>
-                <h1>くくの ぼうけん</h1>
-                <p class="subtitle">-- RETRO KUKU RPG --</p>
-            </div>
-            <div class="field-box" style="height: 140px;">
-                <div class="dot-graphic">🏠✨</div>
-                <p style="font-size: 0.85rem; color: #aaa; margin-top: 4px;">きみの なまえを おしえてね！</p>
-                <input type="text" id="player-name-input" class="name-input" value="ゆうしゃ" maxlength="8">
-            </div>
-            <button class="retro-btn primary" onclick="registerNameAndStart()">ぼうけんを はじめる</button>
-        </div>
-
-        <!-- ホーム画面 -->
-        <div id="home-screen" class="screen">
-            <div>
-                <h1>ゆうしゃの いえ</h1>
-                <p class="subtitle">きょうも くくの しゅぎょうじゃ！</p>
-            </div>
-            <div class="field-box" style="height: 110px;">
-                <div class="dot-graphic" style="font-size: 2.3rem;">🧑‍💻📜</div>
-                <p style="font-size: 0.85rem; color: #8ef; margin-top: 2px;">タンスのなかに くくのきおく</p>
-            </div>
-            <div class="home-menu">
-                <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
-                <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
-            </div>
-        </div>
-
-        <!-- ステージセレクト画面 -->
-        <div id="stage-select-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
-                <span>フィールド えらび</span>
-                <span></span>
-            </div>
-            <div class="stage-list" id="stage-list-container"></div>
-            <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
-        </div>
-
-        <!-- まおうじょう レベルセレクト画面 -->
-        <div id="next-world-select-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="showStageSelect()">◀ もどる</button>
-                <span>まおうじょう の かいろ (Lv.1〜10)</span>
-                <span></span>
-            </div>
-            <div class="stage-list" id="next-world-list-container"></div>
-            <button class="retro-btn" onclick="showStageSelect()" style="margin-top: 8px;">もどる</button>
-        </div>
-
-        <!-- じゅんびセレクト画面 -->
-        <div id="practice-stage-select-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
-                <span>れんしゅうする だん</span>
-                <span></span>
-            </div>
-            <div class="stage-list" id="practice-stage-list-container"></div>
-            <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
-        </div>
-
-        <!-- 練習画面 -->
-        <div id="practice-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="showPracticeStageSelect()">◀ やめる</button>
-                <span id="practice-stage-title">1のだんの じゅんび</span>
-                <span id="practice-counter">1/9</span>
-            </div>
-
-            <div class="flashcard-box" onclick="onFlashcardClick()">
-                <div class="rpg-kana" id="practice-kana">いんいちがいち</div>
-                <div class="rpg-problem" id="practice-main" style="font-size: 2.2rem;">1 × 1</div>
-                <p style="font-size: 0.8rem; color: #888; margin-top: 8px;">[ がめんを タッチして こたえ / つぎへ ]</p>
-            </div>
-
-            <button class="retro-btn secondary" onclick="playPracticeCurrentAudio()" style="font-size: 0.95rem; padding: 9px;">🔊 おんせいを もういちど きく</button>
-        </div>
-
-        <!-- バトル画面 -->
-        <div id="battle-screen" class="screen">
-            <div class="battle-header">
-                <button class="back-home-btn" onclick="leaveBattleToSelect()">◀ にげる</button>
-                <span id="current-stage-title">1のだんの はらっぱ</span>
-                <span></span>
-            </div>
-
-            <div class="field-box" id="battle-field-box">
-                <div class="enemy-info">
-                    <span id="enemy-label">まもの のこり</span>
-                    <span id="enemy-hp-text">9 / 9</span>
-                </div>
-                <div class="pixel-gauge-bg">
-                    <div class="pixel-gauge-fill" id="battle-progress"></div>
-                </div>
-                <div class="dot-graphic" id="monster-emoji" style="margin-top: 4px;">🌱</div>
-            </div>
-
-            <div class="rpg-window">
-                <div id="streak-banner" class="streak-banner">2もんれんぞくせいかい中！</div>
-                <div class="rpg-kana" id="kana-display">いんいちがいち</div>
-                <div class="rpg-problem" id="problem-display">1 × 1</div>
-            </div>
-
-            <div class="input-screen-box" id="user-input-display">-</div>
-
-            <div class="pixel-keypad">
-                <button class="pixel-key" onclick="inputNumber(1)">1</button>
-                <button class="pixel-key" onclick="inputNumber(2)">2</button>
-                <button class="pixel-key" onclick="inputNumber(3)">3</button>
-                <button class="pixel-key" onclick="inputNumber(4)">4</button>
-                <button class="pixel-key" onclick="inputNumber(5)">5</button>
-                <button class="pixel-key" onclick="inputNumber(6)">6</button>
-                <button class="pixel-key" onclick="inputNumber(7)">7</button>
-                <button class="pixel-key" onclick="inputNumber(8)">8</button>
-                <button class="pixel-key" onclick="inputNumber(9)">9</button>
-                <button class="pixel-key clear-key" onclick="clearInput()">けす</button>
-                <button class="pixel-key" onclick="inputNumber(0)">0</button>
-            </div>
-        </div>
-
-        <!-- クリア画面 -->
-        <div id="result-screen" class="screen" style="justify-content: center;">
-            <h1 style="color: #ffcc00;">クリア！</h1>
-            <div class="dot-graphic" style="margin: 8px 0;">🏆✨</div>
-            <div class="rpg-window" style="margin: 4px 0;">
-                <p style="font-size: 0.85rem; color: #aaa;">かかった じかん</p>
-                <p class="rpg-problem" id="clear-time-display" style="color: #55ff55; margin-top: 2px;">0びょう</p>
-                <p style="font-size: 1.05rem; color: #ff88ff; margin-top: 6px; font-weight: bold;" id="earned-exp-display">けいけんち +0 EXPを ゲット！</p>
-            </div>
-            <button class="retro-btn primary" onclick="returnFromComplete()">もどる</button>
-        </div>
-
-        <!-- ゲームオーバー画面 -->
-        <div id="gameover-screen" class="screen" style="justify-content: center;">
-            <h1 style="color: var(--danger-color);">ゲームオーバー</h1>
-            <div class="dot-graphic" style="margin: 8px 0;">💀</div>
-            <div class="rpg-window" style="margin: 8px 0; border-color: var(--danger-color);">
-                <p style="font-size: 0.95rem; color: #ff8888; line-height: 1.3;" id="gameover-msg">HPが ゼロで ぼうけんに でられない！</p>
-            </div>
-            <button class="retro-btn spring-btn" onclick="startSpringRecovery()">💧 いやしのいずみへ かいふくに いく</button>
-        </div>
-
-        <!-- いやしのいずみ画面 -->
-        <div id="spring-screen" class="screen">
-            <div class="battle-header">
-                <span>🧚‍♀️ いやしのいずみ</span>
-                <span id="spring-counter">1/9</span>
-            </div>
-
-            <div class="field-box" id="spring-field-box" style="height: 100px;">
-                <div class="dot-graphic" style="font-size: 2.5rem;">🧚‍♀️💧</div>
-                <p style="font-size: 0.8rem; color: #8ef; margin-top: 3px;">ようせいが くくのじゅもんを きいている…</p>
-            </div>
-
-            <div class="rpg-window">
-                <div class="rpg-kana" id="spring-kana-display">いんいちがいち</div>
-                <div class="rpg-problem" id="spring-problem-display">1 × 1</div>
-            </div>
-
-            <div class="input-screen-box" id="spring-input-display">-</div>
-
-            <div class="pixel-keypad" id="spring-keypad">
-                <button class="pixel-key" id="skey-1" onclick="inputSpringNumber(1)">1</button>
-                <button class="pixel-key" id="skey-2" onclick="inputSpringNumber(2)">2</button>
-                <button class="pixel-key" id="skey-3" onclick="inputSpringNumber(3)">3</button>
-                <button class="pixel-key" id="skey-4" onclick="inputSpringNumber(4)">4</button>
-                <button class="pixel-key" id="skey-5" onclick="inputSpringNumber(5)">5</button>
-                <button class="pixel-key" id="skey-6" onclick="inputSpringNumber(6)">6</button>
-                <button class="pixel-key" id="skey-7" onclick="inputSpringNumber(7)">7</button>
-                <button class="pixel-key" id="skey-8" onclick="inputSpringNumber(8)">8</button>
-                <button class="pixel-key" id="skey-9" onclick="inputSpringNumber(9)">9</button>
-                <button class="pixel-key clear-key" onclick="clearSpringInput()">けす</button>
-                <button class="pixel-key" id="skey-0" onclick="inputSpringNumber(0)">0</button>
-            </div>
-        </div>
+<div class="container" id="game-container">
+    <h1>魔王城の九九クエスト</h1>
+    <div class="info" id="level-info">レベル 1</div>
+    <div class="info" id="score-info">スコア: 0 / 10</div>
+    <div class="question" id="question-text">? × ?</div>
+    <div id="quiz-area">
+        <input type="number" id="answer-input" autofocus autocomplete="off">
+        <br>
+        <button onclick="checkAnswer()">こうげき！</button>
     </div>
+    <div id="message"></div>
+</div>
 
-    <script>
-        let audioCtx = null;
-        let bgmTimer = null;
-        let bgmEnabled = false;
-        let currentBgmMode = 'home';
+<script>
+    let currentLevel = 1;
+    let currentScore = 0;
+    let currentQuestionCount = 0;
+    const MAX_QUESTIONS_PER_LEVEL = 10; // 現在の問題数を維持
+    let currentA = 0;
+    let currentB = 0;
 
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+    const levelInfo = document.getElementById('level-info');
+    const scoreInfo = document.getElementById('score-info');
+    const questionText = document.getElementById('question-text');
+    const answerInput = document.getElementById('answer-input');
+    const message = document.getElementById('message');
+
+    // レベルごとの出題段の定義
+    function getTablesForLevel(level) {
+        if (level === 1) return [1, 2, 5];
+        if (level === 2) return [2, 5, 3];
+        if (level === 3) return [4, 5, 3];
+        if (level === 4) return [3, 6, 4];
+        if (level === 5) return [7, 6, 4];
+        if (level === 6) return [7, 6, 8];
+        if (level === 7) return [8, 6, 4, 7];
+        
+        // レベル8以上：6〜8多め、9わりと、1〜5少しずつ
+        const pool = [
+            1, 2, 3, 4, 5, // 少しずつ
+            9, 9,          // わりと (重み付け)
+            6, 6, 6,       // 多め
+            7, 7, 7,       // 多め
+            8, 8, 8        // 多め
+        ];
+        return pool;
+    }
+
+    function getRandomElement(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateQuestion() {
+        if (currentQuestionCount >= MAX_QUESTIONS_PER_LEVEL) {
+            // レベルクリア処理
+            currentLevel++;
+            currentQuestionCount = 0;
+            message.style.color = "#00ffcc";
+            message.innerText = `レベルアップ！ 次は レベル ${currentLevel} だ！`;
+            setTimeout(nextLevelStart, 1500);
+            return;
         }
 
-        function toggleBGM() {
-            initAudioContext();
-            bgmEnabled = !bgmEnabled;
-            const btn = document.getElementById('bgm-btn');
-            if (bgmEnabled) {
-                btn.textContent = "BGM: ON";
-                btn.classList.add('active');
-                playBGM(currentBgmMode);
-            } else {
-                btn.textContent = "BGM: OFF";
-                btn.classList.remove('active');
-                stopBGM();
-            }
+        const tables = getTablesForLevel(currentLevel);
+        
+        if (currentLevel >= 8) {
+            // レベル8以上はプールから段を選ぶ
+            currentA = getRandomElement(tables);
+        } else {
+            // レベル1〜7は指定された配列からランダムに選ぶ
+            currentA = getRandomElement(tables);
         }
+        
+        // かける数は 1〜9 の中からランダム
+        currentB = Math.floor(Math.random() * 9) + 1;
 
-        function stopBGM() {
-            if (bgmTimer) {
-                clearInterval(bgmTimer);
-                bgmTimer = null;
-            }
+        questionText.innerText = `${currentA} × ${currentB}`;
+        answerInput.value = '';
+        answerInput.focus();
+        levelInfo.innerText = `レベル ${currentLevel}`;
+        scoreInfo.innerText = `もんだい: ${currentQuestionCount + 1} / ${MAX_QUESTIONS_PER_LEVEL}`;
+        message.innerText = '';
+    }
+
+    function nextLevelStart() {
+        generateQuestion();
+    }
+
+    function checkAnswer() {
+        const userAnswer = parseInt(answerInput.value, 10);
+        const correctAnswer = currentA * currentB;
+
+        if (userAnswer === correctAnswer) {
+            currentScore++;
+            currentQuestionCount++;
+            message.style.color = "#00ff00";
+            message.innerText = "せいかい！ 魔王にダメージを与えた！";
+            setTimeout(generateQuestion, 1000);
+        } else {
+            message.style.color = "#ff4444";
+            message.innerText = `ざんねん！ 正解は ${correctAnswer} だ！`;
+            currentQuestionCount++;
+            setTimeout(generateQuestion, 1500);
         }
+    }
 
-        function playTone(freq, duration, type = 'square', vol = 0.05, delay = 0) {
-            if (!audioCtx) return;
-            try {
-                const startTime = audioCtx.currentTime + delay;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, startTime);
-                gain.gain.setValueAtTime(vol, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(startTime);
-                osc.stop(startTime + duration);
-            } catch(e) {}
+    // Enterキーでも回答できるようにする
+    answerInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkAnswer();
         }
+    });
 
-        function playHitSound() {
-            initAudioContext();
-            playTone(400, 0.08, 'sawtooth', 0.08, 0);
-            playTone(800, 0.12, 'square', 0.08, 0.05);
-        }
+    // ゲーム開始
+    generateQuestion();
+</script>
 
-        function playDamageSound() {
-            initAudioContext();
-            playTone(180, 0.15, 'sawtooth', 0.1, 0);
-            playTone(110, 0.2, 'sawtooth', 0.1, 0.1);
-        }
-
-        function playLevelUpSound() {
-            initAudioContext();
-            const notes = [
-                { f: 440.00, d: 0.1, t: 0 },
-                { f: 554.37, d: 0.1, t: 0.1 },
-                { f: 659.25, d: 0.1, t: 0.2 },
-                { f: 880.00, d: 0.3, t: 0.3 }
-            ];
-            notes.forEach(n => { playTone(n.f, n.d, 'square', 0.08, n.t); });
-        }
-
-        function playVictoryFanfare() {
-            initAudioContext();
-            const notes = [
-                { f: 523.25, d: 0.15, t: 0 },
-                { f: 659.25, d: 0.15, t: 0.15 },
-                { f: 783.99, d: 0.15, t: 0.30 },
-                { f: 1046.50, d: 0.4, t: 0.45 }
-            ];
-            notes.forEach(n => { playTone(n.f, n.d, 'square', 0.08, n.t); });
-        }
-
-        function playBGM(mode) {
-            currentBgmMode = mode;
-            stopBGM();
-            if (!bgmEnabled) return;
-
-            let step = 0;
-            let melody = [];
-            let tempo = 250;
-
-            if (mode === 'home') {
-                melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 329.63, 349.23, 329.63, 293.66, 261.63, 220.00, 246.94, 261.63, 0];
-                tempo = 280;
-            } else if (mode === 'practice') {
-                melody = [330.00, 392.00, 440.00, 493.88, 440.00, 392.00, 330.00, 293.66, 330.00, 392.00, 330.00, 261.63];
-                tempo = 320;
-            } else if (mode === 'battle') {
-                melody = [220.00, 220.00, 329.63, 220.00, 196.00, 220.00, 246.94, 261.63, 293.66, 329.63, 293.66, 261.63, 246.94, 220.00, 196.00, 164.81];
-                tempo = 180;
-            } else if (mode === 'spring') {
-                melody = [392.00, 523.25, 659.25, 783.99, 659.25, 523.25, 440.00, 523.25];
-                tempo = 350;
-            }
-
-            bgmTimer = setInterval(() => {
-                if (!bgmEnabled) return;
-                const freq = melody[step % melody.length];
-                if (freq > 0) {
-                    playTone(freq, tempo / 1000 * 0.8, mode === 'battle' ? 'sawtooth' : 'square', 0.02);
-                }
-                step++;
-            }, tempo);
-        }
-
-        const kukuData = {
-            1: {
-                1: { first: "いんいちがいち", second: "いち" },
-                2: { first: "いんにがに", second: "に" },
-                3: { first: "いんさんがさん", second: "さん" },
-                4: { first: "いんしがし", second: "し" },
-                5: { first: "いんごがご", second: "ご" },
-                6: { first: "いんろくがろく", second: "ろく" },
-                7: { first: "いんしちがしち", second: "しち" },
-                8: { first: "いんはちがはち", second: "はち" },
-                9: { first: "いんくがく", second: "く" }
-            },
-            2: {
-                1: { first: "にいちが", second: "に" },
-                2: { first: "ににんが", second: "し" },
-                3: { first: "にさんが", second: "ろく" },
-                4: { first: "にしが", second: "はち" },
-                5: { first: "にご", second: "じゅう" },
-                6: { first: "にろく", second: "じゅうに" },
-                7: { first: "にしち", second: "じゅうし" },
-                8: { first: "にはち", second: "じゅうろく" },
-                9: { first: "にく", second: "じゅうはち" }
-            },
-            3: {
-                1: { first: "さんいちが", second: "さん" },
-                2: { first: "さんにが", second: "ろく" },
-                3: { first: "さざんが", second: "く" },
-                4: { first: "さんし", second: "じゅうに" },
-                5: { first: "さんご", second: "じゅうご" },
-                6: { first: "さぶろく", second: "じゅうはち" },
-                7: { first: "さんしち", second: "にじゅういち" },
-                8: { first: "さんぱ", second: "にじゅうし" },
-                9: { first: "さんく", second: "にじゅうしち" }
-            },
-            4: {
-                1: { first: "しいちが", second: "し" },
-                2: { first: "しにが", second: "はち" },
-                3: { first: "しさん", second: "じゅうに" },
-                4: { first: "しし", second: "じゅうろく" },
-                5: { first: "しご", second: "にじゅう" },
-                6: { first: "しろく", second: "じゅうし" },
-                7: { first: "ししち", second: "にじゅうはち" },
-                8: { first: "しは", second: "さんじゅうに" },
-                9: { first: "しく", second: "さんじゅうろく" }
-            },
-            5: {
-                1: { first: "ごいちが", second: "ご" },
-                2: { first: "ごに", second: "じゅう" },
-                3: { first: "ごさん", second: "じゅうご" },
-                4: { first: "ごし", second: "にじゅう" },
-                5: { first: "ごご", second: "にじゅうご" },
-                6: { first: "ごろく", second: "さんじゅう" },
-                7: { first: "ごしち", second: "さんじゅうご" },
-                8: { first: "ごは", second: "しじゅう" },
-                9: { first: "ごっく", second: "しじゅうご" }
-            },
-            6: {
-                1: { first: "ろくいちが", second: "ろく" },
-                2: { first: "ろくに", second: "じゅうに" },
-                3: { first: "ろくさん", second: "じゅうはち" },
-                4: { first: "ろくし", second: "にじゅうし" },
-                5: { first: "ろくご", second: "さんじゅう" },
-                6: { first: "ろくろく", second: "さんじゅうろく" },
-                7: { first: "ろくしち", second: "しじゅうに" },
-                8: { first: "ろくは", second: "しじゅうはち" },
-                9: { first: "ろっく", second: "ごじゅうし" }
-            },
-            7: {
-                1: { first: "しちいちが", second: "しち" },
-                2: { first: "しちに", second: "じゅうし" },
-                3: { first: "しちさん", second: "にじゅういち" },
-                4: { first: "しちし", second: "にじゅうはち" },
-                5: { first: "しちご", second: "さんじゅうご" },
-                6: { first: "しちろく", second: "しじゅうに" },
-                7: { first: "しちしち", second: "しじゅうく" },
-                8: { first: "しちは", second: "ごじゅうろく" },
-                9: { first: "しちく", second: "ろくじゅうさん" }
-            },
-            8: {
-                1: { first: "はちいちが", second: "はち" },
-                2: { first: "はちに", second: "じゅうろく" },
-                3: { first: "はちさん", second: "にじゅうし" },
-                4: { first: "はちし", second: "さんじゅうに" },
-                5: { first: "はちご", second: "しじゅう" },
-                6: { first: "はちろく", second: "しじゅうはち" },
-                7: { first: "はちしち", second: "ごじゅうろく" },
-                8: { first: "はっぱ", second: "ろくじゅうし" },
-                9: { first: "はっく", second: "しちじゅうに" }
-            },
-            9: {
-                1: { first: "くいちが", second: "く" },
-                2: { first: "くに", second: "じゅうはち" },
-                3: { first: "くさん", second: "にじゅうしち" },
-                4: { first: "くし", second: "さんじゅうろく" },
-                5: { first: "くご", second: "しじゅうご" },
-                6: { first: "くろく", second: "ごじゅうし" },
-                7: { first: "くしち", second: "ろくじゅうさん" },
-                8: { first: "くは", second: "しちじゅうに" },
-                9: { first: "くく", second: "はちじゅういち" }
-            }
-        };
-
-        const STAGE_ORDER = [1, 2, 5, 3, 4, 6, 7, 8, 9];
-        const STAGE_NAMES = {
-            1: "1のだん (はじまりの はらっぱ)",
-            2: "2のだん (はじまりの もり)",
-            5: "5のだん (しずかな 平原)",
-            3: "3のだん (いばらの 林)",
-            4: "4のだん (まがった 洞窟)",
-            6: "6のだん (大きな 山道)",
-            7: "7のだん (ひみつの 谷)",
-            8: "8のだん (ふぶきの 雪原)",
-            9: "9のだん (りゅうの 城門)"
-        };
-
-        const MONSTER_DATA = {
-            1: { icon: "🌱", name: "プチビビ" },
-            2: { icon: "🟢", name: "モチモチ" },
-            5: { icon: "⭐", name: "ピカテング" },
-            3: { icon: "👺", name: "トゲトゲ" },
-            4: { icon: "💀", name: "ゴースト" },
-            6: { icon: "👹", name: "ヤマオニ" },
-            7: { icon: "🗿", name: "ストーン" },
-            8: { icon: "🦅", name: "アイスバード" },
-            9: { icon: "🐲", name: "ドラゴン" }
-        };
-
-        const RANDOM_MONSTER_DATA = {
-            1: { icon: "🌱", name: "プカプカポコポコ" },
-            2: { icon: "🟢", name: "ランランニノノ" },
-            5: { icon: "⭐", name: "ピカピカキラキラ" },
-            3: { icon: "👺", name: "ガガガギギギ" },
-            4: { icon: "💀", name: "ウロウロドギマギ" },
-            6: { icon: "👹", name: "ドスンバスン" },
-            7: { icon: "🗿", name: "カチカチゴロゴロ" },
-            8: { icon: "🦅", name: "ヒュードロドロ" },
-            9: { icon: "🐲", name: "ギガゴガガーン" }
-        };
-
-        const NEXT_WORLD_MONSTER_DATA = {
-            1: { icon: "🦇", name: "暗黒バット" },
-            2: { icon: "💀", name: "スケルトンナイト" },
-            3: { icon: "👁️", name: "魔眼のストーカー" },
-            4: { icon: "🦂", name: "ヴェノムスコーピオン" },
-            5: { icon: "👻", name: "ファントムスペクター" },
-            6: { icon: "🛡️", name: "アイアンゴーレム" },
-            7: { icon: "⚔️", name: "ダークソードマン" },
-            8: { icon: "🧊", name: "フロストデーモン" },
-            9: { icon: "🔥", name: "フレイムキメラ" },
-            10: { icon: "👿", name: "魔王ギガデウス" }
-        };
-
-        let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
-            playerName: "ゆうしゃ",
-            unlockedStages: [1],
-            clearedStages: [],
-            randomClearCounts: {}, // ステージごとのランダムクリア回数
-            level: 1,
-            exp: 0,
-            hp: 5,
-            failedStage: 1,
-            failedIsNextWorld: false,
-            failedNextLevel: 1,
-            clearedNextLevels: []
-        };
-        if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
-        if (typeof saveData.level === 'undefined') saveData.level = 1;
-        if (typeof saveData.exp === 'undefined') saveData.exp = 0;
-        if (typeof saveData.hp === 'undefined') saveData.hp = 5;
-        if (typeof saveData.failedStage === 'undefined') saveData.failedStage = 1;
-        if (typeof saveData.failedIsNextWorld === 'undefined') saveData.failedIsNextWorld = false;
-        if (typeof saveData.failedNextLevel === 'undefined') saveData.failedNextLevel = 1;
-        if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
-        if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
-        if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
-
-        let currentStage = 1;
-        let isRandomMode = false;
-        let isNextWorldMode = false;
-        let currentNextLevel = 1;
-        let currentMultiplierIndex = 0;
-        let currentAudio = null;
-        let startTime = 0;
-        let userInputString = "";
-        let problemsQueue = [];
-        let isAnswered = false;
-        let stageEarnedExp = 0;
-        let currentBattleHp = 5;
-        let correctStreak = 0;
-
-        let springStage = 1;
-        let springIsNextWorld = false;
-        let springNextLevel = 1;
-        let springIndex = 0;
-        let springProblems = [];
-        let springInputString = "";
-        let springMistakeCount = 0;
-
-        let practiceStage = 1;
-        let practiceIndex = 0;
-        let flashcardState = 0;
-
-        function setWorldTheme(isNext) {
-            const bodyRoot = document.getElementById('body-root');
-            if (isNext) {
-                bodyRoot.classList.add('world-next');
-            } else {
-                bodyRoot.classList.remove('world-next');
-            }
-        }
-
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-
-            const persistentBar = document.getElementById('persistent-status');
-            if (screenId === 'start-screen') {
-                persistentBar.style.display = 'none';
-            } else {
-                persistentBar.style.display = 'flex';
-                updatePersistentStatus();
-            }
-        }
-
-        function registerNameAndStart() {
-            initAudioContext();
-            const inputVal = document.getElementById('player-name-input').value.trim();
-            if (inputVal !== "") {
-                saveData.playerName = inputVal;
-            }
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-            showHome();
-        }
-
-        function openNameChange() {
-            const newName = prompt("あたらしい なまえを 入力してね（8文字まで）:", saveData.playerName);
-            if (newName !== null && newName.trim() !== "") {
-                saveData.playerName = newName.trim().substring(0, 8);
-                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-                updatePersistentStatus();
-                showPopup("なまえを かえたよ！");
-            }
-        }
-
-        function getNextLevelExp(level) {
-            return level * 20;
-        }
-
-        function addExp(amount) {
-            saveData.exp += amount;
-            let neededExp = getNextLevelExp(saveData.level);
-            let leveledUp = false;
-
-            while (saveData.exp >= neededExp) {
-                saveData.exp -= neededExp;
-                saveData.level++;
-                leveledUp = true;
-                neededExp = getNextLevelExp(saveData.level);
-            }
-
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-            updatePersistentStatus();
-
-            if (leveledUp) {
-                playLevelUpSound();
-                setTimeout(() => {
-                    showPopup(`レベルアップ！ Lv.${saveData.level}に なった！`);
-                }, 700);
-            }
-        }
-
-        function updatePersistentStatus() {
-            document.getElementById('p-status-name-level').textContent = `Lv.${saveData.level} ${saveData.playerName}`;
-            
-            const heartsStr = "♥".repeat(Math.max(0, saveData.hp)) + "♡".repeat(Math.max(0, 5 - saveData.hp));
-            document.getElementById('p-status-hearts').textContent = heartsStr;
-
-            const needed = getNextLevelExp(saveData.level);
-            document.getElementById('p-status-exp').textContent = `EXP: ${saveData.exp} / ${needed}`;
-            document.getElementById('p-status-next').textContent = `つぎまで あと ${needed - saveData.exp}`;
-
-            const fillPercent = Math.min(100, (saveData.exp / needed) * 100);
-            document.getElementById('p-status-exp-fill').style.width = `${fillPercent}%`;
-        }
-
-        function showHome() {
-            setWorldTheme(false);
-            playBGM('home');
-            updatePersistentStatus();
-            if (saveData.hp <= 0) {
-                showGameOverScreen();
-                return;
-            }
-            switchScreen('home-screen');
-        }
-
-        function showGameOverScreen() {
-            document.getElementById('gameover-msg').textContent = "HPが ゼロで ぼうけんに でられない！";
-            playBGM('battle');
-            switchScreen('gameover-screen');
-        }
-
-        function showStageSelect() {
-            setWorldTheme(false);
-            if (saveData.hp <= 0) {
-                showGameOverScreen();
-                return;
-            }
-            playBGM('home');
-            const container = document.getElementById('stage-list-container');
-            container.innerHTML = '';
-
-            // 全ステージのランダム問題が1回以上クリアされているかチェック
-            const allRandomCleared = STAGE_ORDER.every(s => (saveData.randomClearCounts[s] || 0) > 0);
-
-            STAGE_ORDER.forEach((stageNum) => {
-                const isUnlocked = saveData.unlockedStages.includes(stageNum);
-                const isCleared = saveData.clearedStages.includes(stageNum);
-
-                const btn = document.createElement('div');
-                btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? "" : " [🔒]");
-                
-                if (isUnlocked) {
-                    btn.onclick = () => startBattle(stageNum, false, false);
-                }
-                container.appendChild(btn);
-
-                if (isCleared) {
-                    const randomCount = saveData.randomClearCounts[stageNum] || 0;
-                    const randomBtn = document.createElement('div');
-                    randomBtn.className = `stage-item random-mode`;
-                    randomBtn.textContent = `🎲 ${stageNum}のだん ランダム (${randomCount}回クリア)`;
-                    randomBtn.onclick = () => startBattle(stageNum, true, false);
-                    container.appendChild(randomBtn);
-                }
-            });
-
-            const nextAreaBtn = document.createElement('div');
-            nextAreaBtn.className = `stage-item ${allRandomCleared ? 'next-world' : 'locked'}`;
-            nextAreaBtn.textContent = allRandomCleared ? "🔮 まおうじょう (つぎの ぼうけん)" : "🔒 まおうじょう (すべての だんの ランダムを クリアしよう！)";
-            nextAreaBtn.onclick = () => {
-                if (allRandomCleared) {
-                    showNextWorldSelect();
-                } else {
-                    alert("すべての だんの ランダム問題を クリアすると、まおうじょうへの とびらが ひらくよ！");
-                }
-            };
-            container.appendChild(nextAreaBtn);
-
-            switchScreen('stage-select-screen');
-        }
-
-        function showNextWorldSelect() {
-            setWorldTheme(true);
-            playBGM('battle');
-            const container = document.getElementById('next-world-list-container');
-            container.innerHTML = '';
-
-            for (let lvl = 1; lvl <= 10; lvl++) {
-                const isCleared = saveData.clearedNextLevels.includes(lvl);
-                // 前のレベル（lvl - 1）がクリアされている、またはLv.1なら解放
-                const isUnlocked = (lvl === 1) || saveData.clearedNextLevels.includes(lvl - 1);
-                const count = getNextWorldProblemCount(lvl);
-                const nwMonster = NEXT_WORLD_MONSTER_DATA[lvl] || { name: "魔王軍" };
-
-                const btn = document.createElement('div');
-                btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                btn.textContent = isUnlocked ? `Lv.${lvl} ${nwMonster.name} (${count}もん)` : `Lv.${lvl} ${nwMonster.name} [🔒 まえのレベルをクリアしてね]`;
-                
-                if (isUnlocked) {
-                    btn.onclick = () => startNextWorldBattle(lvl);
-                } else {
-                    btn.onclick = () => alert("前のレベルを クリアすると ちょうせん できるよ！");
-                }
-                container.appendChild(btn);
-            }
-
-            switchScreen('next-world-select-screen');
-        }
-
-        function getNextWorldProblemCount(lvl) {
-            return Math.round(10 + (lvl - 1) * (20 / 9));
-        }
-
-        function generateNextWorldProblems(lvl, count) {
-            let stagesPool = [];
-            for (let s = 1; s <= 9; s++) {
-                let weight = 1;
-                if ([6, 7, 8, 9].includes(s)) {
-                    weight = 1 + (lvl * 0.8);
-                } else if ([1, 2].includes(s)) {
-                    weight = Math.max(0.1, 2.0 - (lvl * 0.2));
-                }
-                
-                let countWeight = Math.round(weight * 10);
-                for (let w = 0; w < countWeight; w++) {
-                    stagesPool.push(s);
-                }
-            }
-
-            let result = [];
-            for (let i = 0; i < count; i++) {
-                let s = stagesPool[Math.floor(Math.random() * stagesPool.length)];
-                let b = Math.floor(Math.random() * 9) + 1;
-                result.push({ a: s, b: b });
-            }
-            return result;
-        }
-
-        function startNextWorldBattle(lvl) {
-            if (saveData.hp <= 0) {
-                showGameOverScreen();
-                return;
-            }
-            currentNextLevel = lvl;
-            isNextWorldMode = true;
-            isRandomMode = false;
-            currentMultiplierIndex = 0;
-            isAnswered = false;
-            stageEarnedExp = 0;
-            currentBattleHp = saveData.hp;
-            correctStreak = 0;
-            updateStreakDisplay();
-            setWorldTheme(true);
-            playBGM('battle');
-
-            const totalCount = getNextWorldProblemCount(lvl);
-            problemsQueue = generateNextWorldProblems(lvl, totalCount);
-
-            const nwMonster = NEXT_WORLD_MONSTER_DATA[lvl] || { icon: "🦇", name: "魔王軍の使者" };
-            document.getElementById('current-stage-title').textContent = `まおうじょう Lv.${lvl}`;
-            
-            const monsterEl = document.getElementById('monster-emoji');
-            monsterEl.textContent = nwMonster.icon;
-            monsterEl.classList.remove('hit', 'defeated');
-            document.getElementById('enemy-label').textContent = `${nwMonster.name} のこり`;
-
-            updateBattleStatusDisplay();
-            switchScreen('battle-screen');
-            startTime = Date.now();
-            loadCurrentProblem();
-        }
-
-        function startBattle(stageNum, randomMode, nextWorld = false) {
-            if (saveData.hp <= 0) {
-                showGameOverScreen();
-                return;
-            }
-            currentStage = stageNum;
-            isRandomMode = randomMode;
-            isNextWorldMode = nextWorld;
-            currentMultiplierIndex = 0;
-            isAnswered = false;
-            stageEarnedExp = 0;
-            currentBattleHp = saveData.hp;
-            correctStreak = 0;
-            updateStreakDisplay();
-            setWorldTheme(false);
-            playBGM('battle');
-
-            problemsQueue = [];
-            for (let b = 1; b <= 9; b++) {
-                problemsQueue.push({ a: currentStage, b: b });
-            }
-
-            if (isRandomMode) {
-                for (let i = problemsQueue.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [problemsQueue[i], problemsQueue[j]] = [problemsQueue[j], problemsQueue[i]];
-                }
-            }
-
-            const titlePrefix = isRandomMode ? `${currentStage}のだん [ランダム]` : STAGE_NAMES[currentStage].split(' ')[0];
-            document.getElementById('current-stage-title').textContent = titlePrefix;
-            
-            const monsterInfo = isRandomMode 
-                ? (RANDOM_MONSTER_DATA[currentStage] || { icon: "👑", name: "強敵" }) 
-                : (MONSTER_DATA[currentStage] || { icon: "🐲", name: "まもの" });
-            
-            const monsterEl = document.getElementById('monster-emoji');
-            monsterEl.textContent = monsterInfo.icon;
-            monsterEl.classList.remove('hit', 'defeated');
-            document.getElementById('enemy-label').textContent = `${monsterInfo.name} のこり`;
-
-            updateBattleStatusDisplay();
-            switchScreen('battle-screen');
-            startTime = Date.now();
-            loadCurrentProblem();
-        }
-
-        function updateBattleStatusDisplay() {
-            const totalCount = isNextWorldMode ? getNextWorldProblemCount(currentNextLevel) : 9;
-            const remainingHp = totalCount - currentMultiplierIndex;
-            const hpPercent = (remainingHp / totalCount) * 100;
-            document.getElementById('battle-progress').style.width = `${hpPercent}%`;
-            document.getElementById('enemy-hp-text').textContent = `${remainingHp} / ${totalCount}`;
-
-            saveData.hp = currentBattleHp;
-            updatePersistentStatus();
-        }
-
-        function updateStreakDisplay() {
-            const banner = document.getElementById('streak-banner');
-            if (correctStreak >= 2) {
-                banner.textContent = `${correctStreak}もんれんぞくせいかい中！`;
-                banner.style.display = 'block';
-            } else {
-                banner.style.display = 'none';
-            }
-        }
-
-        function loadCurrentProblem() {
-            isAnswered = false;
-            userInputString = "";
-            updateInputDisplay();
-
-            const prob = problemsQueue[currentMultiplierIndex];
-            updateBattleStatusDisplay();
-            document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b}`;
-
-            if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
-                document.getElementById('kana-display').textContent = kukuData[prob.a][prob.b].first;
-            }
-            playFirstAudio();
-        }
-
-        function playFirstAudio() {
-            if (isAnswered) return;
-            const prob = problemsQueue[currentMultiplierIndex];
-            const audioPath = `audio/${prob.a}-${prob.b}_1.wav`;
-            if (currentAudio) { currentAudio.pause(); }
-            currentAudio = new Audio(audioPath);
-            currentAudio.play().catch(e => {});
-        }
-
-        function playSecondAudio(callback) {
-            const prob = problemsQueue[currentMultiplierIndex];
-            const audioPath = `audio/${prob.a}-${prob.b}_2.wav`;
-            if (currentAudio) { currentAudio.pause(); }
-            currentAudio = new Audio(audioPath);
-            currentAudio.play().then(() => {
-                currentAudio.onended = () => { if (callback) callback(); };
-            }).catch(e => { if (callback) callback(); });
-        }
-
-        function inputNumber(num) {
-            if (isAnswered) return;
-            if (userInputString.length >= 2) return;
-            userInputString += num.toString();
-            updateInputDisplay();
-
-            const prob = problemsQueue[currentMultiplierIndex];
-            const correctAnswer = prob.a * prob.b;
-            const userAns = parseInt(userInputString, 10);
-            const targetLength = correctAnswer >= 10 ? 2 : 1;
-
-            if (userInputString.length === targetLength) {
-                if (userAns === correctAnswer) {
-                    isAnswered = true;
-                    correctStreak++;
-                    updateStreakDisplay();
-
-                    showPopup("こうげき ヒット！");
-                    playHitSound();
-
-                    let solvedExp = 1;
-                    if (isNextWorldMode) {
-                        solvedExp = 2 + Math.floor(currentNextLevel / 2);
-                    } else if (isRandomMode) {
-                        solvedExp = 3;
-                    }
-                    stageEarnedExp += solvedExp;
-                    addExp(solvedExp);
-
-                    document.getElementById('problem-display').textContent = `${prob.a} × ${prob.b} ＝ ${correctAnswer}`;
-                    document.getElementById('kana-display').textContent = kukuData[prob.a][prob.b].first + kukuData[prob.a][prob.b].second;
-
-                    const monsterEl = document.getElementById('monster-emoji');
-                    monsterEl.classList.add('hit');
-
-                    playSecondAudio(() => {
-                        currentMultiplierIndex++;
-                        const totalCount = isNextWorldMode ? getNextWorldProblemCount(currentNextLevel) : 9;
-                        updateBattleStatusDisplay();
-                        monsterEl.classList.remove('hit');
-
-                        if (currentMultiplierIndex >= totalCount) {
-                            let clearBonusExp = 5;
-                            if (isNextWorldMode) {
-                                clearBonusExp = 20 + (currentNextLevel * 10);
-                            } else if (isRandomMode) {
-                                clearBonusExp = 15;
-                            }
-                            stageEarnedExp += clearBonusExp;
-                            addExp(clearBonusExp);
-
-                            saveData.hp = currentBattleHp;
-                            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-
-                            monsterEl.classList.add('defeated');
-                            stopBGM();
-                            playVictoryFanfare();
-                            setTimeout(() => { completeStage(); }, 1200);
-                        } else {
-                            loadCurrentProblem();
-                        }
-                    });
-                } else {
-                    playDamageSound();
-                    currentBattleHp--;
-                    saveData.hp = currentBattleHp;
-                    
-                    correctStreak = 0;
-                    updateStreakDisplay();
-                    
-                    if (isNextWorldMode) {
-                        saveData.failedIsNextWorld = true;
-                        saveData.failedNextLevel = currentNextLevel;
-                    } else {
-                        saveData.failedIsNextWorld = false;
-                        saveData.failedStage = currentStage;
-                    }
-                    localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-
-                    updateBattleStatusDisplay();
-
-                    if (currentBattleHp <= 0) {
-                        isAnswered = true;
-                        showPopup("HPが ゼロに なった…");
-                        stopBGM();
-                        setTimeout(() => { showGameOverScreen(); }, 1000);
-                        return;
-                    }
-
-                    showPopup("ざんねん！ ♥が へった");
-                    userInputString = "";
-                    updateInputDisplay();
-                }
-            }
-        }
-
-        function clearInput() {
-            if (isAnswered) return;
-            userInputString = "";
-            updateInputDisplay();
-        }
-
-        function updateInputDisplay() {
-            document.getElementById('user-input-display').textContent = userInputString === "" ? "-" : userInputString;
-        }
-
-        function showPopup(text) {
-            const popup = document.getElementById('popup-msg');
-            popup.textContent = text;
-            popup.classList.add('show');
-            setTimeout(() => { popup.classList.remove('show'); }, 600);
-        }
-
-        function completeStage() {
-            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('clear-time-display').textContent = `${elapsedTime}びょう`;
-            document.getElementById('earned-exp-display').textContent = `けいけんち +${stageEarnedExp} EXPを ゲット！`;
-
-            if (isNextWorldMode) {
-                if (!saveData.clearedNextLevels.includes(currentNextLevel)) {
-                    saveData.clearedNextLevels.push(currentNextLevel);
-                }
-            } else {
-                if (!saveData.clearedStages.includes(currentStage)) {
-                    saveData.clearedStages.push(currentStage);
-                }
-                const currentIdx = STAGE_ORDER.indexOf(currentStage);
-                if (currentIdx < STAGE_ORDER.length - 1) {
-                    const nextStageNum = STAGE_ORDER[currentIdx + 1];
-                    if (!saveData.unlockedStages.includes(nextStageNum)) {
-                        saveData.unlockedStages.push(nextStageNum);
-                    }
-                }
-                if (isRandomMode) {
-                    if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
-                    saveData.randomClearCounts[currentStage] = (saveData.randomClearCounts[currentStage] || 0) + 1;
-                }
-            }
-            saveData.hp = currentBattleHp;
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-            updatePersistentStatus();
-
-            switchScreen('result-screen');
-        }
-
-        function returnFromComplete() {
-            if (isNextWorldMode) {
-                showNextWorldSelect();
-            } else {
-                showStageSelect();
-            }
-        }
-
-        function leaveBattleToSelect() {
-            if (isNextWorldMode) {
-                showNextWorldSelect();
-            } else {
-                showStageSelect();
-            }
-        }
-
-        function startSpringRecovery() {
-            springIsNextWorld = !!saveData.failedIsNextWorld;
-            springNextLevel = saveData.failedNextLevel || 1;
-            springStage = saveData.failedStage || 1;
-            springIndex = 0;
-            saveData.hp = 0;
-            localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-
-            if (springIsNextWorld) {
-                springProblems = generateNextWorldProblems(springNextLevel, 9);
-            } else {
-                springProblems = [];
-                for (let b = 1; b <= 9; b++) {
-                    springProblems.push({ a: springStage, b: b });
-                }
-            }
-
-            playBGM('spring');
-            switchScreen('spring-screen');
-            loadSpringProblem();
-        }
-
-        function loadSpringProblem() {
-            springInputString = "";
-            springMistakeCount = 0;
-            clearSpringKeyGlow();
-            updateSpringInputDisplay();
-
-            const prob = springProblems[springIndex];
-            const titleInfo = springIsNextWorld ? `まおうじょう Lv.${springNextLevel}` : `${springStage}のだん`;
-            document.getElementById('spring-counter').textContent = `いやしのじゅもん ${springIndex + 1}/9 (${titleInfo})`;
-            document.getElementById('spring-problem-display').textContent = `${prob.a} × ${prob.b}`;
-
-            if (kukuData[prob.a] && kukuData[prob.a][prob.b]) {
-                document.getElementById('spring-kana-display').textContent = kukuData[prob.a][prob.b].first;
-            }
-
-            const audioPath = `audio/${prob.a}-${prob.b}_1.wav`;
-            if (currentAudio) { currentAudio.pause(); }
-            currentAudio = new Audio(audioPath);
-            currentAudio.play().catch(e => {});
-        }
-
-        function clearSpringKeyGlow() {
-            document.querySelectorAll('#spring-keypad .pixel-key').forEach(k => {
-                k.classList.remove('hint-glow');
-            });
-        }
-
-        function showSpringHint() {
-            const prob = springProblems[springIndex];
-            const correctAnswer = prob.a * prob.b;
-            const ansStr = correctAnswer.toString();
-
-            for (let char of ansStr) {
-                const targetBtn = document.getElementById(`skey-${char}`);
-                if (targetBtn) {
-                    targetBtn.classList.add('hint-glow');
-                }
-            }
-        }
-
-        function inputSpringNumber(num) {
-            if (springInputString.length >= 2) return;
-            springInputString += num.toString();
-            updateSpringInputDisplay();
-
-            const prob = springProblems[springIndex];
-            const correctAnswer = prob.a * prob.b;
-            const userAns = parseInt(springInputString, 10);
-            const targetLength = correctAnswer >= 10 ? 2 : 1;
-
-            if (springInputString.length === targetLength) {
-                if (userAns === correctAnswer) {
-                    playHitSound();
-                    clearSpringKeyGlow();
-
-                    springIndex++;
-                    let shouldHeal = (springIndex % 2 === 0) || (springIndex === 9);
-                    
-                    if (shouldHeal && saveData.hp < 5) {
-                        saveData.hp = Math.min(5, saveData.hp + 1);
-                        showPopup("せいかい！ ♥が 1つ かいふく！");
-                    } else if (springIndex === 9) {
-                        saveData.hp = 5;
-                        showPopup("ぜんもん せいかい！ HPが ぜんかいした！");
-                    } else {
-                        showPopup("せいかい！");
-                    }
-
-                    localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
-                    updatePersistentStatus();
-
-                    document.getElementById('spring-problem-display').textContent = `${prob.a} × ${prob.b} ＝ ${correctAnswer}`;
-                    document.getElementById('spring-kana-display').textContent = kukuData[prob.a][prob.b].first + kukuData[prob.a][prob.b].second;
-
-                    const audioPath = `audio/${prob.a}-${prob.b}_2.wav`;
-                    if (currentAudio) { currentAudio.pause(); }
-                    currentAudio = new Audio(audioPath);
-                    currentAudio.play().catch(e => {});
-
-                    setTimeout(() => {
-                        if (springIndex >= 9) {
-                            playVictoryFanfare();
-                            alert("いやしのいずみの まほうで、HPが かんぜんに かいふくしたよ！");
-                            showHome();
-                        } else {
-                            loadSpringProblem();
-                        }
-                    }, 1000);
-                } else {
-                    playDamageSound();
-                    springMistakeCount++;
-                    
-                    if (springMistakeCount >= 1) {
-                        showPopup("ヒント：ひかる ボタンを おしてね！");
-                        showSpringHint();
-                    } else {
-                        showPopup("ざんねん！ もういちど");
-                    }
-
-                    springInputString = "";
-                    updateSpringInputDisplay();
-                }
-            }
-        }
-
-        function clearSpringInput() {
-            springInputString = "";
-            updateSpringInputDisplay();
-        }
-
-        function updateSpringInputDisplay() {
-            document.getElementById('spring-input-display').textContent = springInputString === "" ? "-" : springInputString;
-        }
-
-        function showPracticeStageSelect() {
-            setWorldTheme(false);
-            playBGM('home');
-            const container = document.getElementById('practice-stage-list-container');
-            container.innerHTML = '';
-            for (let s = 1; s <= 9; s++) {
-                const btn = document.createElement('div');
-                btn.className = 'stage-item unlocked';
-                btn.textContent = `${s}のだんを れんしゅうする`;
-                btn.onclick = () => startPractice(s);
-                container.appendChild(btn);
-            }
-            switchScreen('practice-stage-select-screen');
-        }
-
-        function startPractice(stageNum) {
-            practiceStage = stageNum;
-            practiceIndex = 0;
-            flashcardState = 0;
-            playBGM('practice');
-
-            document.getElementById('practice-stage-title').textContent = `${practiceStage}のだん`;
-            switchScreen('practice-screen');
-            updateFlashcardDisplay();
-            playPracticeCurrentAudio();
-        }
-
-        function updateFlashcardDisplay() {
-            const b = practiceIndex + 1;
-            const data = kukuData[practiceStage][b];
-            document.getElementById('practice-counter').textContent = `${practiceIndex + 1}/9`;
-
-            if (flashcardState === 0) {
-                document.getElementById('practice-kana').textContent = data.first;
-                document.getElementById('practice-main').textContent = `${practiceStage} × ${b}`;
-            } else {
-                document.getElementById('practice-kana').textContent = data.second;
-                document.getElementById('practice-main').textContent = practiceStage * b;
-            }
-        }
-
-        function playPracticeCurrentAudio() {
-            const b = practiceIndex + 1;
-            const filename = flashcardState === 0 ? `${practiceStage}-${b}_1.wav` : `${practiceStage}-${b}_2.wav`;
-            const audioPath = `audio/${filename}`;
-            if (currentAudio) { currentAudio.pause(); }
-            currentAudio = new Audio(audioPath);
-            currentAudio.play().catch(e => {});
-        }
-
-        function onFlashcardClick() {
-            if (flashcardState === 0) {
-                flashcardState = 1;
-                updateFlashcardDisplay();
-                playPracticeCurrentAudio();
-            } else {
-                practiceIndex++;
-                if (practiceIndex >= 9) {
-                    alert(`${practiceStage}のだんの れんしゅうが おわったよ！`;
-                    showPracticeStageSelect();
-                } else {
-                    flashcardState = 0;
-                    updateFlashcardDisplay();
-                    playPracticeCurrentAudio();
-                }
-            }
-        }
-    </script>
 </body>
 </html>
