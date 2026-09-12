@@ -17,6 +17,13 @@
             --text-color: #ffffff;
         }
 
+        /* 次の冒険エリア（暗黒世界）用のカラーテーマクラス */
+        body.world-next {
+            --screen-bg: #2d1226;
+            --border-color: #ff88ff;
+            --accent-color: #ff77ff;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -72,7 +79,6 @@
             border-color: #55ff55;
         }
 
-        /* 常に表示される常駐ステータスバー */
         .persistent-status-bar {
             background: #000;
             border: 2px solid var(--accent-color);
@@ -226,6 +232,18 @@
             border-color: #ff88ff;
             color: #ff88ff;
             background-color: #220022;
+        }
+
+        .stage-item.next-world {
+            border-color: #ff44ff;
+            color: #ff88ff;
+            background-color: #330033;
+            animation: next-world-pulse 1.5s infinite alternate;
+        }
+
+        @keyframes next-world-pulse {
+            0% { border-color: #ff44ff; box-shadow: 0 0 5px #ff44ff; }
+            100% { border-color: #ffff00; box-shadow: 0 0 15px #ff00ff; }
         }
 
         .stage-item.locked {
@@ -385,7 +403,6 @@
             grid-column: span 2;
         }
 
-        /* ヒントで光るボタンのエフェクト */
         .pixel-key.hint-glow {
             background: #ffcc00 !important;
             color: #000 !important;
@@ -408,7 +425,6 @@
             box-shadow: inset 0 0 10px rgba(255,204,0,0.2);
         }
 
-        /* 名前入力インプット */
         .name-input {
             background: #000;
             color: #ffcc00;
@@ -440,7 +456,7 @@
         }
     </style>
 </head>
-<body>
+<body id="body-root">
 
     <div id="popup-msg">せいかい！</div>
 
@@ -450,7 +466,6 @@
             <button id="bgm-btn" class="bgm-toggle-btn" onclick="toggleBGM()">BGM: OFF</button>
         </div>
 
-        <!-- 常に画面上部に表示されるステータスバー -->
         <div class="persistent-status-bar" id="persistent-status" style="display: none;">
             <div class="status-row">
                 <span id="p-status-name-level">Lv.1 ゆうしゃ</span>
@@ -465,7 +480,7 @@
             </div>
         </div>
 
-        <!-- ① スタート画面 -->
+        <!-- スタート画面 -->
         <div id="start-screen" class="screen active">
             <div>
                 <h1>九九のぼうけん</h1>
@@ -479,7 +494,7 @@
             <button class="retro-btn primary" onclick="registerNameAndStart()">ぼうけんをはじめる</button>
         </div>
 
-        <!-- ② ホーム画面 -->
+        <!-- ホーム画面 -->
         <div id="home-screen" class="screen">
             <div>
                 <h1>ゆう者のいえ</h1>
@@ -496,7 +511,7 @@
             </div>
         </div>
 
-        <!-- ③ ぼうけん ステージセレクト -->
+        <!-- ステージセレクト画面 -->
         <div id="stage-select-screen" class="screen">
             <div class="battle-header">
                 <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
@@ -507,7 +522,18 @@
             <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
         </div>
 
-        <!-- ④ じゅんび（練習）セレクト -->
+        <!-- 次の冒険 レベルセレクト画面 -->
+        <div id="next-world-select-screen" class="screen">
+            <div class="battle-header">
+                <button class="back-home-btn" onclick="showStageSelect()">◀ もどる</button>
+                <span>魔王城への回廊 (Lv.1〜10)</span>
+                <span></span>
+            </div>
+            <div class="stage-list" id="next-world-list-container"></div>
+            <button class="retro-btn" onclick="showStageSelect()" style="margin-top: 8px;">もどる</button>
+        </div>
+
+        <!-- じゅんびセレクト画面 -->
         <div id="practice-stage-select-screen" class="screen">
             <div class="battle-header">
                 <button class="back-home-btn" onclick="showHome()">◀ もどる</button>
@@ -518,28 +544,28 @@
             <button class="retro-btn" onclick="showHome()" style="margin-top: 8px;">いえに かえる</button>
         </div>
 
-        <!-- ⑤ 練習（フラッシュカード）画面 -->
+        <!-- 練習画面 -->
         <div id="practice-screen" class="screen">
             <div class="battle-header">
                 <button class="back-home-btn" onclick="showPracticeStageSelect()">◀ やめる</button>
-                <span id="practice-stage-title">2の段のじゅんび</span>
+                <span id="practice-stage-title">1の段のじゅんび</span>
                 <span id="practice-counter">1/9</span>
             </div>
 
             <div class="flashcard-box" onclick="onFlashcardClick()">
-                <div class="rpg-kana" id="practice-kana">にいちが</div>
-                <div class="rpg-problem" id="practice-main" style="font-size: 2.2rem;">2 × 1</div>
+                <div class="rpg-kana" id="practice-kana">いんいちがいち</div>
+                <div class="rpg-problem" id="practice-main" style="font-size: 2.2rem;">1 × 1</div>
                 <p style="font-size: 0.8rem; color: #888; margin-top: 8px;">[ 画面をタッチしてこたえ／つぎへ ]</p>
             </div>
 
             <button class="retro-btn secondary" onclick="playPracticeCurrentAudio()" style="font-size: 0.95rem; padding: 9px;">🔊 音声をもういちどきく</button>
         </div>
 
-        <!-- ⑥ バトル（冒険）画面 -->
+        <!-- バトル画面 -->
         <div id="battle-screen" class="screen">
             <div class="battle-header">
-                <button class="back-home-btn" onclick="showStageSelect()">◀ にげる</button>
-                <span id="current-stage-title">2の段の森</span>
+                <button class="back-home-btn" onclick="leaveBattleToSelect()">◀ にげる</button>
+                <span id="current-stage-title">1の段の原っぱ</span>
                 <span></span>
             </div>
 
@@ -551,12 +577,12 @@
                 <div class="pixel-gauge-bg">
                     <div class="pixel-gauge-fill" id="battle-progress"></div>
                 </div>
-                <div class="dot-graphic" id="monster-emoji" style="margin-top: 4px;">🟢</div>
+                <div class="dot-graphic" id="monster-emoji" style="margin-top: 4px;">🌱</div>
             </div>
 
             <div class="rpg-window">
-                <div class="rpg-kana" id="kana-display">にいちが</div>
-                <div class="rpg-problem" id="problem-display">2 × 1</div>
+                <div class="rpg-kana" id="kana-display">いんいちがいち</div>
+                <div class="rpg-problem" id="problem-display">1 × 1</div>
             </div>
 
             <div class="input-screen-box" id="user-input-display">-</div>
@@ -576,7 +602,7 @@
             </div>
         </div>
 
-        <!-- ⑦ クリア画面 -->
+        <!-- クリア画面 -->
         <div id="result-screen" class="screen" style="justify-content: center;">
             <h1 style="color: #ffcc00;">ステージクリア！</h1>
             <div class="dot-graphic" style="margin: 8px 0;">🏆✨</div>
@@ -585,10 +611,10 @@
                 <p class="rpg-problem" id="clear-time-display" style="color: #55ff55; margin-top: 2px;">0秒</p>
                 <p style="font-size: 1.05rem; color: #ff88ff; margin-top: 6px; font-weight: bold;" id="earned-exp-display">けいけんち +0 EXPをゲット！</p>
             </div>
-            <button class="retro-btn primary" onclick="showStageSelect()">ステージせんたくへ</button>
+            <button class="retro-btn primary" onclick="returnFromComplete()">もどる</button>
         </div>
 
-        <!-- ⑧ ゲームオーバー画面 -->
+        <!-- ゲームオーバー画面 -->
         <div id="gameover-screen" class="screen" style="justify-content: center;">
             <h1 style="color: var(--danger-color);">ゲームオーバー</h1>
             <div class="dot-graphic" style="margin: 8px 0;">💀</div>
@@ -598,7 +624,7 @@
             <button class="retro-btn spring-btn" onclick="startSpringRecovery()">💧 いやしの泉にかいふくしにいく</button>
         </div>
 
-        <!-- ⑨ いやしの泉（回復ミニゲーム）画面 -->
+        <!-- いやしの泉画面 -->
         <div id="spring-screen" class="screen">
             <div class="battle-header">
                 <span>🧚‍♀️ いやしの泉 (きゅうじゅつ中)</span>
@@ -611,8 +637,8 @@
             </div>
 
             <div class="rpg-window">
-                <div class="rpg-kana" id="spring-kana-display">にいちが</div>
-                <div class="rpg-problem" id="spring-problem-display">2 × 1</div>
+                <div class="rpg-kana" id="spring-kana-display">いんいちがいち</div>
+                <div class="rpg-problem" id="spring-problem-display">1 × 1</div>
             </div>
 
             <div class="input-screen-box" id="spring-input-display">-</div>
@@ -756,15 +782,15 @@
 
         const kukuData = {
             1: {
-                1: { first: "いちはいちが", second: "いち" },
-                2: { first: "いちはにが", second: "に" },
-                3: { first: "いちはさんが", second: "さん" },
-                4: { first: "いちはしが", second: "し" },
-                5: { first: "いちはごが", second: "ご" },
-                6: { first: "いちはろくが", second: "ろく" },
-                7: { first: "いちはしちが", second: "しち" },
-                8: { first: "いちはちはち", second: "はち" },
-                9: { first: "いちはく", second: "く" }
+                1: { first: "いんいちがいち", second: "いち" },
+                2: { first: "いんにがに", second: "に" },
+                3: { first: "いんさんがさん", second: "さん" },
+                4: { first: "いんしがし", second: "し" },
+                5: { first: "いんごがご", second: "ご" },
+                6: { first: "いんろくがろく", second: "ろく" },
+                7: { first: "いんしちがしち", second: "しち" },
+                8: { first: "いんはちがはち", second: "はち" },
+                9: { first: "いんくがく", second: "く" }
             },
             2: {
                 1: { first: "にいちが", second: "に" },
@@ -868,26 +894,41 @@
             8: "8の段 (吹雪の雪原)",
             9: "9の段 (竜の城門)"
         };
-        const MONSTER_ICONS = ["🟡", "🟢", "👺", "💀", "👻", "👹", "🗿", "🦅", "🐲"];
 
-        // セーブデータ
+        const MONSTER_DATA = {
+            1: { icon: "🌱", name: "イチダン・プチビビ" },
+            2: { icon: "🟢", name: "ニノダン・モチモチ" },
+            5: { icon: "⭐", name: "ゴノダン・ピカテング" },
+            3: { icon: "👺", name: "サンノダン・トゲトゲ" },
+            4: { icon: "💀", name: "シノダン・ゴースト" },
+            6: { icon: "👹", name: "ロクノダン・ヤマオニ" },
+            7: { icon: "🗿", name: "シチノダン・ストーン" },
+            8: { icon: "🦅", name: "ハチノダン・アイスバード" },
+            9: { icon: "🐲", name: "クノダン・グレートドラゴン" }
+        };
+
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
             playerName: "ゆうしゃ",
-            unlockedStages: [1, 2],
+            unlockedStages: [1],
             clearedStages: [],
             level: 1,
             exp: 0,
             hp: 5,
-            failedStage: 7
+            failedStage: 1,
+            clearedNextLevels: []
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.level === 'undefined') saveData.level = 1;
         if (typeof saveData.exp === 'undefined') saveData.exp = 0;
         if (typeof saveData.hp === 'undefined') saveData.hp = 5;
-        if (typeof saveData.failedStage === 'undefined') saveData.failedStage = 2;
+        if (typeof saveData.failedStage === 'undefined') saveData.failedStage = 1;
+        if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
+        if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
 
         let currentStage = 1;
         let isRandomMode = false;
+        let isNextWorldMode = false;
+        let currentNextLevel = 1;
         let currentMultiplierIndex = 0;
         let currentAudio = null;
         let startTime = 0;
@@ -897,21 +938,28 @@
         let stageEarnedExp = 0;
         let currentBattleHp = 5;
 
-        // いやしの泉用変数
         let springStage = 1;
         let springIndex = 0;
         let springInputString = "";
-        let springMistakeCount = 0; // 間違いカウント（ヒント用）
+        let springMistakeCount = 0;
 
         let practiceStage = 1;
         let practiceIndex = 0;
         let flashcardState = 0;
 
+        function setWorldTheme(isNext) {
+            const bodyRoot = document.getElementById('body-root');
+            if (isNext) {
+                bodyRoot.classList.add('world-next');
+            } else {
+                bodyRoot.classList.remove('world-next');
+            }
+        }
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
 
-            // スタート画面以外では常駐ステータスバーを表示する
             const persistentBar = document.getElementById('persistent-status');
             if (screenId === 'start-screen') {
                 persistentBar.style.display = 'none';
@@ -983,6 +1031,7 @@
         }
 
         function showHome() {
+            setWorldTheme(false);
             playBGM('home');
             updatePersistentStatus();
             if (saveData.hp <= 0) {
@@ -998,8 +1047,8 @@
             switchScreen('gameover-screen');
         }
 
-        // --- 冒険ステージ ---
         function showStageSelect() {
+            setWorldTheme(false);
             if (saveData.hp <= 0) {
                 showGameOverScreen();
                 return;
@@ -1019,7 +1068,7 @@
                 btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? "" : " [🔒]");
                 
                 if (isUnlocked) {
-                    btn.onclick = () => startBattle(stageNum, false);
+                    btn.onclick = () => startBattle(stageNum, false, false);
                 }
                 container.appendChild(btn);
 
@@ -1027,17 +1076,17 @@
                     const randomBtn = document.createElement('div');
                     randomBtn.className = `stage-item random-mode`;
                     randomBtn.textContent = `🎲 ${stageNum}の段 ランダム (EXP多め)`;
-                    randomBtn.onclick = () => startBattle(stageNum, true);
+                    randomBtn.onclick = () => startBattle(stageNum, true, false);
                     container.appendChild(randomBtn);
                 }
             });
 
             const nextAreaBtn = document.createElement('div');
-            nextAreaBtn.className = `stage-item locked`;
-            nextAreaBtn.textContent = allStagesCleared ? "？？？のステージ (つぎの冒険へ準備中...)" : "🔒 ？？？ (すべての段をクリアすると…？)";
+            nextAreaBtn.className = `stage-item ${allStagesCleared ? 'next-world' : 'locked'}`;
+            nextAreaBtn.textContent = allStagesCleared ? "🔮 魔王城への回廊 (次の冒険エリア)" : "🔒 ？？？ (すべての段をクリアすると…？)";
             nextAreaBtn.onclick = () => {
                 if (allStagesCleared) {
-                    alert("すべての段を制覇した！つぎの冒険の舞台は…今後のアップデートをまつべし！");
+                    showNextWorldSelect();
                 } else {
                     alert("すべての段をクリアすると、あたらしい冒険エリアへの門が開くぞ！");
                 }
@@ -1047,17 +1096,122 @@
             switchScreen('stage-select-screen');
         }
 
-        function startBattle(stageNum, randomMode) {
+        function showNextWorldSelect() {
+            setWorldTheme(true);
+            playBGM('battle');
+            const container = document.getElementById('next-world-list-container');
+            container.innerHTML = '';
+
+            for (let lvl = 1; lvl <= 10; lvl++) {
+                const isCleared = saveData.clearedNextLevels.includes(lvl);
+                // すべてのレベルが挑戦可能（アンロック）
+                const btn = document.createElement('div');
+                btn.className = `stage-item unlocked ${isCleared ? 'cleared' : ''}`;
+                btn.textContent = `回廊 レベル ${lvl} (${getNextLevelDescription(lvl)})`;
+                btn.onclick = () => startNextWorldBattle(lvl);
+                container.appendChild(btn);
+            }
+
+            switchScreen('next-world-select-screen');
+        }
+
+        function getNextLevelDescription(lvl) {
+            if (lvl === 1) return "2と5の段";
+            if (lvl === 2) return "5と3の段";
+            if (lvl === 3) return "3と4の段";
+            if (lvl === 4) return "4と6の段";
+            if (lvl === 5) return "6と7の段";
+            if (lvl === 6) return "7と8の段";
+            if (lvl === 7) return "6,7,8多め (3段ミックス)";
+            if (lvl === 8) return "全段 (6〜8多め)";
+            if (lvl === 9) return "全段 (難関ミックス)";
+            if (lvl === 10) return "魔王級 全段バトル";
+            return "ミックス";
+        }
+
+        function startNextWorldBattle(lvl) {
+            if (saveData.hp <= 0) {
+                showGameOverScreen();
+                return;
+            }
+            currentNextLevel = lvl;
+            isNextWorldMode = true;
+            isRandomMode = false;
+            currentMultiplierIndex = 0;
+            isAnswered = false;
+            stageEarnedExp = 0;
+            currentBattleHp = saveData.hp;
+            setWorldTheme(true);
+            playBGM('battle');
+
+            // 10問のランダム問題を生成
+            problemsQueue = generateNextWorldProblems(lvl, 10);
+
+            document.getElementById('current-stage-title').textContent = `魔王城 回廊 Lv.${lvl}`;
+            
+            const monsterEl = document.getElementById('monster-emoji');
+            monsterEl.textContent = lvl === 10 ? "👿" : "🦇";
+            monsterEl.classList.remove('hit', 'defeated');
+            document.getElementById('enemy-label').textContent = `魔王軍 HP`;
+
+            updateBattleStatusDisplay();
+            switchScreen('battle-screen');
+            startTime = Date.now();
+            loadCurrentProblem();
+        }
+
+        function generateNextWorldProblems(lvl, count) {
+            // レベルに応じた段の候補と、6〜8の段の重みづけ
+            let stagesPool = [];
+            if (lvl === 1) stagesPool = [2, 5];
+            else if (lvl === 2) stagesPool = [5, 3];
+            else if (lvl === 3) stagesPool = [3, 4];
+            else if (lvl === 4) stagesPool = [4, 6];
+            else if (lvl === 5) stagesPool = [6, 7];
+            else if (lvl === 6) stagesPool = [7, 8];
+            else if (lvl === 7) stagesPool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            else if (lvl === 8) stagesPool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            else if (lvl === 9) stagesPool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+            else if (lvl === 10) stagesPool = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+            let result = [];
+            for (let i = 0; i < count; i++) {
+                let s = pickStageWithWeight(stagesPool, lvl);
+                let b = Math.floor(Math.random() * 9) + 1;
+                result.push({ a: s, b: b });
+            }
+            return result;
+        }
+
+        function pickStageWithWeight(pool, lvl) {
+            // レベルが高くなるほど 6, 7, 8 の段が出やすくなる重み付け抽選
+            let weightedPool = [];
+            pool.forEach(s => {
+                let weight = 1;
+                if ([6, 7, 8].includes(s)) {
+                    // レベルに応じて 6〜8の重みを増加 (lvl 1〜10)
+                    weight = 1 + (lvl * 0.4);
+                }
+                for (let w = 0; w < Math.ceil(weight); w++) {
+                    weightedPool.push(s);
+                }
+            });
+            return weightedPool[Math.floor(Math.random() * weightedPool.length)];
+        }
+
+        function startBattle(stageNum, randomMode, nextWorld = false) {
             if (saveData.hp <= 0) {
                 showGameOverScreen();
                 return;
             }
             currentStage = stageNum;
             isRandomMode = randomMode;
+            isNextWorldMode = nextWorld;
             currentMultiplierIndex = 0;
             isAnswered = false;
             stageEarnedExp = 0;
             currentBattleHp = saveData.hp;
+            setWorldTheme(false);
             playBGM('battle');
 
             problemsQueue = [];
@@ -1075,10 +1229,11 @@
             const titlePrefix = isRandomMode ? `${currentStage}の段 [ランダム]` : STAGE_NAMES[currentStage].split(' ')[0];
             document.getElementById('current-stage-title').textContent = titlePrefix;
             
-            const stageIdx = STAGE_ORDER.indexOf(currentStage);
+            const monsterInfo = MONSTER_DATA[currentStage] || { icon: "🐲", name: "まもの" };
             const monsterEl = document.getElementById('monster-emoji');
-            monsterEl.textContent = isRandomMode ? "👑" : (MONSTER_ICONS[stageIdx] || "🐲");
+            monsterEl.textContent = isRandomMode ? "👑" : monsterInfo.icon;
             monsterEl.classList.remove('hit', 'defeated');
+            document.getElementById('enemy-label').textContent = isRandomMode ? `強敵 HP` : `${monsterInfo.name} HP`;
 
             updateBattleStatusDisplay();
             switchScreen('battle-screen');
@@ -1087,10 +1242,11 @@
         }
 
         function updateBattleStatusDisplay() {
-            const remainingHp = 9 - currentMultiplierIndex;
-            const hpPercent = (remainingHp / 9) * 100;
+            const totalCount = isNextWorldMode ? 10 : 9;
+            const remainingHp = totalCount - currentMultiplierIndex;
+            const hpPercent = (remainingHp / totalCount) * 100;
             document.getElementById('battle-progress').style.width = `${hpPercent}%`;
-            document.getElementById('enemy-hp-text').textContent = `${remainingHp} / 9`;
+            document.getElementById('enemy-hp-text').textContent = `${remainingHp} / ${totalCount}`;
 
             saveData.hp = currentBattleHp;
             updatePersistentStatus();
@@ -1147,7 +1303,7 @@
                     showPopup("こうげきヒット！");
                     playHitSound();
 
-                    const solvedExp = isRandomMode ? 3 : 1;
+                    const solvedExp = isNextWorldMode ? 5 : (isRandomMode ? 3 : 1);
                     stageEarnedExp += solvedExp;
                     addExp(solvedExp);
 
@@ -1159,11 +1315,12 @@
 
                     playSecondAudio(() => {
                         currentMultiplierIndex++;
+                        const totalCount = isNextWorldMode ? 10 : 9;
                         updateBattleStatusDisplay();
                         monsterEl.classList.remove('hit');
 
-                        if (currentMultiplierIndex >= 9) {
-                            const clearBonusExp = isRandomMode ? 15 : 5;
+                        if (currentMultiplierIndex >= totalCount) {
+                            const clearBonusExp = isNextWorldMode ? 30 : (isRandomMode ? 15 : 5);
                             stageEarnedExp += clearBonusExp;
                             addExp(clearBonusExp);
 
@@ -1182,7 +1339,7 @@
                     playDamageSound();
                     currentBattleHp--;
                     saveData.hp = currentBattleHp;
-                    saveData.failedStage = currentStage;
+                    saveData.failedStage = isNextWorldMode ? 1 : currentStage;
                     localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
 
                     updateBattleStatusDisplay();
@@ -1224,7 +1381,11 @@
             document.getElementById('clear-time-display').textContent = `${elapsedTime}秒`;
             document.getElementById('earned-exp-display').textContent = `けいけんち +${stageEarnedExp} EXPをゲット！`;
 
-            if (!isRandomMode) {
+            if (isNextWorldMode) {
+                if (!saveData.clearedNextLevels.includes(currentNextLevel)) {
+                    saveData.clearedNextLevels.push(currentNextLevel);
+                }
+            } else if (!isRandomMode) {
                 if (!saveData.clearedStages.includes(currentStage)) {
                     saveData.clearedStages.push(currentStage);
                 }
@@ -1243,9 +1404,24 @@
             switchScreen('result-screen');
         }
 
-        // --- いやしの泉（復活ミニゲーム & ヒント機能） ---
+        function returnFromComplete() {
+            if (isNextWorldMode) {
+                showNextWorldSelect();
+            } else {
+                showStageSelect();
+            }
+        }
+
+        function leaveBattleToSelect() {
+            if (isNextWorldMode) {
+                showNextWorldSelect();
+            } else {
+                showStageSelect();
+            }
+        }
+
         function startSpringRecovery() {
-            springStage = saveData.failedStage || 2;
+            springStage = saveData.failedStage || 1;
             springIndex = 0;
             saveData.hp = 0;
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
@@ -1285,7 +1461,6 @@
             const correctAnswer = springStage * b;
             const ansStr = correctAnswer.toString();
 
-            // 正解の数字に該当するボタンを光らせる（1桁目または2桁目のボタン）
             for (let char of ansStr) {
                 const targetBtn = document.getElementById(`skey-${char}`);
                 if (targetBtn) {
@@ -1308,9 +1483,22 @@
                 if (userAns === correctAnswer) {
                     playHitSound();
                     clearSpringKeyGlow();
-                    showPopup("せいかい！♥が1つかいふく！");
 
-                    saveData.hp = Math.min(5, saveData.hp + 1);
+                    // 2問正解ごとにハート1つ回復。全9問クリアで全快(5個)になるように調整
+                    // index 1, 3, 5, 7, 8 などで回復（2問ごと＋最終問題クリア）
+                    springIndex++;
+                    let shouldHeal = (springIndex % 2 === 0) || (springIndex === 9);
+                    
+                    if (shouldHeal && saveData.hp < 5) {
+                        saveData.hp = Math.min(5, saveData.hp + 1);
+                        showPopup("せいかい！♥が1つかいふく！");
+                    } else if (springIndex === 9) {
+                        saveData.hp = 5;
+                        showPopup("全問正解！HPが全快した！");
+                    } else {
+                        showPopup("せいかい！");
+                    }
+
                     localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
                     updatePersistentStatus();
 
@@ -1323,7 +1511,6 @@
                     currentAudio.play().catch(e => {});
 
                     setTimeout(() => {
-                        springIndex++;
                         if (springIndex >= 9) {
                             playVictoryFanfare();
                             alert("いやしの泉のまほうで、HPが完全にかいふくした！");
@@ -1358,8 +1545,8 @@
             document.getElementById('spring-input-display').textContent = springInputString === "" ? "-" : springInputString;
         }
 
-        // --- 練習モード ---
         function showPracticeStageSelect() {
+            setWorldTheme(false);
             playBGM('home');
             const container = document.getElementById('practice-stage-list-container');
             container.innerHTML = '';
