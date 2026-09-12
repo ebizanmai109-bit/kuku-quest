@@ -849,7 +849,7 @@
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="showProfile()">🦭 ぼうけんしゃカード</button>
+                <button class="retro-btn" onclick="showProfile()">📋️ ぼうけんしゃカード</button>
                 <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
             </div>
         </div>
@@ -2188,30 +2188,29 @@
         // Lv.5 = girl-3 / boy-3
         // Lv.7 = girl-4 / boy-4
         // Lv.9 = girl-5 / boy-5
-        // Lv.10 = girl-6 / boy-6
+        // Lv.12 = girl-6 / boy-6（まほうせんし）
         // Lv.15 = girl-7 / boy-7
         // Lv.20 = girl-8 / boy-8
         //
-        // 序盤は2レベルごとに成長を感じられるようにし、
-        // Lv.10以降は節目のレベルで特別な姿を解放します。
+        // レベルに応じて順番に解放し、Lv.11ですべて選べてしまわないようにします。
 
         const AVAILABLE_CHARACTERS = [
             { path: "image/girl-1.png", name: "ククリン（しんまいゆうしゃのすがた）", minLevel: 1 },
             { path: "image/boy-1.png",  name: "ククル（しんまいゆうしゃのすがた）", minLevel: 1 },
-            { path: "image/girl-2.png", name: "ククリン（かけだしゆうしゃのすがた）", minLevel: 2 },
-            { path: "image/boy-2.png",  name: "ククル（かけだしゆうしゃのすがた）", minLevel: 2 },
-            { path: "image/girl-3.png", name: "ククリン（たびするゆうしゃのすがた）", minLevel: 3 },
-            { path: "image/boy-3.png",  name: "ククル（たびするゆうしゃのすがた）", minLevel: 3 },
-            { path: "image/girl-4.png", name: "ククリン（せいちょうしたゆうしゃのすがた）", minLevel: 4 },
-            { path: "image/boy-4.png",  name: "ククル（せいちょうしたゆうしゃのすがた）", minLevel: 4 },
-            { path: "image/girl-5.png", name: "ククリン（たたかうゆうしゃのすがた）", minLevel: 5 },
-            { path: "image/boy-5.png",  name: "ククル（たたかうゆうしゃのすがた）", minLevel: 5 },
-            { path: "image/girl-6.png", name: "ククリン（まほうせんしのすがた）", minLevel: 6 },
-            { path: "image/boy-6.png",  name: "ククル（まほうせんしのすがた）", minLevel: 6 },
-            { path: "image/girl-7.png", name: "ククリン（きらめきのまほうせんしのすがた）", minLevel: 7 },
-            { path: "image/boy-7.png",  name: "ククル（きらめきのまほうせんしのすがた）", minLevel: 7 },
-            { path: "image/girl-8.png", name: "ククリン（でんせつのまほうせんしのすがた）", minLevel: 8 },
-            { path: "image/boy-8.png",  name: "ククル（でんせつのまほうせんしのすがた）", minLevel: 8 }
+            { path: "image/girl-2.png", name: "ククリン（かけだしゆうしゃのすがた）", minLevel: 3 },
+            { path: "image/boy-2.png",  name: "ククル（かけだしゆうしゃのすがた）", minLevel: 3 },
+            { path: "image/girl-3.png", name: "ククリン（たびするゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/boy-3.png",  name: "ククル（たびするゆうしゃのすがた）", minLevel: 5 },
+            { path: "image/girl-4.png", name: "ククリン（せいちょうしたゆうしゃのすがた）", minLevel: 7 },
+            { path: "image/boy-4.png",  name: "ククル（せいちょうしたゆうしゃのすがた）", minLevel: 7 },
+            { path: "image/girl-5.png", name: "ククリン（たたかうゆうしゃのすがた）", minLevel: 9 },
+            { path: "image/boy-5.png",  name: "ククル（たたかうゆうしゃのすがた）", minLevel: 9 },
+            { path: "image/girl-6.png", name: "ククリン（まほうせんしのすがた）", minLevel: 12 },
+            { path: "image/boy-6.png",  name: "ククル（まほうせんしのすがた）", minLevel: 12 },
+            { path: "image/girl-7.png", name: "ククリン（きらめきのまほうせんしのすがた）", minLevel: 15 },
+            { path: "image/boy-7.png",  name: "ククル（きらめきのまほうせんしのすがた）", minLevel: 15 },
+            { path: "image/girl-8.png", name: "ククリン（でんせつのまほうせんしのすがた）", minLevel: 20 },
+            { path: "image/boy-8.png",  name: "ククル（でんせつのまほうせんしのすがた）", minLevel: 20 }
         ];
         // 古いセーブデータで絵文字などが入っている場合は、最初の画像へ移行。
         if (!AVAILABLE_CHARACTERS.some(c => c.path === saveData.heroIcon)) {
@@ -2355,8 +2354,13 @@
             saveGameData();
             updateProfileScreen();
             updateHomeScreen();
-            renderCompanionSelect();
-            showPopup(`${target.name}を えらんだよ！`);
+
+            // キャラクター選択と同じように、選択直後にメッセージを表示して
+            // ぼうけんしゃノートへ自動的に戻す。
+            showPopup(`あいぼうを ${target.name}にへんこうしたよ！`);
+            setTimeout(() => {
+                switchScreen('profile-screen');
+            }, 600);
         }
 
         const PROFILE_TITLES = [
