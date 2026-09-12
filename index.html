@@ -228,6 +228,18 @@
             background-color: #222200;
         }
 
+        .stage-item.reverse-mode {
+            border-color: #55ccff;
+            color: #55ccff;
+            background-color: #002233;
+        }
+
+        .stage-item.practice-reverse {
+            border-color: #bb66ff;
+            color: #bb66ff;
+            background-color: #220033;
+        }
+
         .stage-item.random-mode {
             border-color: #ff88ff;
             color: #ff88ff;
@@ -697,8 +709,8 @@
             filter: grayscale(1);
         }
         .character-choice img {
-            width: 126px;
-            height: 126px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
             image-rendering: pixelated;
             display: block;
@@ -852,7 +864,8 @@
             <div class="home-menu">
                 <button class="retro-btn primary" id="btn-go-adventure" onclick="showStageSelect()">⚔️ ぼうけんに でる</button>
                 <button class="retro-btn secondary" onclick="showPracticeStageSelect()">📖 じゅんびを する</button>
-                <button class="retro-btn" onclick="showProfile()">📋️ ぼうけんしゃカード</button>
+                <button class="retro-btn" onclick="showProfile()">🦭 ぼうけんしゃカード</button>
+                <button class="retro-btn" onclick="openSpecialPractice()">⚔️ とっくん</button>
                 <button class="retro-btn" onclick="openNameChange()" style="font-size: 0.9rem; padding: 8px;">✏️ なまえを かえる</button>
             </div>
         </div>
@@ -879,6 +892,7 @@
                 </div>
                 <button class="retro-btn secondary" onclick="openCharacterSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">👥 キャラクターをかえる</button>
                 <button class="retro-btn secondary" onclick="openCompanionSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🐾 あいぼうをえらぶ</button>
+                <button id="all-clear-review-btn" class="retro-btn secondary" onclick="showAllClearScreen()" style="display:none; font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🏆 クリア画面を もう一度みる</button>
                 <div class="profile-name" id="profile-name">ゆうしゃ</div>
                 <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
 
@@ -894,6 +908,15 @@
                     <div><span>せいかいしたもんだい</span><strong id="profile-correct">0</strong></div>
                     <div><span>ぼうけんしたかいすう</span><strong id="profile-plays">0</strong></div>
                 </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-section-title">⏱️ ステージの さいたんタイム</div>
+                <div id="profile-stage-times" class="profile-map"></div>
+                <div class="profile-section-title" style="margin-top: 14px;">🎲 ランダムモードの さいたんタイム</div>
+                <div id="profile-random-times" class="profile-map"></div>
+                <div class="profile-section-title" style="margin-top: 14px;">🏰 まおうじょうの さいたんタイム</div>
+                <div id="profile-nextworld-times" class="profile-map"></div>
             </div>
 
             <div class="profile-section">
@@ -924,6 +947,28 @@
             <p class="subtitle" id="companion-select-subtitle">レベルが あがると あたらしい あいぼうが ひらくよ。</p>
             <div id="companion-grid" class="companion-grid"></div>
             <button class="retro-btn" onclick="showProfile()" style="margin-top: 8px;">ぼうけんしゃカードへ</button>
+        </div>
+
+        <!-- とっくん説明画面 -->
+        <div id="special-practice-info-screen" class="screen" style="justify-content:center; text-align:center;">
+            <div class="battle-header"><button class="back-home-btn" onclick="showHome()">◀ もどる</button><span>とっくん</span><span></span></div>
+            <div class="profile-section" style="margin-top:18px;">
+                <h2 style="color:var(--accent-color); margin:8px 0 16px;">とっくんするのじゃ！</h2>
+                <p style="line-height:1.9; font-size:1rem;">まちがえた九九だけを<br>くりかえし れんしゅうするのじゃ。</p>
+                <p id="special-practice-count" style="color:#8ef; font-size:.85rem; margin-top:14px;"></p>
+            </div>
+            <button class="retro-btn primary" onclick="startSpecialPractice()">とっくんを かいし</button>
+        </div>
+
+        <!-- とっくん問題画面 -->
+        <div id="special-practice-screen" class="screen">
+            <div class="battle-header"><button class="back-home-btn" onclick="showSpecialPracticeInfo()">◀ やめる</button><span>とっくん</span><span id="special-practice-counter">1</span></div>
+            <div class="rpg-window" style="margin-top:20px;"><div class="rpg-kana" id="special-practice-kana"></div><div class="rpg-problem" id="special-practice-problem">7 × 8</div></div>
+            <button class="retro-btn secondary" onclick="playSpecialPracticeAudio()" style="font-size:0.95rem; padding:9px; margin-top:8px;">🔊 おんせいを もういちど きく</button>
+            <div class="input-screen-box" id="special-practice-input">-</div>
+            <div class="pixel-keypad" id="special-practice-keypad">
+                <button class="pixel-key" id="spkey-1" onclick="inputSpecialPracticeNumber(1)">1</button><button class="pixel-key" id="spkey-2" onclick="inputSpecialPracticeNumber(2)">2</button><button class="pixel-key" id="spkey-3" onclick="inputSpecialPracticeNumber(3)">3</button><button class="pixel-key" id="spkey-4" onclick="inputSpecialPracticeNumber(4)">4</button><button class="pixel-key" id="spkey-5" onclick="inputSpecialPracticeNumber(5)">5</button><button class="pixel-key" id="spkey-6" onclick="inputSpecialPracticeNumber(6)">6</button><button class="pixel-key" id="spkey-7" onclick="inputSpecialPracticeNumber(7)">7</button><button class="pixel-key" id="spkey-8" onclick="inputSpecialPracticeNumber(8)">8</button><button class="pixel-key" id="spkey-9" onclick="inputSpecialPracticeNumber(9)">9</button><button class="pixel-key clear-key" onclick="clearSpecialPracticeInput()">けす</button><button class="pixel-key" id="spkey-0" onclick="inputSpecialPracticeNumber(0)">0</button>
+            </div>
         </div>
 
         <!-- ステージセレクト画面 -->
@@ -1017,6 +1062,23 @@
             </div>
         </div>
 
+        <!-- 全クリア画面 -->
+        <div id="all-clear-screen" class="screen" style="justify-content:center; overflow-y:auto;">
+            <h1 style="color:#ffcc00; margin-bottom:6px;">🎉 くくクエスト クリア！</h1>
+            <img src="image/clear.png" alt="クリア！" style="width:min(80vw,420px); max-height:32vh; object-fit:contain; image-rendering:auto; margin:4px auto 8px;">
+            <div class="rpg-window" style="max-width:720px; width:90%; margin:0 auto 10px; text-align:center;">
+                <p style="font-size:1.15rem; color:#fff; font-weight:bold;">九九のぼうけんを さいごまで クリアしたぞ！</p>
+                <p>ここまで、たくさんの九九を<br>何度もれんしゅうしてきたね。</p>
+                <p>まちがえても あきらめずに、<br>もう一度ちょうせんしたことが、<br>きみの力になっています。</p>
+                <p style="color:#ffcc00; font-weight:bold;">これからも ときどき九九をれんしゅうして、<br>すばやく、正しく答えられるように<br>力をのばしていこう。</p>
+                <p>そして、ぜひちょうせんしてみてね。</p>
+                <p style="font-size:1.15rem; color:#55ff55; font-weight:bold;">「それぞれのステージの<br>さいたんタイムを こえる！」</p>
+                <p>きのうの自分より、<br>1びょうでも はやく！<br>自分のきろくに ちょうせんしよう！</p>
+                <p style="font-size:1.25rem; color:#ff88ff; font-weight:bold;">⭐ よくがんばったね！<br>これからも 学習をつづけていこう！</p>
+            </div>
+            <button class="pixel-btn primary" onclick="returnFromAllClear()">ぼうけんしゃノートへ</button>
+        </div>
+
         <!-- クリア画面 -->
         <div id="result-screen" class="screen" style="justify-content: center;">
             <h1 style="color: #ffcc00;">クリア！</h1>
@@ -1024,6 +1086,7 @@
             <div class="rpg-window" style="margin: 4px 0;">
                 <p style="font-size: 0.85rem; color: #aaa;">かかった じかん</p>
                 <p class="rpg-problem" id="clear-time-display" style="color: #55ff55; margin-top: 2px;">0びょう</p>
+                <p id="clear-time-record-message" style="font-size: 0.95rem; color: #ffcc00; margin-top: 6px; font-weight: bold; min-height: 1.3em;"></p>
                 <p style="font-size: 1.05rem; color: #ff88ff; margin-top: 6px; font-weight: bold;" id="earned-exp-display">けいけんち +0 EXPを ゲット！</p>
             </div>
             <button class="retro-btn primary" onclick="returnFromComplete()">もどる</button>
@@ -1212,15 +1275,15 @@
 
         const kukuData = {
             1: {
-                1: { first: "いんいちが", second: "いち" },
-                2: { first: "いんにが", second: "に" },
-                3: { first: "いんさんが", second: "さん" },
-                4: { first: "いんしが", second: "し" },
-                5: { first: "いんごが", second: "ご" },
-                6: { first: "いんろくが", second: "ろく" },
-                7: { first: "いんしちが", second: "しち" },
-                8: { first: "いんはちが", second: "はち" },
-                9: { first: "いんくが", second: "く" }
+                1: { first: "いんいちがいち", second: "いち" },
+                2: { first: "いんにがに", second: "に" },
+                3: { first: "いんさんがさん", second: "さん" },
+                4: { first: "いんしがし", second: "し" },
+                5: { first: "いんごがご", second: "ご" },
+                6: { first: "いんろくがろく", second: "ろく" },
+                7: { first: "いんしちがしち", second: "しち" },
+                8: { first: "いんはちがはち", second: "はち" },
+                9: { first: "いんくがく", second: "く" }
             },
             2: {
                 1: { first: "にいちが", second: "に" },
@@ -1326,40 +1389,40 @@
         };
 
         const MONSTER_DATA = {
-            1: { icon: "🌱", name: "スプラー" },
-            2: { icon: "🟢", name: "モスリン" },
-            5: { icon: "⭐", name: "キラリン" },
-            3: { icon: "👺", name: "ピノッキー" },
-            4: { icon: "💀", name: "スカルル" },
+            1: { icon: "🌱", name: "プチビビ" },
+            2: { icon: "🟢", name: "モチモチ" },
+            5: { icon: "⭐", name: "ピカテング" },
+            3: { icon: "👺", name: "トゲトゲ" },
+            4: { icon: "💀", name: "ゴースト" },
             6: { icon: "👹", name: "ヤマオニ" },
-            7: { icon: "🗿", name: "モアイーノ" },
+            7: { icon: "🗿", name: "ストーン" },
             8: { icon: "🦅", name: "アイスバード" },
             9: { icon: "🐲", name: "ドラゴン" }
         };
 
         const RANDOM_MONSTER_DATA = {
-            1: { icon: "🌱", name: "スプラウトンガ" },
-            2: { icon: "🟢", name: "モスズーン" },
-            5: { icon: "⭐", name: "シュティンガー" },
-            3: { icon: "👺", name: "ビノギオン" },
-            4: { icon: "💀", name: "スカルンガー" },
-            6: { icon: "👹", name: "ワルイゴイネガー" },
-            7: { icon: "🗿", name: "ホリブカーン" },
-            8: { icon: "🦅", name: "ファイアーファルコン" },
-            9: { icon: "🐲", name: "ギガンテス" }
+            1: { icon: "🌱", name: "プカプカポコポコ" },
+            2: { icon: "🟢", name: "ランランニノノ" },
+            5: { icon: "⭐", name: "ピカピカキラキラ" },
+            3: { icon: "👺", name: "ガガガギギギ" },
+            4: { icon: "💀", name: "ウロウロドギマギ" },
+            6: { icon: "👹", name: "ドスンバスン" },
+            7: { icon: "🗿", name: "カチカチゴロゴロ" },
+            8: { icon: "🦅", name: "ヒュードロドロ" },
+            9: { icon: "🐲", name: "ギガゴガガーン" }
         };
 
         const NEXT_WORLD_MONSTER_DATA = {
-            1: { icon: "🦇", name: "あんこくバット" },
+            1: { icon: "🦇", name: "暗黒バット" },
             2: { icon: "💀", name: "スケルトンナイト" },
-            3: { icon: "👁️", name: "まがんアイリス" },
+            3: { icon: "👁️", name: "魔眼のストーカー" },
             4: { icon: "🦂", name: "ヴェノムスコーピオン" },
             5: { icon: "👻", name: "ファントムスペクター" },
             6: { icon: "🛡️", name: "アイアンゴーレム" },
             7: { icon: "⚔️", name: "ダークソードマン" },
             8: { icon: "🧊", name: "フロストデーモン" },
             9: { icon: "🔥", name: "フレイムキメラ" },
-            10: { icon: "😈", name: "魔王ギガデウス" }
+            10: { icon: "👿", name: "魔王ギガデウス" }
         };
 
         let saveData = JSON.parse(localStorage.getItem('kuku_save_data')) || {
@@ -1370,7 +1433,12 @@
             unlockedStages: [1],
             clearedStages: [],
             stageClearCounts: {},
+            stageBestTimes: {},
+            randomBestTimes: {},
+            reverseBestTimes: {},
+            nextWorldBestTimes: {},
             randomClearCounts: {},
+            reverseClearCounts: {},
             level: 1,
             exp: 0,
             hp: 5,
@@ -1379,16 +1447,24 @@
             failedNextLevel: 1,
             clearedNextLevels: [],
             nextWorldClearCounts: {},
+            allClearShown: false,
             totalCorrect: 0,
             totalAnswered: 0,
             bestCombo: 0,
-            playCount: 0
+            currentCombo: 0,
+            playCount: 0,
+            mistakeProblems: {},
+            practiceMastery: {}
         };
         if (typeof saveData.playerName === 'undefined') saveData.playerName = "ゆうしゃ";
         if (typeof saveData.heroIcon === 'undefined') saveData.heroIcon = "image/boy-1.png";
         if (typeof saveData.companionIcon === 'undefined') saveData.companionIcon = "image/pet-1.png";
         if (typeof saveData.lastAdventureAt === 'undefined') saveData.lastAdventureAt = null;
         if (!saveData.stageClearCounts) saveData.stageClearCounts = {};
+        if (!saveData.stageBestTimes) saveData.stageBestTimes = {};
+        if (!saveData.randomBestTimes) saveData.randomBestTimes = {};
+        if (!saveData.reverseBestTimes) saveData.reverseBestTimes = {};
+        if (!saveData.nextWorldBestTimes) saveData.nextWorldBestTimes = {};
         if (!saveData.nextWorldClearCounts) saveData.nextWorldClearCounts = {};
         if (typeof saveData.level === 'undefined') saveData.level = 1;
         if (typeof saveData.exp === 'undefined') saveData.exp = 0;
@@ -1397,25 +1473,30 @@
         if (typeof saveData.failedIsNextWorld === 'undefined') saveData.failedIsNextWorld = false;
         if (typeof saveData.failedNextLevel === 'undefined') saveData.failedNextLevel = 1;
         if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
+        if (!saveData.reverseClearCounts) saveData.reverseClearCounts = {};
         if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
         if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
+        if (typeof saveData.allClearShown !== 'boolean') saveData.allClearShown = false;
         if (typeof saveData.totalCorrect === 'undefined') saveData.totalCorrect = 0;
         if (typeof saveData.totalAnswered === 'undefined') saveData.totalAnswered = 0;
         if (typeof saveData.bestCombo === 'undefined') saveData.bestCombo = 0;
+        if (typeof saveData.currentCombo === 'undefined') saveData.currentCombo = 0;
         if (typeof saveData.playCount === 'undefined') saveData.playCount = 0;
+        if (!saveData.mistakeProblems || typeof saveData.mistakeProblems !== 'object') saveData.mistakeProblems = {};
+        if (!saveData.practiceMastery || typeof saveData.practiceMastery !== 'object') saveData.practiceMastery = {};
 
         let currentStage = 1;
+        let isReverseMode = false;
         let isRandomMode = false;
         let isNextWorldMode = false;
         let currentNextLevel = 1;
         let currentMultiplierIndex = 0;
         let currentAudio = null;
         // 連続正解数。ステージをまたいで継続し、まちがえた時だけ0に戻します。
-        let currentCombo = 0;
+        let currentCombo = Number(saveData.currentCombo) || 0;
         let startTime = 0;
         let battleTimerInterval = null;
         let battleTimeLimit = 90;
-        let battleTimeLimitRemaining = 90;
         let userInputString = "";
         let problemsQueue = [];
         let isAnswered = false;
@@ -1431,8 +1512,13 @@
         let springMistakeCount = 0;
 
         let practiceStage = 1;
+        let practiceReverseMode = false;
         let practiceIndex = 0;
         let flashcardState = 0;
+        let specialPracticeProblems = [];
+        let specialPracticeIndex = 0;
+        let specialPracticeInput = "";
+        let specialPracticeLocked = false;
 
         function setWorldTheme(isNext) {
             const bodyRoot = document.getElementById('body-root');
@@ -1592,25 +1678,40 @@
 
                 const btn = document.createElement('div');
                 btn.className = `stage-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCleared ? 'cleared' : ''}`;
-                const clearCount = isCleared
-                    ? Math.max(1, Number(saveData.stageClearCounts?.[stageNum]) || 0)
-                    : 0;
+                const clearCount = isCleared ? Math.max(1, Number(saveData.stageClearCounts?.[stageNum]) || 0) : 0;
                 const clearMark = isCleared ? " ★" : "";
                 const countText = isCleared ? ` (${clearCount}回クリア)` : " (0回クリア)";
                 btn.textContent = STAGE_NAMES[stageNum] + (isUnlocked ? `${clearMark}${countText}` : " [🔒]");
-
-                if (isUnlocked) {
-                    btn.onclick = () => startBattle(stageNum, false, false);
-                }
+                if (isUnlocked) btn.onclick = () => startBattle(stageNum, false, false, false);
                 container.appendChild(btn);
 
                 if (isCleared) {
-                    const randomCount = saveData.randomClearCounts[stageNum] || 0;
-                    const randomBtn = document.createElement('div');
-                    randomBtn.className = `stage-item random-mode`;
-                    randomBtn.textContent = `🎲 ${stageNum}のだん ランダム (${randomCount}回クリア)`;
-                    randomBtn.onclick = () => startBattle(stageNum, true, false);
-                    container.appendChild(randomBtn);
+                    const reverseCount = saveData.reverseClearCounts[stageNum] || 0;
+                    const reverseCleared = reverseCount > 0;
+                    const reverseBtn = document.createElement('div');
+                    reverseBtn.className = `stage-item reverse-mode ${reverseCleared ? 'cleared' : ''}`;
+                    reverseBtn.textContent = reverseCleared
+                        ? `↔️ ${stageNum}のだん さかさま ★ (${reverseCount}回クリア)`
+                        : `↔️ ${stageNum}のだん さかさま`;
+                    reverseBtn.onclick = () => startBattle(stageNum, false, false, true);
+                    container.appendChild(reverseBtn);
+
+                    if (reverseCleared) {
+                        const randomCount = saveData.randomClearCounts[stageNum] || 0;
+                        const randomBtn = document.createElement('div');
+                        randomBtn.className = `stage-item random-mode ${randomCount > 0 ? 'cleared' : ''}`;
+                        randomBtn.textContent = randomCount > 0
+                            ? `🎲 ${stageNum}のだん ランダム ★ (${randomCount}回クリア)`
+                            : `🎲 ${stageNum}のだん ランダム`;
+                        randomBtn.onclick = () => startBattle(stageNum, true, false, false);
+                        container.appendChild(randomBtn);
+                    } else {
+                        const lockedRandomBtn = document.createElement('div');
+                        lockedRandomBtn.className = 'stage-item locked';
+                        lockedRandomBtn.textContent = `🔒 ${stageNum}のだん ランダム (さかさまを クリアしよう！)`;
+                        lockedRandomBtn.onclick = () => alert(`${stageNum}のだん さかさまを クリアすると、ランダムモードが ひらくよ！`);
+                        container.appendChild(lockedRandomBtn);
+                    }
                 }
             });
 
@@ -1618,14 +1719,10 @@
             nextAreaBtn.className = `stage-item ${allRandomCleared ? 'next-world' : 'locked'}`;
             nextAreaBtn.textContent = allRandomCleared ? "🔮 まおうじょう (つぎの ぼうけん)" : "🔒 まおうじょう (すべての だんの ランダムを クリアしよう！)";
             nextAreaBtn.onclick = () => {
-                if (allRandomCleared) {
-                    showNextWorldSelect();
-                } else {
-                    alert("すべての だんの ランダム問題を クリアすると、まおうじょうへの とびらが ひらくよ！");
-                }
+                if (allRandomCleared) showNextWorldSelect();
+                else alert("すべての だんの ランダム問題を クリアすると、まおうじょうへの とびらが ひらくよ！");
             };
             container.appendChild(nextAreaBtn);
-
             switchScreen('stage-select-screen');
         }
 
@@ -1693,6 +1790,7 @@
         }
 
         function startNextWorldBattle(lvl) {
+            clearBattleTimer();
             if (saveData.hp <= 0) {
                 showGameOverScreen();
                 return;
@@ -1700,6 +1798,7 @@
             currentNextLevel = lvl;
             isNextWorldMode = true;
             isRandomMode = false;
+            isReverseMode = false;
             currentMultiplierIndex = 0;
             isAnswered = false;
             stageEarnedExp = 0;
@@ -1722,11 +1821,10 @@
             switchScreen('battle-screen');
             startTime = Date.now();
             if (lvl === 10) startBattleTimer(90);
-            else clearBattleTimer();
             loadCurrentProblem();
         }
 
-        function startBattle(stageNum, randomMode, nextWorld = false) {
+        function startBattle(stageNum, randomMode, nextWorld = false, reverseMode = false) {
             clearBattleTimer();
             // 冒険を始めた日時を保存。トップページで「前回の冒険」として表示します。
             saveData.lastAdventureAt = new Date().toISOString();
@@ -1740,6 +1838,7 @@
             currentStage = stageNum;
             isRandomMode = randomMode;
             isNextWorldMode = nextWorld;
+            isReverseMode = reverseMode;
             currentMultiplierIndex = 0;
             isAnswered = false;
             stageEarnedExp = 0;
@@ -1748,8 +1847,16 @@
             playBGM('battle');
 
             problemsQueue = [];
-            for (let b = 1; b <= 9; b++) {
-                problemsQueue.push({ a: currentStage, b: b });
+            if (isReverseMode) {
+                // さかさまモードは「○のだん」は固定し、かける数だけ 9→1 にする。
+                // 例：1×9 → 1×8 → … → 1×1
+                for (let b = 9; b >= 1; b--) {
+                    problemsQueue.push({ a: currentStage, b: b });
+                }
+            } else {
+                for (let b = 1; b <= 9; b++) {
+                    problemsQueue.push({ a: currentStage, b: b });
+                }
             }
 
             if (isRandomMode) {
@@ -1759,7 +1866,7 @@
                 }
             }
 
-            const titlePrefix = isRandomMode ? `${currentStage}のだん [ランダム]` : STAGE_NAMES[currentStage].split(' ')[0];
+            const titlePrefix = isRandomMode ? `${currentStage}のだん [ランダム]` : (isReverseMode ? `${currentStage}のだん [さかさま]` : STAGE_NAMES[currentStage].split(' ')[0]);
             document.getElementById('current-stage-title').textContent = titlePrefix;
             
             const monsterInfo = isRandomMode 
@@ -1780,22 +1887,24 @@
         function startBattleTimer(seconds) {
             clearBattleTimer();
             battleTimeLimit = seconds;
-            battleTimeLimitRemaining = seconds;
             const el = document.getElementById("battle-timer-display");
             if (!el) return;
             el.style.display = "inline-block";
             updateBattleTimerDisplay();
             battleTimerInterval = setInterval(() => {
                 const remaining = battleTimeLimit - Math.floor((Date.now() - startTime) / 1000);
-                battleTimeLimitRemaining = Math.max(0, remaining);
-                updateBattleTimerDisplay();
                 if (remaining <= 0) {
+                    el.textContent = "⏱️ 0びょう";
                     clearBattleTimer();
                     timeLimitReached();
+                } else {
+                    battleTimeLimitRemaining = remaining;
+                    updateBattleTimerDisplay();
                 }
             }, 250);
         }
 
+        let battleTimeLimitRemaining = 90;
         function updateBattleTimerDisplay() {
             const el = document.getElementById("battle-timer-display");
             if (!el) return;
@@ -1804,10 +1913,7 @@
         }
 
         function clearBattleTimer() {
-            if (battleTimerInterval) {
-                clearInterval(battleTimerInterval);
-                battleTimerInterval = null;
-            }
+            if (battleTimerInterval) { clearInterval(battleTimerInterval); battleTimerInterval = null; }
             const el = document.getElementById("battle-timer-display");
             if (el) el.style.display = "none";
         }
@@ -1929,6 +2035,10 @@
                         }
                     });
                 } else {
+                    const mistakeKey = `${prob.a}x${prob.b}`;
+                    saveData.mistakeProblems[mistakeKey] = Number(saveData.mistakeProblems[mistakeKey] || 0) + 1;
+                    saveData.practiceMastery[mistakeKey] = 0;
+                    saveGameData();
                     playDamageSound();
                     currentBattleHp--;
                     saveData.hp = currentBattleHp;
@@ -1976,39 +2086,91 @@
             setTimeout(() => { popup.classList.remove('show'); }, 600);
         }
 
+        function hasClearedAllContent() {
+            const normalCleared = STAGE_ORDER.every(s => (saveData.stageClearCounts?.[s] || 0) > 0);
+            const reverseCleared = STAGE_ORDER.every(s => (saveData.reverseClearCounts?.[s] || 0) > 0);
+            const randomCleared = STAGE_ORDER.every(s => (saveData.randomClearCounts?.[s] || 0) > 0);
+            const castleCleared = Array.from({length: 10}, (_, i) => i + 1).every(lv => (saveData.nextWorldClearCounts?.[lv] || 0) > 0);
+            return normalCleared && reverseCleared && randomCleared && castleCleared;
+        }
+
+        function showAllClearScreen() {
+            playBGM('home');
+            switchScreen('all-clear-screen');
+        }
+
+        function returnFromAllClear() {
+            updateProfileScreen();
+            switchScreen('profile-screen');
+        }
+
         function completeStage() {
             clearBattleTimer();
             const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('clear-time-display').textContent = `${elapsedTime}びょう`;
             document.getElementById('earned-exp-display').textContent = `けいけんち +${stageEarnedExp} EXPを ゲット！`;
+            const recordMessageEl = document.getElementById('clear-time-record-message');
+            if (recordMessageEl) recordMessageEl.textContent = '';
+            let previousBest = null;
+            let bestStore = null;
+            let bestKey = null;
 
             if (isNextWorldMode) {
-                if (!saveData.clearedNextLevels.includes(currentNextLevel)) {
-                    saveData.clearedNextLevels.push(currentNextLevel);
-                }
-                    saveData.nextWorldClearCounts[currentNextLevel] =
-                        (Number(saveData.nextWorldClearCounts[currentNextLevel]) || 0) + 1;
+                bestStore = saveData.nextWorldBestTimes;
+                bestKey = currentNextLevel;
+            } else if (isRandomMode) {
+                bestStore = saveData.randomBestTimes;
+                bestKey = currentStage;
+            } else if (isReverseMode) {
+                bestStore = saveData.reverseBestTimes;
+                bestKey = currentStage;
             } else {
-                if (!saveData.clearedStages.includes(currentStage)) {
-                    saveData.clearedStages.push(currentStage);
-                }
-                    saveData.stageClearCounts[currentStage] =
-                        (Number(saveData.stageClearCounts[currentStage]) || 0) + 1;
+                bestStore = saveData.stageBestTimes;
+                bestKey = currentStage;
+            }
+
+            previousBest = Number(bestStore?.[bestKey]);
+            if (Number.isFinite(previousBest) && elapsedTime < previousBest) {
+                const improvement = previousBest - elapsedTime;
+                if (recordMessageEl) recordMessageEl.textContent = `まえより ${improvement}びょう はやく クリアしたよ！`;
+            } else if (!Number.isFinite(previousBest)) {
+                if (recordMessageEl) recordMessageEl.textContent = 'さいしょの きろく！';
+            }
+            if (!Number.isFinite(previousBest) || elapsedTime < previousBest) {
+                bestStore[bestKey] = elapsedTime;
+            }
+
+            if (isNextWorldMode) {
+                if (!saveData.clearedNextLevels.includes(currentNextLevel)) saveData.clearedNextLevels.push(currentNextLevel);
+                saveData.nextWorldClearCounts[currentNextLevel] = (Number(saveData.nextWorldClearCounts[currentNextLevel]) || 0) + 1;
+            } else if (isRandomMode) {
+                if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
+                saveData.randomClearCounts[currentStage] = (saveData.randomClearCounts[currentStage] || 0) + 1;
+            } else if (isReverseMode) {
+                if (!saveData.reverseClearCounts) saveData.reverseClearCounts = {};
+                saveData.reverseClearCounts[currentStage] = (saveData.reverseClearCounts[currentStage] || 0) + 1;
+            } else {
+                if (!saveData.clearedStages.includes(currentStage)) saveData.clearedStages.push(currentStage);
+                saveData.stageClearCounts[currentStage] = (Number(saveData.stageClearCounts[currentStage]) || 0) + 1;
                 const currentIdx = STAGE_ORDER.indexOf(currentStage);
                 if (currentIdx < STAGE_ORDER.length - 1) {
                     const nextStageNum = STAGE_ORDER[currentIdx + 1];
-                    if (!saveData.unlockedStages.includes(nextStageNum)) {
-                        saveData.unlockedStages.push(nextStageNum);
-                    }
-                }
-                if (isRandomMode) {
-                    if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
-                    saveData.randomClearCounts[currentStage] = (saveData.randomClearCounts[currentStage] || 0) + 1;
+                    if (!saveData.unlockedStages.includes(nextStageNum)) saveData.unlockedStages.push(nextStageNum);
                 }
             }
             saveData.hp = currentBattleHp;
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             updatePersistentStatus();
+
+            // すべての通常ステージ・ランダム・まおうじょうを初めてクリアしたら特別画面へ。
+            const firstAllClear = hasClearedAllContent() && !saveData.allClearShown;
+            if (firstAllClear) {
+                saveData.allClearShown = true;
+                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                updateProfileScreen();
+                showAllClearScreen();
+                return;
+            }
 
             switchScreen('result-screen');
         }
@@ -2022,7 +2184,6 @@
         }
 
         function leaveBattleToSelect() {
-            clearBattleTimer();
             if (isNextWorldMode) {
                 showNextWorldSelect();
             } else {
@@ -2171,30 +2332,42 @@
             playBGM('home');
             const container = document.getElementById('practice-stage-list-container');
             container.innerHTML = '';
+            // れんしゅうは、冒険の解放状況に関係なく最初から1～9のだんをすべて選べる。
             for (let s = 1; s <= 9; s++) {
                 const btn = document.createElement('div');
                 btn.className = 'stage-item unlocked';
                 btn.textContent = `${s}のだんを れんしゅうする`;
-                btn.onclick = () => startPractice(s);
+                btn.onclick = () => startPractice(s, false);
                 container.appendChild(btn);
+
+                const reverseBtn = document.createElement('div');
+                reverseBtn.className = 'stage-item practice-reverse';
+                reverseBtn.textContent = `↔️ ${s}のだん さかさまを れんしゅうする`;
+                reverseBtn.onclick = () => startPractice(s, true);
+                container.appendChild(reverseBtn);
             }
             switchScreen('practice-stage-select-screen');
         }
 
-        function startPractice(stageNum) {
+        function startPractice(stageNum, reverseMode = false) {
             practiceStage = stageNum;
+            practiceReverseMode = reverseMode;
             practiceIndex = 0;
             flashcardState = 0;
             playBGM('practice');
 
-            document.getElementById('practice-stage-title').textContent = `${practiceStage}のだん`;
+            document.getElementById('practice-stage-title').textContent = reverseMode
+                ? `${practiceStage}のだん さかさまの じゅんび`
+                : `${practiceStage}のだんの じゅんび`;
             switchScreen('practice-screen');
             updateFlashcardDisplay();
             playPracticeCurrentAudio();
         }
 
         function updateFlashcardDisplay() {
-            const b = practiceIndex + 1;
+            // さかさま練習は、○のだんを固定し、かける数だけ 9→1 にする。
+            // 例：1×9 → 1×8 → … → 1×1
+            const b = practiceReverseMode ? 9 - practiceIndex : practiceIndex + 1;
             const data = kukuData[practiceStage][b];
             document.getElementById('practice-counter').textContent = `${practiceIndex + 1}/9`;
 
@@ -2208,8 +2381,10 @@
         }
 
         function playPracticeCurrentAudio() {
-            const b = practiceIndex + 1;
-            const filename = flashcardState === 0 ? `${practiceStage}-${b}_1.wav` : `${practiceStage}-${b}_2.wav`;
+            const b = practiceReverseMode ? 9 - practiceIndex : practiceIndex + 1;
+            const audioA = practiceStage;
+            const audioB = b;
+            const filename = flashcardState === 0 ? `${audioA}-${audioB}_1.wav` : `${audioA}-${audioB}_2.wav`;
             const audioPath = `audio/${filename}`;
             if (currentAudio) { currentAudio.pause(); }
             currentAudio = new Audio(audioPath);
@@ -2224,7 +2399,7 @@
             } else {
                 practiceIndex++;
                 if (practiceIndex >= 9) {
-                    alert(`${practiceStage}のだんの れんしゅうが おわったよ！`);
+                    alert(`${practiceStage}のだん${practiceReverseMode ? ' さかさま' : ''}の れんしゅうが おわったよ！`);
                     showPracticeStageSelect();
                 } else {
                     flashcardState = 0;
@@ -2273,6 +2448,102 @@
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
         }
 
+
+        function getMistakePool() {
+            return Object.keys(saveData.mistakeProblems || {}).filter(k => Number(saveData.mistakeProblems[k]) > 0);
+        }
+
+        function openSpecialPractice() {
+            const count = getMistakePool().length;
+            document.getElementById('special-practice-count').textContent = count ? `いま とっくんする九九は ${count}もん あるよ。` : 'まだ まちがえた九九は ありません。';
+            switchScreen('special-practice-info-screen');
+        }
+
+        function showSpecialPracticeInfo() { openSpecialPractice(); }
+
+        function startSpecialPractice() {
+            const pool = getMistakePool();
+            if (!pool.length) { showPopup('まちがえた九九は ありません！'); return; }
+            specialPracticeProblems = pool.map(key => { const [a,b] = key.split('x').map(Number); return {a,b,key}; });
+            specialPracticeProblems.sort(() => Math.random() - 0.5);
+            specialPracticeIndex = 0;
+            specialPracticeInput = '';
+            specialPracticeLocked = false;
+            switchScreen('special-practice-screen');
+            loadSpecialPracticeProblem();
+        }
+
+        function clearSpecialPracticeKeyGlow() {
+            document.querySelectorAll('#special-practice-keypad .pixel-key').forEach(k => k.classList.remove('hint-glow'));
+        }
+
+        function showSpecialPracticeHint() {
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            if (!p) return;
+            const ansStr = String(p.a * p.b);
+            for (const char of ansStr) {
+                const btn = document.getElementById(`spkey-${char}`);
+                if (btn) btn.classList.add('hint-glow');
+            }
+        }
+
+        function playSpecialPracticeAudio() {
+            if (!specialPracticeProblems.length) return;
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            const audioPath = `audio/${p.a}-${p.b}_1.wav`;
+            if (currentAudio) currentAudio.pause();
+            currentAudio = new Audio(audioPath);
+            currentAudio.play().catch(e => {});
+        }
+
+        function loadSpecialPracticeProblem() {
+            if (!specialPracticeProblems.length) return;
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            document.getElementById('special-practice-counter').textContent = `${specialPracticeIndex + 1}`;
+            document.getElementById('special-practice-problem').textContent = `${p.a} × ${p.b}`;
+            document.getElementById('special-practice-kana').textContent = (kukuData[p.a] && kukuData[p.a][p.b]) ? kukuData[p.a][p.b].first : '';
+            specialPracticeInput = ''; specialPracticeLocked = false;
+            clearSpecialPracticeKeyGlow();
+            updateSpecialPracticeInput();
+            playSpecialPracticeAudio();
+        }
+
+        function inputSpecialPracticeNumber(num) {
+            if (specialPracticeLocked || specialPracticeInput.length >= 2) return;
+            specialPracticeInput += String(num); updateSpecialPracticeInput();
+            const p = specialPracticeProblems[specialPracticeIndex % specialPracticeProblems.length];
+            const answer = p.a * p.b;
+            if (specialPracticeInput.length === (answer >= 10 ? 2 : 1)) {
+                specialPracticeLocked = true;
+                if (Number(specialPracticeInput) === answer) {
+                    const key = p.key;
+                    const mastery = Number(saveData.practiceMastery[key] || 0) + 1;
+                    clearSpecialPracticeKeyGlow();
+                    const audioPath = `audio/${p.a}-${p.b}_2.wav`;
+                    if (currentAudio) currentAudio.pause();
+                    currentAudio = new Audio(audioPath);
+                    currentAudio.play().catch(e => {});
+                    saveData.practiceMastery[key] = mastery;
+                    if (mastery >= 3) { delete saveData.mistakeProblems[key]; delete saveData.practiceMastery[key]; showPopup(`${p.a}×${p.b}を とっくん クリア！`); } else { showPopup('せいかい！'); }
+                    saveGameData();
+                    setTimeout(() => {
+                        const remaining = getMistakePool();
+                        if (!remaining.length) { showPopup('とっくん クリア！'); setTimeout(() => showHome(), 700); return; }
+                        specialPracticeProblems = remaining.map(k => { const [a,b]=k.split('x').map(Number); return {a,b,key:k}; }).sort(() => Math.random()-0.5);
+                        specialPracticeIndex = 0; loadSpecialPracticeProblem();
+                    }, 650);
+                } else {
+                    saveData.mistakeProblems[p.key] = Number(saveData.mistakeProblems[p.key] || 0) + 1;
+                    saveData.practiceMastery[p.key] = 0; saveGameData();
+                    showPopup('ざんねん！ もういちど とっくんじゃ！');
+                    showSpecialPracticeHint();
+                    setTimeout(() => { specialPracticeInput=''; specialPracticeLocked=false; updateSpecialPracticeInput(); }, 650);
+                }
+            }
+        }
+
+        function clearSpecialPracticeInput() { if (!specialPracticeLocked) { specialPracticeInput=''; updateSpecialPracticeInput(); } }
+        function updateSpecialPracticeInput() { document.getElementById('special-practice-input').textContent = specialPracticeInput || '-'; }
 
         function openCharacterSelect() {
             renderCharacterSelect();
@@ -2479,6 +2750,8 @@
             document.getElementById('profile-combo').textContent = Number(saveData.bestCombo) || 0;
             document.getElementById('profile-correct').textContent = Number(saveData.totalCorrect) || 0;
             document.getElementById('profile-plays').textContent = Number(saveData.playCount) || 0;
+            const allClearReviewBtn = document.getElementById('all-clear-review-btn');
+            if (allClearReviewBtn) allClearReviewBtn.style.display = hasClearedAllContent() ? 'inline-block' : 'none';
 
             const titlesEl = document.getElementById('profile-titles');
             titlesEl.innerHTML = PROFILE_TITLES.map(t => {
@@ -2497,6 +2770,41 @@
                     <div class="collection-name">${earned ? b.name : '？？？'}</div>
                 </div>`;
             }).join('');
+
+            const stageTimesEl = document.getElementById('profile-stage-times');
+            stageTimesEl.innerHTML = STAGE_ORDER.map((stage) => {
+                const best = Number(saveData.stageBestTimes?.[stage]);
+                const timeText = Number.isFinite(best) ? `${best}びょう` : 'まだ クリアしていません';
+                return `<div class="map-item ${Number.isFinite(best) ? 'cleared' : ''}">
+                    <span>${STAGE_NAMES[stage]}</span>
+                    <span>⏱️ ${timeText}</span>
+                </div>`;
+            }).join('');
+
+            const randomTimesEl = document.getElementById('profile-random-times');
+            if (randomTimesEl) {
+                randomTimesEl.innerHTML = STAGE_ORDER.map((stage) => {
+                    const best = Number(saveData.randomBestTimes?.[stage]);
+                    const timeText = Number.isFinite(best) ? `${best}びょう` : 'まだ クリアしていません';
+                    return `<div class="map-item ${Number.isFinite(best) ? 'cleared' : ''}">
+                        <span>🎲 ${STAGE_NAMES[stage]}</span>
+                        <span>⏱️ ${timeText}</span>
+                    </div>`;
+                }).join('');
+            }
+
+            const nextWorldTimesEl = document.getElementById('profile-nextworld-times');
+            if (nextWorldTimesEl) {
+                nextWorldTimesEl.innerHTML = Array.from({length: 10}, (_, i) => i + 1).map((lvl) => {
+                    const best = Number(saveData.nextWorldBestTimes?.[lvl]);
+                    const timeText = Number.isFinite(best) ? `${best}びょう` : 'まだ クリアしていません';
+                    const monster = NEXT_WORLD_MONSTER_DATA[lvl]?.name || `Lv.${lvl}`;
+                    return `<div class="map-item ${Number.isFinite(best) ? 'cleared' : ''}">
+                        <span>🏰 Lv.${lvl} ${monster}</span>
+                        <span>⏱️ ${timeText}</span>
+                    </div>`;
+                }).join('');
+            }
 
             const mapEl = document.getElementById('profile-map');
             mapEl.innerHTML = STAGE_ORDER.map((stage, i) => {
@@ -2519,11 +2827,14 @@
 
             if (isCorrect) {
                 saveData.totalCorrect = (Number(saveData.totalCorrect) || 0) + 1;
+                // ステージが変わっても currentCombo はリセットしない。
                 currentCombo++;
                 updateBestCombo(currentCombo);
             } else {
+                // まちがえた時だけ連続正解をリセット。
                 currentCombo = 0;
             }
+            saveData.currentCombo = currentCombo;
 
             saveGameData();
         }
