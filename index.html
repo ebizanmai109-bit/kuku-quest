@@ -880,6 +880,7 @@
                 </div>
                 <button class="retro-btn secondary" onclick="openCharacterSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">👥 キャラクターをかえる</button>
                 <button class="retro-btn secondary" onclick="openCompanionSelect()" style="font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🐾 あいぼうをえらぶ</button>
+                <button id="all-clear-review-btn" class="retro-btn secondary" onclick="showAllClearScreen()" style="display:none; font-size: 0.85rem; padding: 6px 10px; margin-bottom: 6px;">🏆 クリア画面を もう一度みる</button>
                 <div class="profile-name" id="profile-name">ゆうしゃ</div>
                 <div class="profile-title" id="profile-title">はじめての ぼうけんしゃ</div>
 
@@ -1046,6 +1047,23 @@
                 <button class="pixel-key clear-key" onclick="clearInput()">けす</button>
                 <button class="pixel-key" onclick="inputNumber(0)">0</button>
             </div>
+        </div>
+
+        <!-- 全クリア画面 -->
+        <div id="all-clear-screen" class="screen" style="justify-content:center; overflow-y:auto;">
+            <h1 style="color:#ffcc00; margin-bottom:6px;">🎉 くくクエスト クリア！</h1>
+            <img src="image/clear.png" alt="クリア！" style="width:min(80vw,420px); max-height:32vh; object-fit:contain; image-rendering:auto; margin:4px auto 8px;">
+            <div class="rpg-window" style="max-width:720px; width:90%; margin:0 auto 10px; text-align:center;">
+                <p style="font-size:1.15rem; color:#fff; font-weight:bold;">九九のぼうけんを さいごまで クリアしたぞ！</p>
+                <p>ここまで、たくさんの九九を<br>何度もれんしゅうしてきたね。</p>
+                <p>まちがえても あきらめずに、<br>もう一度ちょうせんしたことが、<br>きみの力になっています。</p>
+                <p style="color:#ffcc00; font-weight:bold;">これからも ときどき九九をれんしゅうして、<br>すばやく、正しく答えられるように<br>力をのばしていこう。</p>
+                <p>そして、ぜひちょうせんしてみてね。</p>
+                <p style="font-size:1.15rem; color:#55ff55; font-weight:bold;">「それぞれのステージの<br>さいたんタイムを こえる！」</p>
+                <p>きのうの自分より、<br>1びょうでも はやく！<br>自分のきろくに ちょうせんしよう！</p>
+                <p style="font-size:1.25rem; color:#ff88ff; font-weight:bold;">⭐ よくがんばったね！<br>これからも 学習をつづけていこう！</p>
+            </div>
+            <button class="pixel-btn primary" onclick="returnFromAllClear()">ぼうけんしゃノートへ</button>
         </div>
 
         <!-- クリア画面 -->
@@ -1414,6 +1432,7 @@
             failedNextLevel: 1,
             clearedNextLevels: [],
             nextWorldClearCounts: {},
+            allClearShown: false,
             totalCorrect: 0,
             totalAnswered: 0,
             bestCombo: 0,
@@ -1439,6 +1458,7 @@
         if (!saveData.randomClearCounts) saveData.randomClearCounts = {};
         if (!saveData.unlockedStages.includes(1)) saveData.unlockedStages.push(1);
         if (!saveData.clearedNextLevels) saveData.clearedNextLevels = [];
+        if (typeof saveData.allClearShown !== 'boolean') saveData.allClearShown = false;
         if (typeof saveData.totalCorrect === 'undefined') saveData.totalCorrect = 0;
         if (typeof saveData.totalAnswered === 'undefined') saveData.totalAnswered = 0;
         if (typeof saveData.bestCombo === 'undefined') saveData.bestCombo = 0;
@@ -1976,6 +1996,23 @@
             setTimeout(() => { popup.classList.remove('show'); }, 600);
         }
 
+        function hasClearedAllContent() {
+            const normalCleared = STAGE_ORDER.every(s => (saveData.stageClearCounts?.[s] || 0) > 0);
+            const randomCleared = STAGE_ORDER.every(s => (saveData.randomClearCounts?.[s] || 0) > 0);
+            const castleCleared = Array.from({length: 10}, (_, i) => i + 1).every(lv => (saveData.nextWorldClearCounts?.[lv] || 0) > 0);
+            return normalCleared && randomCleared && castleCleared;
+        }
+
+        function showAllClearScreen() {
+            playBGM('home');
+            switchScreen('all-clear-screen');
+        }
+
+        function returnFromAllClear() {
+            updateProfileScreen();
+            switchScreen('profile-screen');
+        }
+
         function completeStage() {
             const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
             document.getElementById('clear-time-display').textContent = `${elapsedTime}びょう`;
@@ -2035,6 +2072,16 @@
             saveData.hp = currentBattleHp;
             localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
             updatePersistentStatus();
+
+            // すべての通常ステージ・ランダム・まおうじょうを初めてクリアしたら特別画面へ。
+            const firstAllClear = hasClearedAllContent() && !saveData.allClearShown;
+            if (firstAllClear) {
+                saveData.allClearShown = true;
+                localStorage.setItem('kuku_save_data', JSON.stringify(saveData));
+                updateProfileScreen();
+                showAllClearScreen();
+                return;
+            }
 
             switchScreen('result-screen');
         }
@@ -2567,6 +2614,8 @@
             document.getElementById('profile-combo').textContent = Number(saveData.bestCombo) || 0;
             document.getElementById('profile-correct').textContent = Number(saveData.totalCorrect) || 0;
             document.getElementById('profile-plays').textContent = Number(saveData.playCount) || 0;
+            const allClearReviewBtn = document.getElementById('all-clear-review-btn');
+            if (allClearReviewBtn) allClearReviewBtn.style.display = hasClearedAllContent() ? 'inline-block' : 'none';
 
             const titlesEl = document.getElementById('profile-titles');
             titlesEl.innerHTML = PROFILE_TITLES.map(t => {
