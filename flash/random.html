@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>ランダム九九フラッシュカード</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:#000;color:#fff}
+button{font:inherit}
+#app{display:none;width:100%;height:100dvh;max-width:520px;margin:auto;background:#fff;color:#000;flex-direction:column}
+.header{padding:10px 12px 7px;text-align:center;border-bottom:2px solid #000;flex:none}
+.title{font-size:clamp(22px,6vw,30px);font-weight:900}
+.guide{text-align:center;font-size:clamp(17px,4.8vw,22px);font-weight:900;line-height:1.35;padding:7px 8px 4px;flex:none}
+.guide div+div{font-size:clamp(14px,4vw,18px);margin-top:2px}
+.progress{padding:2px 12px 7px;flex:none}
+.progress-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-size:12px;font-weight:900}
+#timer{font-size:18px}
+#stage{text-align:right}
+.bar{height:6px;border:1px solid #000;margin-top:4px}
+.fill{height:100%;width:0;background:#000}
+.main{flex:1;min-height:0;padding:5px 12px 8px;display:flex;flex-direction:column}
+.card-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+.card{width:100%;height:100%;max-height:470px;background:#fff;border:3px solid #000;border-radius:16px;color:#000;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;touch-action:manipulation;outline:none}
+.view{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:15px}
+.reading{font-size:clamp(28px,8vw,46px);font-weight:900;margin-bottom:12px}
+.question{font-size:clamp(58px,17vw,94px);font-weight:900;line-height:1}
+.answer{font-size:clamp(27px,7.5vw,40px);font-weight:900;color:#d00000;margin-bottom:18px}
+.next-reading{font-size:clamp(27px,7.5vw,42px);font-weight:900;margin-bottom:5px}
+.next-question{font-size:clamp(52px,15vw,84px);font-weight:900;line-height:1}
+.last-answer{font-size:clamp(35px,10vw,58px);font-weight:900;color:#d00000}
+.controls{flex:none;padding-top:7px;padding-bottom:env(safe-area-inset-bottom, 4px)}
+.wrong{width:100%;min-height:45px;border:2px solid #000;background:#fff;color:#000;font-weight:900;border-radius:10px}
+.screen{position:fixed;inset:0;background:#111;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}
+.screen.show{display:flex}
+.mission{width:min(100%,500px);background:#fff;color:#000;border:3px solid #000;border-radius:14px;padding:20px}
+.mission-title{text-align:center;font-size:clamp(27px,8vw,40px);font-weight:900;margin-bottom:12px}
+.mission-text{font-size:clamp(16px,4.6vw,20px);font-weight:800;line-height:1.65}
+.mission-note{margin-top:12px;padding:10px;border:2px solid #000;font-size:clamp(15px,4.2vw,18px);font-weight:800;line-height:1.55}
+.start{width:100%;margin-top:15px;min-height:52px;border:2px solid #000;background:#000;color:#fff;border-radius:10px;font-weight:900}
+.complete{text-align:center}
+.complete-title{font-size:clamp(30px,9vw,46px);font-weight:900}
+.complete-time{font-size:clamp(25px,7vw,35px);font-weight:900;margin:15px 0}
+.restart{min-height:50px;padding:10px 20px;border:2px solid #000;background:#000;color:#fff;border-radius:10px;font-weight:900}
+@media(max-height:650px){
+ .header{padding:6px 10px 4px}.guide{padding:4px 6px 2px}.main{padding-top:3px}
+ .card{max-height:none}.controls{padding-top:5px}.wrong{min-height:40px}
+}
+
+.two-cards{
+  width:100%;
+  height:auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  justify-content:center;
+}
+.card{
+  flex:none;
+  height:clamp(145px,25vh,220px);
+  background:#fff;
+  color:#000;
+  border:2px solid #000;
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  touch-action:manipulation;
+  user-select:none;
+}
+.answer-card{color:#d00000}
+.card-reading{
+  font-size:clamp(25px,7vw,40px);
+  font-weight:900;
+  line-height:1.15;
+  margin-bottom:8px;
+}
+.card-answer{
+  font-size:clamp(45px,13vw,75px);
+  font-weight:900;
+  line-height:1;
+}
+.card-question{
+  font-size:clamp(48px,14vw,82px);
+  font-weight:900;
+  line-height:1;
+}
+.answer-card.empty{
+  color:#777;
+}
+.answer-card.empty .card-reading::after{
+  content:'ここに前の答え';
+}
+@media(max-height:650px){
+  .two-cards{gap:4px}
+  .card-reading{margin-bottom:5px}
+}
+
+
+.card-section{
+  display:flex;
+  flex-direction:column;
+  flex:none;
+}
+.card-label{
+  text-align:center;
+  font-size:clamp(13px,3.5vw,17px);
+  font-weight:800;
+  line-height:1.2;
+  margin:1px 0 3px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="header"><div class="title">じゅんばん九九フラッシュカード</div></header>
+  <div class="guide">
+    <div>声にだして、もんだいとこたえを言おう！</div>
+    <div>まちがえたらさいしょからやりなおそうね！</div>
+  </div>
+  <div class="progress">
+    <div class="progress-top">
+      <span id="counter">1 / 81</span>
+      <span id="timer">0分00秒</span>
+      <span id="stage">1のだん</span>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <main class="main">
+    <div class="card-wrap">
+  <div class="two-cards" id="twoCards">
+    <div class="card-section">
+      <div class="card-label">↓前のカードの答えだよ</div>
+      <div class="card answer-card" id="answerCard">
+      <div class="card-reading" id="answerReading"></div>
+      <div class="card-answer" id="answerText"></div>
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="card-label">↓つぎのもんだいだよ</div>
+      <div class="card question-card" id="questionCard">
+      <div class="card-reading" id="questionReading"></div>
+      <div class="card-question" id="questionText"></div>
+    </div>
+  </div>
+</div></div>
+    <div class="controls">
+      <button class="wrong" id="wrong" type="button">言いまちがえたので、やり直す</button>
+    </div>
+  </main>
+</div>
+
+<div class="screen show" id="intro">
+  <div class="mission">
+    <div class="mission-title">ミッション！</div>
+    <div class="mission-text">
+      九九をぜんぶクリアしたあなたへ！<br>
+      九九81問をランダムなじゅんばんで、まちがえずに言おう。<br>
+      ぜんぶ言い終わるまで、なんぷんなんびょうかかるかな？
+    </div>
+    <div class="mission-note">
+      フラッシュカードの問題を声にだして読もう。<br>
+      答えを自分で言ってから、カードをめくろう。<br>
+      言いまちがえたら、さいしょからやりなおそう！
+    </div>
+    <button class="start" id="start" type="button">チャレンジをはじめる</button>
+  </div>
+</div>
+
+<div class="screen" id="complete">
+  <div class="mission complete">
+    <div class="complete-title">九九コンプリート！</div>
+    <div class="complete-time" id="elapsed"></div>
+    <button class="restart" id="restart" type="button">もういちどチャレンジ</button>
+  </div>
+</div>
+
+<script>
+const readings=[
+ ['いんいち','いんに','いんさん','いんし','いんご','いんろく','いんしち','いんはち','いんく'],
+ ['にいち','ににん','にさん','にし','にご','にろく','にしち','にはち','にく'],
+ ['さんいち','さんに','さざん','さんし','さんご','さぶろく','さんしち','さんぱ','さんく'],
+ ['しいち','しに','しさん','しし','しご','しろく','ししち','しは','しく'],
+ ['ごいち','ごに','ごさん','ごし','ごご','ごろく','ごしち','ごは','ごっく'],
+ ['ろくいち','ろくに','ろくさん','ろくし','ろくご','ろくろく','ろくしち','ろくは','ろっく'],
+ ['しちいち','しちに','しちさん','しちし','しちご','しちろく','しちしち','しちは','しちく'],
+ ['はちいち','はちに','はちさん','はちし','はちご','はちろく','はちしち','はっぱ','はっく'],
+ ['くいち','くに','くさん','くし','くご','くろく','くしち','くは','くく']
+];
+
+const numberReading={
+1:'いち',2:'に',3:'さん',4:'し',5:'ご',6:'ろく',7:'しち',8:'はち',9:'く',
+10:'じゅう',11:'じゅういち',12:'じゅうに',13:'じゅうさん',14:'じゅうし',15:'じゅうご',
+16:'じゅうろく',17:'じゅうしち',18:'じゅうはち',19:'じゅうく',
+20:'にじゅう',21:'にじゅういち',22:'にじゅうに',23:'にじゅうさん',24:'にじゅうし',
+25:'にじゅうご',26:'にじゅうろく',27:'にじゅうしち',28:'にじゅうはち',29:'にじゅうく',
+30:'さんじゅう',31:'さんじゅういち',32:'さんじゅうに',33:'さんじゅうさん',34:'さんじゅうし',
+35:'さんじゅうご',36:'さんじゅうろく',37:'さんじゅうしち',38:'さんじゅうはち',39:'さんじゅうく',
+40:'しじゅう',41:'しじゅういち',42:'しじゅうに',43:'しじゅうさん',44:'しじゅうし',
+45:'しじゅうご',46:'しじゅうろく',47:'しじゅうしち',48:'しじゅうはち',49:'しじゅうく',
+50:'ごじゅう',51:'ごじゅういち',52:'ごじゅうに',53:'ごじゅうさん',54:'ごじゅうし',
+55:'ごじゅうご',56:'ごじゅうろく',57:'ごじゅうしち',58:'ごじゅうはち',59:'ごじゅうく',
+60:'ろくじゅう',61:'ろくじゅういち',62:'ろくじゅうに',63:'ろくじゅうさん',64:'ろくじゅうし',
+65:'ろくじゅうご',66:'ろくじゅうろく',67:'ろくじゅうしち',68:'ろくじゅうはち',69:'ろくじゅうく',
+70:'しちじゅう',71:'しちじゅういち',72:'しちじゅうに',73:'しちじゅうさん',74:'しちじゅうし',
+75:'しちじゅうご',76:'しちじゅうろく',77:'しちじゅうしち',78:'しちじゅうはち',79:'しちじゅうく',
+80:'はちじゅう',81:'はちじゅういち'
+};
+
+const cards=[];
+for(let a=1;a<=9;a++){
+  for(let b=1;b<=9;b++){
+    cards.push({a,b,p:a*b,r:readings[a-1][b-1]});
+  }
+}
+
+function shuffleCards(){
+  for(let i=cards.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [cards[i],cards[j]]=[cards[j],cards[i]];
+  }
+}
+
+let index=0;
+let startTime=0;
+let timerId=null;
+
+const $=id=>document.getElementById(id);
+
+function fmt(ms){
+  const s=Math.floor(ms/1000);
+  return Math.floor(s/60)+'分'+String(s%60).padStart(2,'0')+'秒';
+}
+function tick(){
+  if(startTime) $('timer').textContent=fmt(Date.now()-startTime);
+}
+
+function render(){
+  const c=cards[index];
+  $('counter').textContent=(index+1)+' / 81';
+  $('stage').textContent='ランダム九九';
+  $('fill').style.width=((index+1)/81*100)+'%';
+
+  // Upper card = previous card's answer.
+  if(index===0){
+    $('answerCard').classList.add('empty');
+    $('answerReading').textContent='';
+    $('answerText').textContent='';
+  }else{
+    const prev=cards[index-1];
+    $('answerCard').classList.remove('empty');
+    $('answerReading').textContent=numberReading[prev.p];
+    $('answerText').textContent=String(prev.p);
+  }
+
+  // Lower card = current question.
+  $('questionReading').textContent=c.r;
+  $('questionText').textContent=c.a+' × '+c.b;
+
+  // Keep restart button fixed in the layout; hidden only before the first answer exists.
+  tick();
+}
+
+function begin(){
+  clearInterval(timerId);
+  shuffleCards();
+  index=0;
+  startTime=Date.now();
+  $('timer').textContent='0分00秒';
+  $('intro').classList.remove('show');
+  $('complete').classList.remove('show');
+  $('app').style.display='flex';
+  timerId=setInterval(tick,100);
+  render();
+}
+
+function next(){
+  if(index<80){
+    index++;
+    render();
+    return;
+  }
+  clearInterval(timerId);
+  const elapsed=Date.now()-startTime;
+  $('timer').textContent=fmt(elapsed);
+  $('elapsed').textContent='かかった時間：'+fmt(elapsed);
+  $('complete').classList.add('show');
+}
+
+$('start').addEventListener('click',begin);
+$('restart').addEventListener('click',begin);
+$('wrong').addEventListener('click',begin);
+
+// Either card advances to the next page.
+$('answerCard').addEventListener('click',next);
+$('questionCard').addEventListener('click',next);
+$('answerCard').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();next();}
+});
+$('questionCard').addEventListener('keydown',e=>{
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();next();}
+});
+</script>
+</body>
+</html>
